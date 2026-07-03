@@ -1,4 +1,8 @@
 import ProductGrid from "../../components/product/ProductGrid";
+import ProductQuickView from "../../components/product/ProductQuickView";
+import SearchBar from "../../components/product/SearchBar";
+import FilterBar from "../../components/product/FilterBar";
+
 import useProducts from "../../hooks/useProducts";
 import useFilterStore from "../../store/useFilterStore";
 
@@ -13,10 +17,20 @@ const Home = () => {
   });
 
   return (
-    <div className="mx-auto max-w-7xl p-6">
-      <h1 className="text-3xl font-bold mb-4">J.Rome POS</h1>
+    <div className="max-w-7xl mx-auto p-4">
+      {/* POS CONTROLS */}
+      <SearchBar />
+      <FilterBar />
 
-      <ProductGrid products={products || []} />
+      {/* PRODUCT GRID */}
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <ProductGrid products={products || []} />
+      )}
+
+      {/* GLOBAL DRAWER */}
+      <ProductQuickView />
     </div>
   );
 };
