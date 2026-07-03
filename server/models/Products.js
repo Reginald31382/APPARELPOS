@@ -6,24 +6,22 @@ const variantSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     size: {
       type: String,
       required: true,
     },
-
     quantity: {
       type: Number,
       default: 0,
     },
-
     sku: {
       type: String,
       required: true,
-      unique: true,
     },
-
-    barcode: String,
+    barcode: {
+      type: String,
+      default: "",
+    },
   },
   {
     _id: true,
