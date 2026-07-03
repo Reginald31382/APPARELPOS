@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-import Home from "../pages/customer/Home";
+import PosLayout from "../layouts/PosLayout";
 import Product from "../pages/customer/Product";
 import Checkout from "../pages/customer/Checkout";
 
@@ -23,7 +23,7 @@ const AppRoutes = () => {
     <Routes>
       {/* Customer */}
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<PosLayout />} />
         <Route path="/product/:id" element={<Product />} />
         <Route path="/checkout" element={<Checkout />} />
       </Route>

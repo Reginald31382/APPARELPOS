@@ -1,76 +1,92 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+const TAX_RATE = 0.06;
+
 const useCartStore = create(
   persist(
     (set, get) => ({
-      cart: [],
+      items: [],
 
-      addToCart: (product, variant) => {
-        const cart = get().cart;
+      addItem: (item) => {
+        const items = [...get().items];
 
-        const existingItemIndex = cart.findIndex(
-          (item) =>
-            item.productId === product._id && item.variant.sku === variant.sku,
-        );
+        const existingIndex = items.findIndex((i) => i.sku === item.sku);
 
-        if (existingItemIndex !== -1) {
-          const updatedCart = [...cart];
+        if (existingIndex !== -1) {
+          if (items[existingIndex].quantity >= item.stock) {
+            return;
+          }
 
-          updatedCart[existingItemIndex].quantity += 1;
+          items[existingIndex].quantity += 1;
 
-          set({ cart: updatedCart });
+          set({ items });
+
           return;
         }
 
+        items.push({
+          ...item,
+          quantity: 1,
+        });
+
+        set({ items });
+      },
+
+      removeItem: (sku) => {
         set({
-          cart: [
-            ...cart,
-            {
-              productId: product._id,
-              name: product.name,
-              price: product.price,
-              image: product.images?.[0],
-              variant: {
-                color: variant.color,
-                size: variant.size,
-                sku: variant.sku,
-              },
-              quantity: 1,
-            },
-          ],
+          items: get().items.filter((item) => item.sku !== sku),
         });
       },
 
-      removeFromCart: (sku) => {
-        set({
-          cart: get().cart.filter((item) => item.variant.sku !== sku),
-        });
+      increaseQuantity: (sku) => {
+        const items = [...get().items];
+
+        const item = items.find((i) => i.sku === sku);
+
+        if (!item) return;
+
+        if (item.quantity >= item.stock) return;
+
+        item.quantity++;
+
+        set({ items });
       },
 
-      updateQuantity: (sku, quantity) => {
-        const cart = get().cart.map((item) =>
-          item.variant.sku === sku ? { ...item, quantity } : item,
-        );
+      decreaseQuantity: (sku) => {
+        const items = [...get().items];
 
-        set({ cart });
+        const item = items.find((i) => i.sku === sku);
+
+        if (!item) return;
+
+        if (item.quantity === 1) {
+          set({
+            items: items.filter((i) => i.sku !== sku),
+          });
+
+          return;
+        }
+
+        item.quantity--;
+
+        set({ items });
       },
 
-      clearCart: () => set({ cart: [] }),
+      clearCart: () => set({ items: [] }),
 
-      getTotal: () => {
-        return get().cart.reduce(
-          (total, item) => total + item.price * item.quantity,
+      subtotal: () =>
+        get().items.reduce(
+          (total, item) => total + item.unitPrice * item.quantity,
           0,
-        );
-      },
+        ),
 
-      getItemCount: () => {
-        return get().cart.reduce((count, item) => count + item.quantity, 0);
-      },
+      tax: () => get().subtotal() * TAX_RATE,
+
+      total: () => get().subtotal() + get().tax(),
     }),
     {
-      name: "pos-cart",
+      name: "jrome-pos-cart",
     },
   ),
 );

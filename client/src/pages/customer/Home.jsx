@@ -1,5 +1,5 @@
 import ProductGrid from "../../components/product/ProductGrid";
-import ProductQuickView from "../../components/product/ProductQuickView";
+// import ProductQuickView from "../../components/product/ProductQuickView";
 import SearchBar from "../../components/product/SearchBar";
 import FilterBar from "../../components/product/FilterBar";
 
@@ -30,7 +30,7 @@ const Home = () => {
       )}
 
       {/* GLOBAL DRAWER */}
-      <ProductQuickView />
+      {/* <ProductQuickView /> */}
     </div>
   );
 };

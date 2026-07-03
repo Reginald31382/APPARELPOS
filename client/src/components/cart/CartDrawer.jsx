@@ -1,54 +1,66 @@
 import useCartStore from "../../store/useCartStore";
 
 const CartDrawer = () => {
-  const cart = useCartStore((state) => state.cart);
-  const removeFromCart = useCartStore((state) => state.removeFromCart);
-  const updateQuantity = useCartStore((state) => state.updateQuantity);
-  const getTotal = useCartStore((state) => state.getTotal);
+  const items = useCartStore((state) => state.items);
+
+  const increaseQuantity = useCartStore((state) => state.increaseQuantity);
+
+  const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
+
+  const removeItem = useCartStore((state) => state.removeItem);
+
+  const subtotal = useCartStore((state) => state.subtotal);
+
+  const tax = useCartStore((state) => state.tax);
+
+  const total = useCartStore((state) => state.total);
 
   return (
-    <div className="fixed right-0 top-0 h-full w-96 border-l bg-white shadow-lg">
-      <div className="border-b p-4 text-xl font-bold">Cart</div>
+    <div className="flex h-full flex-col border-l">
+      <div className="border-b p-4 text-xl font-bold">Shopping Cart</div>
+      <div className="border-b p-4">
+        <h2 className="text-xl font-bold">Current Sale</h2>
+      </div>
+      <div className="flex-1 overflow-y-auto space-y-4 p-4">
+        {items.length === 0 && (
+          <p className="text-gray-500">Your cart is empty.</p>
+        )}
 
-      <div className="h-[75vh] overflow-y-auto p-4 space-y-4">
-        {cart.length === 0 && <p className="text-gray-500">Cart is empty</p>}
+        {items.map((item) => (
+          <div key={item.sku} className="rounded-lg border p-4">
+            <img
+              src={item.image}
+              alt={item.name}
+              className="mb-3 h-28 w-full rounded object-cover"
+            />
 
-        {cart.map((item) => (
-          <div key={item.variant.sku} className="rounded-lg border p-3">
-            <h4 className="font-bold">{item.name}</h4>
+            <h3 className="font-semibold">{item.name}</h3>
 
             <p className="text-sm text-gray-500">
-              {item.variant.color} / {item.variant.size}
+              {item.color} / {item.size}
             </p>
 
-            <p className="text-blue-600 font-bold">${item.price}</p>
+            <p className="font-bold">${item.unitPrice.toFixed(2)}</p>
 
-            <div className="flex items-center gap-2 mt-2">
+            <div className="mt-3 flex items-center gap-2">
               <button
-                onClick={() =>
-                  updateQuantity(
-                    item.variant.sku,
-                    Math.max(1, item.quantity - 1),
-                  )
-                }
-                className="px-2 py-1 border"
+                onClick={() => decreaseQuantity(item.sku)}
+                className="rounded border px-3 py-1"
               >
-                -
+                −
               </button>
 
               <span>{item.quantity}</span>
 
               <button
-                onClick={() =>
-                  updateQuantity(item.variant.sku, item.quantity + 1)
-                }
-                className="px-2 py-1 border"
+                onClick={() => increaseQuantity(item.sku)}
+                className="rounded border px-3 py-1"
               >
                 +
               </button>
 
               <button
-                onClick={() => removeFromCart(item.variant.sku)}
+                onClick={() => removeItem(item.sku)}
                 className="ml-auto text-red-500"
               >
                 Remove
@@ -58,13 +70,26 @@ const CartDrawer = () => {
         ))}
       </div>
 
-      <div className="border-t p-4">
-        <div className="flex justify-between font-bold text-lg">
-          <span>Total</span>
-          <span>${getTotal().toFixed(2)}</span>
+      <div className="space-y-2 border-t p-4">
+        <div className="flex justify-between">
+          <span>Subtotal</span>
+
+          <span>${subtotal().toFixed(2)}</span>
         </div>
 
-        <button className="mt-4 w-full rounded-lg bg-green-600 py-3 text-white">
+        <div className="flex justify-between">
+          <span>Tax</span>
+
+          <span>${tax().toFixed(2)}</span>
+        </div>
+
+        <div className="flex justify-between text-lg font-bold">
+          <span>Total</span>
+
+          <span>${total().toFixed(2)}</span>
+        </div>
+
+        <button className="mt-4 w-full rounded-lg bg-green-600 py-3 text-white hover:bg-green-700">
           Checkout
         </button>
       </div>

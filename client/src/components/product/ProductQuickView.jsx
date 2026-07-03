@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import useCartStore from "../../store/useCartStore";
+import useProductStore from "../../store/useProductStore";
 
 import {
   Sheet,
@@ -7,15 +9,15 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import useProductStore from "../../store/useProductStore";
-
 const ProductQuickView = () => {
   const { isOpen, selectedProduct, closeProduct } = useProductStore();
+
+  const addItem = useCartStore((state) => state.addItem);
 
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
 
-  // Reset selections whenever a different product is opened
+  // Reset selections when product changes
   useEffect(() => {
     if (selectedProduct) {
       setSelectedColor(null);
@@ -23,9 +25,7 @@ const ProductQuickView = () => {
     }
   }, [selectedProduct]);
 
-  if (!selectedProduct) return null;
-
-  const variants = selectedProduct.variants || [];
+  const variants = selectedProduct?.variants || [];
 
   const colors = [...new Set(variants.map((v) => v.color))];
 
@@ -49,9 +49,12 @@ const ProductQuickView = () => {
     (v) => v.color === selectedColor && v.size === selectedSize,
   );
 
+  // ✅ SAFE GUARD (NO HOOKS AFTER THIS)
+  if (!selectedProduct) return null;
+
   return (
     <Sheet open={isOpen} onOpenChange={closeProduct}>
-      <SheetContent className="w-[450px] overflow-y-auto p-6">
+      <SheetContent className="w-112.5 overflow-y-auto p-6">
         <SheetHeader>
           <SheetTitle>{selectedProduct.name}</SheetTitle>
         </SheetHeader>
@@ -144,7 +147,21 @@ const ProductQuickView = () => {
           {/* ADD TO CART */}
           <button
             disabled={!selectedVariant || selectedVariant.quantity <= 0}
-            className="w-full rounded bg-black py-3 text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={() => {
+              addItem({
+                productId: selectedProduct._id,
+                sku: selectedVariant.sku,
+                image: selectedProduct.images[0],
+                name: selectedProduct.name,
+                color: selectedVariant.color,
+                size: selectedVariant.size,
+                unitPrice: selectedProduct.price,
+                stock: selectedVariant.quantity,
+              });
+
+              closeProduct();
+            }}
+            className="w-full rounded bg-black py-3 text-white transition disabled:opacity-50"
           >
             Add to Cart
           </button>

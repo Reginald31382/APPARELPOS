@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import CartDrawer from "../components/cart/CartDrawer";
 
 const MainLayout = () => {
   return (
@@ -12,8 +11,6 @@ const MainLayout = () => {
         <main className="flex-1">
           <Outlet />
         </main>
-
-        <CartDrawer />
       </div>
 
       <Footer />
