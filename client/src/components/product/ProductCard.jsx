@@ -1,4 +1,10 @@
+import useCartStore from "../../store/useCartStore";
+
 const ProductCard = ({ product }) => {
+  const addToCart = useCartStore((state) => state.addToCart);
+
+  const firstVariant = product.variants?.[0];
+
   return (
     <div className="overflow-hidden rounded-xl border bg-white shadow transition hover:shadow-lg">
       <img
@@ -14,7 +20,10 @@ const ProductCard = ({ product }) => {
 
         <p className="text-xl font-bold text-blue-600">${product.price}</p>
 
-        <button className="w-full rounded-lg bg-blue-600 py-2 text-white hover:bg-blue-700">
+        <button
+          onClick={() => addToCart(product, firstVariant)}
+          className="w-full rounded-lg bg-blue-600 py-2 text-white hover:bg-blue-700"
+        >
           Add To Cart
         </button>
       </div>
