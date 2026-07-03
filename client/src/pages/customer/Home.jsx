@@ -1,24 +1,22 @@
 import ProductGrid from "../../components/product/ProductGrid";
 import useProducts from "../../hooks/useProducts";
+import useFilterStore from "../../store/useFilterStore";
 
 const Home = () => {
-  const { data: products, isLoading, error } = useProducts();
+  const { search, category, brand, featured } = useFilterStore();
 
-  if (isLoading)
-    return <div className="p-10 text-center">Loading products...</div>;
-
-  if (error)
-    return (
-      <div className="p-10 text-center text-red-500">
-        Error loading products
-      </div>
-    );
+  const { data: products, isLoading } = useProducts({
+    search,
+    category,
+    brand,
+    featured,
+  });
 
   return (
-    <div className="mx-auto max-w-7xl p-8">
-      <h1 className="mb-6 text-4xl font-bold">J.Rome Apparel POS</h1>
+    <div className="mx-auto max-w-7xl p-6">
+      <h1 className="text-3xl font-bold mb-4">J.Rome POS</h1>
 
-      <ProductGrid products={products} />
+      <ProductGrid products={products || []} />
     </div>
   );
 };
