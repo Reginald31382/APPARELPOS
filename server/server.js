@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 
 import productRoutes from "./routes/products.js";
+import customerRoutes from "./routes/customers.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/products", productRoutes);
+app.use("/api/customers", customerRoutes);
 
 // app.post("/test", (req, res) => {
 //   console.log("TEST BODY:", req.body);

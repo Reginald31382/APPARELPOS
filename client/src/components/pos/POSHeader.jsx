@@ -1,5 +1,10 @@
 import useProductStore from "../../store/useProductStore";
 import CartSummary from "./CartSummary";
+import CustomerSearch from "../customer/CustomerSearch";
+import CustomerDropdown from "../customer/CustomerDropdown";
+import CustomerCard from "../customer/CustomerCard";
+
+import useCustomerStore from "../../store/useCustomerStore";
 
 const categories = ["All", "Men", "Women", "Kids", "Accessories", "Shoes"];
 
@@ -16,12 +21,22 @@ const POSHeader = () => {
     setSort,
   } = useProductStore();
 
+  const customer = useCustomerStore((state) => state.selectedCustomer);
+
   return (
     <div className="space-y-4 border-b bg-white p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">J.Rome POS</h1>
 
         <CartSummary />
+      </div>
+
+      {/* Customer Section */}
+      <div>
+        <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
+          Customer
+        </h2>
+        <CustomerAutocomplete />
       </div>
 
       <input

@@ -3,7 +3,7 @@ import ProductGrid from "../../components/product/ProductGrid";
 import SearchBar from "../../components/product/SearchBar";
 import FilterBar from "../../components/product/FilterBar";
 
-import useProducts from "../../hooks/useProducts";
+import useProducts from "../../layouts/hooks/useProducts";
 import useFilterStore from "../../store/useFilterStore";
 
 const Home = () => {

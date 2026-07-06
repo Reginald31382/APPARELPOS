@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import api from "../api/axios";
-import useProductStore from "../store/useProductStore";
+import api from "../../api/axios";
+import useProductStore from "../../store/useProductStore";
 
 const fetchProducts = async (filters) => {
   const params = new URLSearchParams();
