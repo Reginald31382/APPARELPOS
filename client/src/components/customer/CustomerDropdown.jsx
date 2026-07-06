@@ -1,4 +1,4 @@
-import useCustomers from "../../layouts/hooks/useCustomers";
+import useCustomers from "../../hooks/useCustomers";
 import useCustomerStore from "../../store/useCustomerStore";
 
 const CustomerDropdown = () => {

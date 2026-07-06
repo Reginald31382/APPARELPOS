@@ -1,0 +1,59 @@
+import useCheckoutStore from "../../store/useCheckoutStore";
+import useCartStore from "../../store/useCartStore";
+import useCustomerStore from "../../store/useCustomerStore";
+
+import useCheckout from "../../hooks/useCheckout";
+
+import buildOrder from "../../utils/buildOrder";
+
+const CompleteSaleButton = () => {
+  const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
+
+  const closeCheckout = useCheckoutStore((state) => state.closeCheckout);
+
+  const items = useCartStore((state) => state.items);
+  const subtotal = useCartStore((state) => state.subtotal());
+  const tax = useCartStore((state) => state.tax());
+  const total = useCartStore((state) => state.total());
+  const clearCart = useCartStore((state) => state.clearCart);
+
+  const customer = useCustomerStore((state) => state.selectedCustomer);
+
+  const clearCustomer = useCustomerStore((state) => state.clearCustomer);
+
+  const checkout = useCheckout();
+
+  const handleCompleteSale = () => {
+    if (items.length === 0) return;
+
+    const order = buildOrder({
+      items,
+      customer,
+      subtotal,
+      tax,
+      total,
+      paymentMethod,
+    });
+
+    checkout.mutate(order, {
+      onSuccess: () => {
+        clearCart();
+        clearCustomer();
+        closeCheckout();
+      },
+    });
+  };
+  console.log("Checkout pending:", checkout.isPending);
+
+  return (
+    <button
+      disabled={items.length === 0 || checkout.isPending}
+      onClick={handleCompleteSale}
+      className="w-full rounded-lg bg-green-600 py-4 text-lg font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {checkout.isPending ? "Processing..." : "Complete Sale"}
+    </button>
+  );
+};
+
+export default CompleteSaleButton;

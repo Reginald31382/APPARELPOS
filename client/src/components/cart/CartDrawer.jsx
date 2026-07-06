@@ -1,3 +1,5 @@
+import CheckoutButton from "../checkout/CheckoutButton";
+
 import useCartStore from "../../store/useCartStore";
 
 const CartDrawer = () => {
@@ -89,9 +91,7 @@ const CartDrawer = () => {
           <span>${total().toFixed(2)}</span>
         </div>
 
-        <button className="mt-4 w-full rounded-lg bg-green-600 py-3 text-white hover:bg-green-700">
-          Checkout
-        </button>
+        <CheckoutButton />
       </div>
     </div>
   );

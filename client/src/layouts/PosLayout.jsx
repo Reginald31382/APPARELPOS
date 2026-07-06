@@ -1,6 +1,8 @@
 import POSHeader from "../components/pos/POSHeader";
 import ProductGrid from "../components/product/ProductGrid";
 import CartDrawer from "../components/cart/CartDrawer";
+import CheckoutDrawer from "../components/checkout/CheckoutDrawer";
+import ProductQuickView from "../components/product/ProductQuickView";
 
 const PosLayout = () => {
   return (
@@ -15,6 +17,8 @@ const PosLayout = () => {
 
       <div className="w-[420px] border-l bg-white">
         <CartDrawer />
+        <ProductQuickView />
+        <CheckoutDrawer />
       </div>
     </div>
   );

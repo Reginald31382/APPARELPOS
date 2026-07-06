@@ -1,5 +1,5 @@
 import ProductCard from "./ProductCard";
-import useProducts from "../../layouts/hooks/useProducts";
+import useProducts from "../../hooks/useProducts";
 
 const ProductGrid = () => {
   const { data: products = [], isLoading } = useProducts();
