@@ -2,7 +2,7 @@ import Product from "../models/Products.js";
 
 export const getProducts = async (req, res) => {
   try {
-    const { search = "", category, brand, featured } = req.query;
+    const { search = "", category, brand, featured, sort } = req.query;
 
     let query = {};
 
@@ -30,7 +30,30 @@ export const getProducts = async (req, res) => {
 
     console.log("FINAL QUERY:", JSON.stringify(query, null, 2));
 
-    const products = await Product.find(query);
+    let sortQuery = {};
+
+    switch (sort) {
+      case "priceLow":
+        sortQuery.price = 1;
+        break;
+
+      case "priceHigh":
+        sortQuery.price = -1;
+        break;
+
+      case "name":
+        sortQuery.name = 1;
+        break;
+
+      case "featured":
+        sortQuery.featured = -1;
+        break;
+
+      default:
+        sortQuery.createdAt = -1;
+    }
+
+    const products = await Product.find(query).sort(sortQuery);
 
     res.json(products);
   } catch (error) {
