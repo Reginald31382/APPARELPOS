@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 
 import productRoutes from "./routes/products.js";
 import customerRoutes from "./routes/customers.js";
+import orderRoutes from "./routes/orders.js";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
+app.use("/api/orders", orderRoutes);
 
 // app.post("/test", (req, res) => {
 //   console.log("TEST BODY:", req.body);

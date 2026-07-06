@@ -1,5 +1,6 @@
 import useProductStore from "../../store/useProductStore";
 import CartSummary from "./CartSummary";
+import CustomerAutocomplete from "../customer/CustomerAutocomplete";
 
 const categories = ["All", "Men", "Women", "Kids", "Accessories", "Shoes"];
 
@@ -39,23 +40,7 @@ const POSHeader = () => {
         className="w-full rounded-lg border p-3"
       />
 
-      <select
-        value={sort}
-        onChange={(e) => setSort(e.target.value)}
-        className="rounded border p-2"
-      >
-        <option value="newest">Newest</option>
-
-        <option value="name">A-Z</option>
-
-        <option value="priceLow">Price: lowest</option>
-
-        <option value="priceHigh">Price: highest</option>
-
-        <option value="featured">Featured</option>
-      </select>
-
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {categories.map((item) => (
           <button
             key={item}
@@ -78,7 +63,17 @@ const POSHeader = () => {
         >
           ⭐ Featured
         </button>
-
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="rounded-lg border px-3 py-2"
+        >
+          <option value="newest">Newest</option>
+          <option value="name">A-Z</option>
+          <option value="priceLow">Price ↑</option>
+          <option value="priceHigh">Price ↓</option>
+          <option value="featured">Featured</option>
+        </select>
         <button
           onClick={clearFilters}
           className="rounded-full border px-4 py-2"
