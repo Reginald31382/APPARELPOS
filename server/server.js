@@ -20,6 +20,7 @@ app.use(express.json());
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 // app.post("/test", (req, res) => {
 //   console.log("TEST BODY:", req.body);
