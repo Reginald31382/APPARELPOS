@@ -1,7 +1,7 @@
-import ProductGrid from "../../components/product/ProductGrid";
+import ProductGrid from "../../modules/product/ProductGrid";
 // import ProductQuickView from "../../components/product/ProductQuickView";
-import SearchBar from "../../components/product/SearchBar";
-import FilterBar from "../../components/product/FilterBar";
+import SearchBar from "../../modules/product/SearchBar";
+import FilterBar from "../../modules/product/FilterBar";
 
 import useProducts from "../../hooks/useProducts";
 import useFilterStore from "../../store/useFilterStore";

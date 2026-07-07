@@ -1,6 +1,6 @@
 import useProductStore from "../../store/useProductStore";
-import InventoryBadge from "../../inventory/components/InventoryBadge";
-import { getTotalInventory } from "../../inventory/utils/inventoryHelpers";
+import InventoryBadge from "../inventory/components/InventoryBadge";
+import { getTotalInventory } from "../inventory/utils/inventoryHelpers";
 
 const ProductCard = ({ product }) => {
   const openProduct = useProductStore((state) => state.openProduct);

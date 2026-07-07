@@ -1,8 +1,8 @@
 import POSHeader from "../components/pos/POSHeader";
-import ProductGrid from "../components/product/ProductGrid";
-import CartDrawer from "../components/cart/CartDrawer";
-import CheckoutDrawer from "../components/checkout/CheckoutDrawer";
-import ProductQuickView from "../components/product/ProductQuickView";
+import ProductGrid from "../modules/product/ProductGrid";
+import CartDrawer from "../modules/cart/CartDrawer";
+import CheckoutDrawer from "../modules/checkout/CheckoutDrawer";
+import ProductQuickView from "../modules/product/ProductQuickView";
 
 const PosLayout = () => {
   return (

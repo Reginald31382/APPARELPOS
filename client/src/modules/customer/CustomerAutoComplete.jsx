@@ -1,8 +1,8 @@
-import CustomerSearch from "./CustomerSearch";
-import CustomerDropdown from "./CustomerDropdown";
-import CustomerCard from "./CustomerCard";
+import CustomerSearch from "../customer/CustomerSearch";
+import CustomerDropdown from "../customer/CustomerDropdown";
+import CustomerCard from "../customer/CustomerCard";
 
-import useCustomerStore from "../../store/useCustomerStore";
+import useCustomerStore from "../../store/useCustomerStore.js";
 
 const CustomerAutocomplete = () => {
   const customer = useCustomerStore((state) => state.selectedCustomer);
