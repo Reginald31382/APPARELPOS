@@ -1,4 +1,4 @@
-import useCheckoutStore from "../../store/useCheckoutStore";
+import useCheckoutStore from "../../store/checkout/useCheckoutStore";
 import { PAYMENT_METHODS } from "../../constants/paymentMethods";
 
 const PaymentSelector = () => {

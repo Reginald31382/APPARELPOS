@@ -1,7 +1,7 @@
-import useCheckoutStore from "../../store/useCheckoutStore";
-import useCartStore from "../../store/useCartStore";
-import useCustomerStore from "../../store/useCustomerStore";
-import useReceiptStore from "../../store/useReceiptStore";
+import useCheckoutStore from "../../store/checkout/useCheckoutStore";
+import useCartStore from "../../store/cart/useCartStore";
+import useCustomerStore from "../../store/customer/useCustomerStore";
+import useReceiptStore from "../../store/receipt/useReceiptStore";
 
 import useCheckout from "../../hooks/useCheckout";
 

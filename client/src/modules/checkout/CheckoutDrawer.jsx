@@ -1,4 +1,4 @@
-import useCheckoutStore from "../../store/useCheckoutStore";
+import useCheckoutStore from "../../store/checkout/useCheckoutStore";
 import CustomerSummary from "./CustomerSummary";
 import CartReview from "./CartReview";
 import OrderSummary from "./OrderSummary";

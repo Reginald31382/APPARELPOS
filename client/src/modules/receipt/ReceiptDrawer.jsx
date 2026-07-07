@@ -1,4 +1,4 @@
-import useReceiptStore from "../../store/useReceiptStore";
+import useReceiptStore from "../../store/receipt/useReceiptStore";
 
 import ReceiptHeader from "./ReceiptHeader";
 import ReceiptItems from "./ReceiptItems";

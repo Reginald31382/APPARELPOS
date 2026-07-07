@@ -1,4 +1,4 @@
-import useProductStore from "../../store/useProductStore";
+import useProductStore from "../../store/product/useProductStore";
 import InventoryBadge from "../inventory/components/InventoryBadge";
 import { getTotalInventory } from "../inventory/utils/inventoryHelpers";
 

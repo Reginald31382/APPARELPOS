@@ -1,4 +1,4 @@
-import POSHeader from "../components/pos/POSHeader";
+import CheckoutToolbar from "../modules/checkout/CheckoutToolbar";
 import ProductGrid from "../modules/product/ProductGrid";
 import CartDrawer from "../modules/cart/CartDrawer";
 import CheckoutDrawer from "../modules/checkout/CheckoutDrawer";
@@ -9,7 +9,7 @@ const PosLayout = () => {
   return (
     <div className="flex h-screen">
       <div className="flex flex-1 flex-col">
-        <POSHeader />
+        <CheckoutToolbar />
 
         <div className="flex-1 overflow-y-auto bg-gray-50 p-5">
           <ProductGrid />

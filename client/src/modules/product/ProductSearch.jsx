@@ -1,4 +1,4 @@
-import useProductStore from "../../store/useProductStore";
+import useProductStore from "../../store/product/useProductStore";
 
 const ProductSearch = () => {
   const search = useProductStore((state) => state.search);

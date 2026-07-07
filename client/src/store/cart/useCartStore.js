@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { notifyError } from "../utils/notifications";
+import { notifyError } from "../../utils/notifications";
 
 const TAX_RATE = 0.06;
 

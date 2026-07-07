@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import useCartStore from "../../store/useCartStore";
-import useProductStore from "../../store/useProductStore";
+import useCartStore from "../../store/cart/useCartStore";
+import useProductStore from "../../store/product/useProductStore";
 
 import { formatCurrency } from "../../utils/currency";
 

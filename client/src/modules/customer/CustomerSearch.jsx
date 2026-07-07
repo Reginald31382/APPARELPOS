@@ -1,4 +1,4 @@
-import useCustomerStore from "../../store/useCustomerStore";
+import useCustomerStore from "../../store/customer/useCustomerStore";
 
 const CustomerSearch = () => {
   const search = useCustomerStore((state) => state.search);

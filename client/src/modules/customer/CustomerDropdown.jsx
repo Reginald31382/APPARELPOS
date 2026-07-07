@@ -1,5 +1,5 @@
 import useCustomers from "../../hooks/useCustomers";
-import useCustomerStore from "../../store/useCustomerStore";
+import useCustomerStore from "../../store/customer/useCustomerStore";
 
 const CustomerDropdown = () => {
   const { data: customers = [] } = useCustomers();

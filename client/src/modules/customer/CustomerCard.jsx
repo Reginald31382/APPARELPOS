@@ -1,4 +1,4 @@
-import useCustomerStore from "../../store/useCustomerStore";
+import useCustomerStore from "../../store/customer/useCustomerStore";
 
 const CustomerCard = () => {
   const customer = useCustomerStore((state) => state.selectedCustomer);

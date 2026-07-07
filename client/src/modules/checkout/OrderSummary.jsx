@@ -1,4 +1,4 @@
-import useCartStore from "../../store/useCartStore";
+import useCartStore from "../../store/cart/useCartStore";
 
 import { formatCurrency } from "../../utils/currency";
 
