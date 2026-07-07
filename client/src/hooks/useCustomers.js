@@ -1,24 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import api from "../api/axios";
-import useCustomerStore from "../store/useCustomerStore";
 
-const fetchCustomers = async (search) => {
-  const params = new URLSearchParams();
+import { QUERY_KEYS } from "../constants/queryKeys";
 
-  if (search) {
-    params.append("search", search);
-  }
+import { fetchCustomers } from "../services/customerService";
 
-  const res = await api.get(`/customers?${params.toString()}`);
-
-  return res.data;
-};
-
-const useCustomers = () => {
-  const search = useCustomerStore((state) => state.search);
-
+const useCustomers = (search = "") => {
   return useQuery({
-    queryKey: ["customers", search],
+    queryKey: [QUERY_KEYS.CUSTOMERS, search],
 
     queryFn: () => fetchCustomers(search),
 

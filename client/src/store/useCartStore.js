@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { notifyError } from "../utils/notifications";
+
 const TAX_RATE = 0.06;
 
 const useCartStore = create(
@@ -15,6 +17,7 @@ const useCartStore = create(
 
         if (existingIndex !== -1) {
           if (items[existingIndex].quantity >= item.stock) {
+            notifyError("Not enough inventory");
             return;
           }
 
@@ -46,7 +49,10 @@ const useCartStore = create(
 
         if (!item) return;
 
-        if (item.quantity >= item.stock) return;
+        if (item.quantity >= item.stock) {
+          notifyError("Not enough inventory");
+          return;
+        }
 
         item.quantity++;
 

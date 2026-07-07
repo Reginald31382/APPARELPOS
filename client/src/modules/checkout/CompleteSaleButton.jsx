@@ -1,10 +1,13 @@
 import useCheckoutStore from "../../store/useCheckoutStore";
 import useCartStore from "../../store/useCartStore";
 import useCustomerStore from "../../store/useCustomerStore";
+import useReceiptStore from "../../store/useReceiptStore";
 
 import useCheckout from "../../hooks/useCheckout";
 
-import buildOrder from "../../utils/buildOrder";
+import { notifySuccess } from "../../utils/notifications";
+
+import { buildCheckoutOrder } from "../../services/checkoutWorkflow";
 
 const CompleteSaleButton = () => {
   const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
@@ -23,10 +26,12 @@ const CompleteSaleButton = () => {
 
   const checkout = useCheckout();
 
+  const openReceipt = useReceiptStore((state) => state.openReceipt);
+
   const handleCompleteSale = () => {
     if (items.length === 0) return;
 
-    const order = buildOrder({
+    const order = buildCheckoutOrder({
       items,
       customer,
       subtotal,
@@ -37,9 +42,12 @@ const CompleteSaleButton = () => {
 
     checkout.mutate(order, {
       onSuccess: () => {
+        openReceipt(order);
         clearCart();
         clearCustomer();
         closeCheckout();
+
+        notifySuccess("Sale completed");
       },
     });
   };
