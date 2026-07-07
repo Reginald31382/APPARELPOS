@@ -1,6 +1,14 @@
-export const PAYMENT_METHODS = {
-  CASH: "Cash",
-  CARD: "Card",
-  STRIPE: "Stripe",
-  GIFT_CARD: "Gift Card",
-};
+export const PAYMENT_METHODS = [
+  {
+    label: "Cash",
+    value: "Cash",
+  },
+  {
+    label: "Card",
+    value: "Card",
+  },
+  {
+    label: "Stripe",
+    value: "Stripe",
+  },
+];

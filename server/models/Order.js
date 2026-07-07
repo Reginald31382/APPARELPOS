@@ -57,6 +57,16 @@ const orderSchema = new mongoose.Schema(
       enum: ["Pending", "Paid", "Refunded", "Cancelled"],
       default: "Pending",
     },
+    stripePaymentIntentId: {
+      type: String,
+      default: "",
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ["Pending", "Paid", "Failed", "Refunded"],
+      default: "Pending",
+    },
   },
   {
     timestamps: true,

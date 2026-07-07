@@ -1,5 +1,13 @@
 import Order from "../models/Order.js";
 
+let orderSequence = 1;
+
+const generateOrderNumber = () => {
+  const year = new Date().getFullYear();
+
+  return `JR-${year}-${String(orderSequence++).padStart(6, "0")}`;
+};
+
 /*
 GET /api/orders
 */
@@ -43,16 +51,20 @@ POST /api/orders
 */
 export const createOrder = async (req, res) => {
   try {
-    const order = await Order.create(req.body);
+    const orderData = {
+      ...req.body,
+      orderNumber: generateOrderNumber(),
+    };
+
+    const order = await Order.create(orderData);
 
     res.status(201).json(order);
   } catch (error) {
-    console.error("Create Order Error:");
+    console.error("Create Order Error");
     console.error(error);
 
     res.status(500).json({
       message: error.message,
-      stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
   }
 };

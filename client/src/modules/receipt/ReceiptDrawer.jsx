@@ -28,6 +28,22 @@ const ReceiptDrawer = () => {
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <ReceiptHeader />
 
+          <div className="rounded-lg bg-gray-50 p-4">
+            <h3 className="mb-3 font-semibold">Customer</h3>
+
+            <p>
+              {receipt.customer?.firstName && receipt.customer?.lastName
+                ? `${receipt.customer.firstName} ${receipt.customer.lastName}`
+                : "Walk-in Customer"}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-gray-50 p-4">
+            <h3 className="mb-3 font-semibold">Payment</h3>
+
+            <p>{receipt.paymentMethod}</p>
+          </div>
+
           <ReceiptItems items={receipt.items} />
 
           <ReceiptTotals
@@ -37,6 +53,13 @@ const ReceiptDrawer = () => {
           />
 
           <ReceiptFooter />
+          <div className="rounded-lg bg-green-50 p-4 text-center">
+            <p className="font-semibold">Sale Completed Successfully</p>
+
+            <p className="text-sm text-gray-600">
+              Thank you for shopping with J.Rome Apparel.
+            </p>
+          </div>
         </div>
 
         {/* Footer */}
