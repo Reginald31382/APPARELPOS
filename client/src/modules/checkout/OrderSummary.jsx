@@ -1,5 +1,7 @@
 import useCartStore from "../../store/useCartStore";
 
+import { formatCurrency } from "../../utils/currency";
+
 const OrderSummary = () => {
   const subtotal = useCartStore((state) => state.subtotal());
   const tax = useCartStore((state) => state.tax());
@@ -13,13 +15,13 @@ const OrderSummary = () => {
         <div className="flex justify-between">
           <span>Subtotal</span>
 
-          <span>${subtotal.toFixed(2)}</span>
+          <span>{formatCurrency(subtotal)}</span>
         </div>
 
         <div className="flex justify-between">
           <span>Tax</span>
 
-          <span>${tax.toFixed(2)}</span>
+          <span>{formatCurrency(tax)}</span>
         </div>
 
         {/* Future Discounts */}
@@ -35,7 +37,7 @@ const OrderSummary = () => {
         <div className="flex justify-between text-xl font-bold">
           <span>Total</span>
 
-          <span>${total.toFixed(2)}</span>
+          <span>{formatCurrency(total)}</span>
         </div>
       </div>
     </div>

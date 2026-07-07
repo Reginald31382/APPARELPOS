@@ -2,6 +2,8 @@ import useProductStore from "../../store/useProductStore";
 import InventoryBadge from "../inventory/components/InventoryBadge";
 import { getTotalInventory } from "../inventory/utils/inventoryHelpers";
 
+import { formatCurrency } from "../../utils/currency";
+
 const ProductCard = ({ product }) => {
   const openProduct = useProductStore((state) => state.openProduct);
 
@@ -17,7 +19,7 @@ const ProductCard = ({ product }) => {
 
       <h2 className="mt-2 font-semibold">{product.name}</h2>
 
-      <p className="text-sm text-gray-500">${product.price}</p>
+      <p className="text-sm text-gray-500">{formatCurrency(product.price)}</p>
 
       <InventoryBadge quantity={getTotalInventory(product.variants)} />
     </div>

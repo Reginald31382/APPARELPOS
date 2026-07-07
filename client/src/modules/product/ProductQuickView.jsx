@@ -2,12 +2,16 @@ import { useState, useEffect } from "react";
 import useCartStore from "../../store/useCartStore";
 import useProductStore from "../../store/useProductStore";
 
+import { formatCurrency } from "../../utils/currency";
+
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+
+import { notifySuccess, notifyError } from "../../utils/notifications";
 
 const ProductQuickView = () => {
   const { isOpen, selectedProduct, closeProduct } = useProductStore();
@@ -68,7 +72,9 @@ const ProductQuickView = () => {
 
           <p className="text-gray-600">{selectedProduct.description}</p>
 
-          <p className="text-2xl font-bold">${selectedProduct.price}</p>
+          <p className="text-2xl font-bold">
+            {formatCurrency(selectedProduct.price)}
+          </p>
 
           {/* COLOR */}
           <div>
@@ -158,7 +164,7 @@ const ProductQuickView = () => {
                 unitPrice: selectedProduct.price,
                 stock: selectedVariant.quantity,
               });
-
+              notifySuccess("Added to cart");
               closeProduct();
             }}
             className="w-full rounded bg-black py-3 text-white transition disabled:opacity-50"

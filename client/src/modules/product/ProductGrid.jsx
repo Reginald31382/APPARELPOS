@@ -1,5 +1,6 @@
 import ProductCard from "./ProductCard";
 import useProducts from "../../hooks/useProducts";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
 const ProductGrid = () => {
   const { data: products = [], isLoading } = useProducts();
@@ -13,6 +14,7 @@ const ProductGrid = () => {
       {products.map((product) => (
         <ProductCard key={product._id} product={product} />
       ))}
+      <LoadingSpinner text="Loading products..." />
     </div>
   );
 };

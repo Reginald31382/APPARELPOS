@@ -2,6 +2,7 @@ import CheckoutButton from "../checkout/CheckoutButton";
 
 import useCartStore from "../../store/useCartStore";
 
+import { formatCurrency } from "../../utils/currency";
 const CartDrawer = () => {
   const items = useCartStore((state) => state.items);
 
@@ -42,7 +43,7 @@ const CartDrawer = () => {
               {item.color} / {item.size}
             </p>
 
-            <p className="font-bold">${item.unitPrice.toFixed(2)}</p>
+            <p className="font-bold">{formatCurrency(item.unitPrice)}</p>
 
             <div className="mt-3 flex items-center gap-2">
               <button
@@ -76,19 +77,19 @@ const CartDrawer = () => {
         <div className="flex justify-between">
           <span>Subtotal</span>
 
-          <span>${subtotal().toFixed(2)}</span>
+          <span>{formatCurrency(subtotal())}</span>
         </div>
 
         <div className="flex justify-between">
           <span>Tax</span>
 
-          <span>${tax().toFixed(2)}</span>
+          <span>{formatCurrency(tax())}</span>
         </div>
 
         <div className="flex justify-between text-lg font-bold">
           <span>Total</span>
 
-          <span>${total().toFixed(2)}</span>
+          <span>{formatCurrency(total())}</span>
         </div>
 
         <CheckoutButton />

@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createOrder } from "../services/checkoutServices.js";
+import { createOrder } from "../services/orderService";
 
 const useCheckout = () =>
   useMutation({
