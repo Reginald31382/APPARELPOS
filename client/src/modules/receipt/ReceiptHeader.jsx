@@ -1,4 +1,6 @@
 const ReceiptHeader = ({ receipt }) => {
+  if (!receipt) return null;
+
   return (
     <div className="border-b pb-6 text-center">
       <h1 className="text-3xl font-bold">J.Rome Apparel</h1>
@@ -7,10 +9,14 @@ const ReceiptHeader = ({ receipt }) => {
 
       <div className="mt-6 space-y-1 text-sm text-gray-600">
         <p>
-          <span className="font-semibold">Receipt #</span> {receipt.orderNumber}
+          <strong>Receipt #</strong> {receipt.orderNumber || "Pending"}
         </p>
 
-        <p>{new Date(receipt.createdAt).toLocaleString()}</p>
+        <p>
+          {receipt.createdAt
+            ? new Date(receipt.createdAt).toLocaleString()
+            : ""}
+        </p>
       </div>
     </div>
   );

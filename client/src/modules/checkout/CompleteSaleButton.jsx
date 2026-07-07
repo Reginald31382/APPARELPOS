@@ -41,8 +41,9 @@ const CompleteSaleButton = () => {
     });
 
     checkout.mutate(order, {
-      onSuccess: () => {
-        openReceipt(order);
+      onSuccess: (savedOrder) => {
+        openReceipt(savedOrder);
+
         clearCart();
         clearCustomer();
         closeCheckout();
