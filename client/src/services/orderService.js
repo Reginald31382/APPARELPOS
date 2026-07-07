@@ -7,7 +7,8 @@ export const fetchOrders = async () => {
 };
 
 export const createOrder = async (order) => {
-  console.log("Order being sent to API:", order);
+  console.log("Order Payload:", JSON.stringify(order, null, 2));
+
   const { data } = await api.post("/orders", order);
 
   return data;
