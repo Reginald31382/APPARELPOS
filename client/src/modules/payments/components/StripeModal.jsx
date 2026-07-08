@@ -3,6 +3,9 @@ import useCheckoutStore from "../../../store/checkout/useCheckoutStore";
 
 import useCreatePaymentIntent from "../hooks/useCreatePaymentIntent";
 
+import StripeElementsWrapper from "./StripeElementsWrapper";
+import StripePaymentElement from "./StripePaymentElement";
+
 import StripeLoading from "./StripeLoading";
 
 const StripeModal = ({ total }) => {
@@ -14,7 +17,7 @@ const StripeModal = ({ total }) => {
 
   useEffect(() => {
     if (!total) return;
-
+    /11/;
     if (clientSecret) return;
 
     paymentIntent.mutate(Math.round(total * 100), {
@@ -29,14 +32,12 @@ const StripeModal = ({ total }) => {
   }
 
   return (
-    <div className="rounded-lg border bg-white p-6">
-      <h2 className="text-xl font-bold">Stripe Payment</h2>
+    <div className="rounded-lg border border-blue-200 bg-blue-50 p-6 text-center">
+      <h3 className="text-lg font-semibold">Secure Card Payment</h3>
 
-      <p className="mt-3 text-sm text-gray-600">Client Secret:</p>
-
-      <code className="block mt-2 break-all rounded bg-gray-100 p-3 text-xs">
-        {clientSecret}
-      </code>
+      <p className="mt-2 text-sm text-gray-600">
+        Preparing Stripe's secure payment form...
+      </p>
     </div>
   );
 };
