@@ -1,7 +1,7 @@
-import CheckoutToolbar from "../modules/checkout/CheckoutToolbar";
+import CheckoutToolbar from "../modules/checkout/components/CheckoutToolbar";
 import ProductGrid from "../modules/product/ProductGrid";
 import CartDrawer from "../modules/cart/CartDrawer";
-import CheckoutDrawer from "../modules/checkout/CheckoutDrawer";
+import CheckoutDrawer from "../modules/checkout/components/CheckoutDrawer";
 import ProductQuickView from "../modules/product/ProductQuickView";
 import ReceiptDrawer from "../modules/receipt/ReceiptDrawer";
 

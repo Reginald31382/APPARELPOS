@@ -1,13 +1,13 @@
-import useCheckoutStore from "../../store/checkout/useCheckoutStore";
-import useCartStore from "../../store/cart/useCartStore";
-import useCustomerStore from "../../store/customer/useCustomerStore";
-import useReceiptStore from "../../store/receipt/useReceiptStore";
+import useCheckoutStore from "../../../store/checkout/useCheckoutStore";
+import useCartStore from "../../../store/cart/useCartStore";
+import useCustomerStore from "../../../store/customer/useCustomerStore";
+import useReceiptStore from "../../../store/receipt/useReceiptStore";
 
-import useCheckout from "../../hooks/useCheckout";
+import useCheckout from "../../../hooks/useCheckout";
 
-import { notifySuccess } from "../../utils/notifications";
+import { notifySuccess } from "../../../utils/notifications";
 
-import { buildCheckoutOrder } from "../../services/checkoutWorkflow";
+import { buildCheckoutOrder } from "../../../services/checkoutWorkflow";
 
 const CompleteSaleButton = () => {
   const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
@@ -23,6 +23,10 @@ const CompleteSaleButton = () => {
   const customer = useCustomerStore((state) => state.selectedCustomer);
 
   const clearCustomer = useCustomerStore((state) => state.clearCustomer);
+
+  const clearClientSecret = useCheckoutStore(
+    (state) => state.clearClientSecret,
+  );
 
   const checkout = useCheckout();
 
@@ -43,6 +47,8 @@ const CompleteSaleButton = () => {
     checkout.mutate(order, {
       onSuccess: (savedOrder) => {
         openReceipt(savedOrder);
+
+        clearClientSecret();
 
         clearCart();
         clearCustomer();

@@ -1,6 +1,6 @@
-import useProductStore from "../../store/product/useProductStore";
+import useProductStore from "../../../store/product/useProductStore";
 import CartSummary from "./CustomerSummary";
-import CustomerAutocomplete from "../customer/CustomerAutoComplete";
+import CustomerAutocomplete from "../../customer/CustomerAutoComplete";
 
 const categories = ["All", "Men", "Women", "Kids", "Accessories", "Shoes"];
 

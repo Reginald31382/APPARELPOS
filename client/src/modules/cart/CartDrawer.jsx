@@ -1,4 +1,4 @@
-import CheckoutButton from "../checkout/CheckoutButton";
+import CheckoutButton from "../checkout/components/CheckoutButton";
 
 import useCartStore from "../../store/cart/useCartStore";
 

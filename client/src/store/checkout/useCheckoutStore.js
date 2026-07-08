@@ -47,6 +47,18 @@ const useCheckoutStore = create((set) => ({
     set({
       completedOrder: null,
     }),
+
+  clientSecret: "",
+
+  setClientSecret: (clientSecret) =>
+    set({
+      clientSecret,
+    }),
+
+  clearClientSecret: () =>
+    set({
+      clientSecret: "",
+    }),
 }));
 
 export default useCheckoutStore;

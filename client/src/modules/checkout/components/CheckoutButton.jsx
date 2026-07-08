@@ -1,4 +1,4 @@
-import useCheckoutStore from "../../store/checkout/useCheckoutStore";
+import useCheckoutStore from "../../../store/checkout/useCheckoutStore";
 
 const CheckoutButton = () => {
   const openCheckout = useCheckoutStore((state) => state.openCheckout);

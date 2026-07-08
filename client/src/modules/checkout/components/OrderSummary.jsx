@@ -1,6 +1,6 @@
-import useCartStore from "../../store/cart/useCartStore";
+import useCartStore from "../../../store/cart/useCartStore";
 
-import { formatCurrency } from "../../utils/currency";
+import { formatCurrency } from "../../../utils/currency";
 
 const OrderSummary = () => {
   const subtotal = useCartStore((state) => state.subtotal());
