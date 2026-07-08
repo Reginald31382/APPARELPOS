@@ -5,6 +5,8 @@ import CartReview from "../components/CartReview";
 import OrderSummary from "../components/OrderSummary";
 import PaymentSelector from "../components/PaymentSelector";
 import CompleteSaleButton from "../components/CompleteSaleButton";
+import CancelTransactionButton from "./CancelTransactionButton";
+import VoidSaleButton from "./VoidSaleButton";
 
 import StripeModal from "../../payments/components/StripeModal";
 
@@ -17,6 +19,15 @@ const CheckoutDrawer = () => {
 
   const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
 
+  const clearClientSecret = useCheckoutStore(
+    (state) => state.clearClientSecret,
+  );
+
+  const handleCancelTransaction = () => {
+    clearClientSecret();
+    closeCheckout();
+  };
+
   if (!isCheckoutOpen) return null;
 
   return (
@@ -25,13 +36,7 @@ const CheckoutDrawer = () => {
         <div className="flex items-center justify-between border-b p-5">
           <h2 className="text-2xl font-bold">Checkout</h2>
 
-          <button
-            onClick={() => {
-              clearClientSecret();
-              closeCheckout();
-            }}
-            className="text-2xl"
-          >
+          <button onClick={handleCancelTransaction} className="text-2xl">
             ×
           </button>
         </div>
@@ -41,11 +46,17 @@ const CheckoutDrawer = () => {
             <CartReview />
             <OrderSummary />
             <PaymentSelector />
-            {paymentMethod === "Stripe" ? <StripeModal total={total} /> : null}
+
+            {paymentMethod === "Stripe" && <StripeModal total={total} />}
           </div>
         </div>
+
         <div className="border-t bg-white p-6">
-          <CompleteSaleButton />
+          {paymentMethod === "Cash" && <CompleteSaleButton />}
+
+          <CancelTransactionButton />
+
+          <VoidSaleButton />
         </div>
       </div>
     </div>

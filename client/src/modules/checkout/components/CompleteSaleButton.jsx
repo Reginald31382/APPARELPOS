@@ -2,12 +2,13 @@ import useCheckoutStore from "../../../store/checkout/useCheckoutStore";
 import useCartStore from "../../../store/cart/useCartStore";
 import useCustomerStore from "../../../store/customer/useCustomerStore";
 import useReceiptStore from "../../../store/receipt/useReceiptStore";
-
 import useCheckout from "../../../hooks/useCheckout";
 
 import { notifySuccess } from "../../../utils/notifications";
-
 import { buildCheckoutOrder } from "../../../services/checkoutWorkflow";
+import { completeCashSale } from "../services/completeSale";
+
+import { notifyError } from "../../../utils/notifications";
 
 const CompleteSaleButton = () => {
   const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
@@ -32,7 +33,7 @@ const CompleteSaleButton = () => {
 
   const openReceipt = useReceiptStore((state) => state.openReceipt);
 
-  const handleCompleteSale = () => {
+  const handleCompleteSale = async () => {
     if (items.length === 0) return;
 
     const order = buildCheckoutOrder({
@@ -44,21 +45,23 @@ const CompleteSaleButton = () => {
       paymentMethod,
     });
 
-    checkout.mutate(order, {
-      onSuccess: (savedOrder) => {
-        openReceipt(savedOrder);
+    if (paymentMethod === "Cash") {
+      await completeCashSale({
+        order,
+        checkout,
+        openReceipt,
+        clearCart,
+        clearCustomer,
+        clearClientSecret,
+        closeCheckout,
+        notifySuccess,
+        notifyError,
+      });
 
-        clearClientSecret();
-
-        clearCart();
-        clearCustomer();
-        closeCheckout();
-
-        notifySuccess("Sale completed");
-      },
-    });
+      return;
+    }
   };
-  console.log("Checkout pending:", checkout.isPending);
+  // console.log("Checkout pending:", checkout.isPending);
 
   return (
     <button

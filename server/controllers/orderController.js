@@ -1,5 +1,7 @@
 import Order from "../models/Order.js";
 
+import { reduceInventory } from "../services/inventoryService.js";
+
 let orderSequence = 1;
 
 const generateOrderNumber = () => {
@@ -51,16 +53,16 @@ POST /api/orders
 */
 export const createOrder = async (req, res) => {
   try {
-    const orderData = {
-      ...req.body,
-      orderNumber: generateOrderNumber(),
-    };
+    console.log("Incoming Order:");
+    // console.dir(req.body, { depth: null });
 
-    const order = await Order.create(orderData);
+    const order = await Order.create(req.body);
+
+    await reduceInventory(order.items);
 
     res.status(201).json(order);
   } catch (error) {
-    console.error("Create Order Error");
+    console.error("Create Order Error:");
     console.error(error);
 
     res.status(500).json({
