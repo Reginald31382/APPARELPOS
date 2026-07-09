@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 
 import Sidebar from "../components/layout/Sidebar";
 import Navbar from "../components/layout/Navbar";
+import Breadcrumbs from "../components/layout/Breadcrumbs";
 
 const AdminLayout = () => {
   return (
@@ -12,6 +13,8 @@ const AdminLayout = () => {
         <Navbar />
 
         <main className="p-8">
+          <Breadcrumbs />
+
           <Outlet />
         </main>
       </div>

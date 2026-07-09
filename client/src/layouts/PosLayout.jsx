@@ -7,21 +7,25 @@ import ReceiptDrawer from "../modules/receipt/ReceiptDrawer";
 
 const PosLayout = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen flex-col lg:flex-row">
+      {/* Product Area */}
       <div className="flex flex-1 flex-col">
         <CheckoutToolbar />
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 p-5">
+        <div className="flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-5 lg:p-6">
           <ProductGrid />
         </div>
       </div>
 
-      <div className="w-[420px] border-l bg-white">
+      {/* Desktop Cart */}
+      <aside className="hidden w-[420px] shrink-0 border-l bg-white lg:block">
         <CartDrawer />
-        <ProductQuickView />
-        <CheckoutDrawer />
-        <ReceiptDrawer />
-      </div>
+      </aside>
+
+      {/* Global Drawers */}
+      <ProductQuickView />
+      <CheckoutDrawer />
+      <ReceiptDrawer />
     </div>
   );
 };

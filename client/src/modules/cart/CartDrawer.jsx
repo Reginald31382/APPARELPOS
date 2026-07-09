@@ -3,6 +3,7 @@ import CheckoutButton from "../checkout/components/CheckoutButton";
 import useCartStore from "../../store/cart/useCartStore";
 
 import { formatCurrency } from "../../utils/currency";
+
 const CartDrawer = () => {
   const items = useCartStore((state) => state.items);
 
@@ -19,22 +20,24 @@ const CartDrawer = () => {
   const total = useCartStore((state) => state.total);
 
   return (
-    <div className="flex h-full flex-col border-l">
-      <div className="border-b p-4 text-xl font-bold">Shopping Cart</div>
+    <div className="flex h-full flex-col border-l bg-white">
       <div className="border-b p-4">
-        <h2 className="text-xl font-bold">Current Sale</h2>
+        <h1 className="text-lg font-bold sm:text-xl">Shopping Cart</h1>
+
+        <p className="text-sm text-gray-500">Current Sale</p>
       </div>
-      <div className="flex-1 overflow-y-auto space-y-4 p-4">
+
+      <div className="flex-1 space-y-4 overflow-y-auto p-3 sm:p-4">
         {items.length === 0 && (
-          <p className="text-gray-500">Your cart is empty.</p>
+          <p className="text-center text-gray-500">Your cart is empty.</p>
         )}
 
         {items.map((item) => (
-          <div key={item.sku} className="rounded-lg border p-4">
+          <div key={item.sku} className="rounded-lg border p-3 sm:p-4">
             <img
               src={item.image}
               alt={item.name}
-              className="mb-3 h-28 w-full rounded object-cover"
+              className="mb-3 h-24 w-full rounded object-cover sm:h-28"
             />
 
             <h3 className="font-semibold">{item.name}</h3>
@@ -53,7 +56,7 @@ const CartDrawer = () => {
                 −
               </button>
 
-              <span>{item.quantity}</span>
+              <span className="min-w-[24px] text-center">{item.quantity}</span>
 
               <button
                 onClick={() => increaseQuantity(item.sku)}
@@ -64,7 +67,7 @@ const CartDrawer = () => {
 
               <button
                 onClick={() => removeItem(item.sku)}
-                className="ml-auto text-red-500"
+                className="ml-auto text-sm font-medium text-red-500 hover:text-red-700"
               >
                 Remove
               </button>
@@ -73,7 +76,7 @@ const CartDrawer = () => {
         ))}
       </div>
 
-      <div className="space-y-2 border-t p-4">
+      <div className="space-y-2 border-t bg-white p-4">
         <div className="flex justify-between">
           <span>Subtotal</span>
 

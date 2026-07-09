@@ -8,6 +8,8 @@ import productRoutes from "./routes/products.js";
 import customerRoutes from "./routes/customers.js";
 import orderRoutes from "./routes/orders.js";
 import inventoryRoutes from "./routes/inventory.js";
+import dashboardRoutes from "./routes/dashboard.js";
+import reportRoutes from "./routes/reports.js";
 
 import stripeRoutes from "./routes/stripe.js";
 
@@ -24,6 +26,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.use("/api/stripe", stripeRoutes);
 

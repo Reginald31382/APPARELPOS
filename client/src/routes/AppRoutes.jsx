@@ -7,7 +7,7 @@ import PosLayout from "../layouts/PosLayout";
 import Product from "../pages/customer/Product";
 import Checkout from "../pages/customer/Checkout";
 
-import Dashboard from "../pages/admin/Dashboard";
+import DashboardPage from "../modules/dashboard/DashboardPage";
 import Products from "../pages/admin/Products";
 import Orders from "../pages/admin/Orders";
 import Customers from "../pages/admin/Customers";
@@ -33,7 +33,7 @@ const AppRoutes = () => {
 
       {/* Admin */}
       <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<Dashboard />} />
+        <Route index element={<DashboardPage />} />
         <Route path="products" element={<Products />} />
         <Route path="orders" element={<Orders />} />
         <Route path="customers" element={<Customers />} />
