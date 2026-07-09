@@ -1,3 +1,4 @@
+import useMobileCartStore from "../../store/ui/useMobileCartStore";
 import CheckoutButton from "../checkout/components/CheckoutButton";
 
 import useCartStore from "../../store/cart/useCartStore";
@@ -19,85 +20,122 @@ const CartDrawer = () => {
 
   const total = useCartStore((state) => state.total);
 
+  const isOpen = useMobileCartStore((state) => state.isOpen);
+
+  const closeCart = useMobileCartStore((state) => state.closeCart);
+
   return (
-    <div className="flex h-full flex-col border-l bg-white">
-      <div className="border-b p-4">
-        <h1 className="text-lg font-bold sm:text-xl">Shopping Cart</h1>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div
+          onClick={closeCart}
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+        />
+      )}
 
-        <p className="text-sm text-gray-500">Current Sale</p>
-      </div>
+      <div
+        className={`
+          fixed right-0 top-0 z-50 flex h-full w-full max-w-md
+          flex-col border-l bg-white shadow-2xl
+          transition-transform duration-300
 
-      <div className="flex-1 space-y-4 overflow-y-auto p-3 sm:p-4">
-        {items.length === 0 && (
-          <p className="text-center text-gray-500">Your cart is empty.</p>
-        )}
+          lg:static
+          lg:h-full
+          lg:w-auto
+          lg:max-w-none
+          lg:translate-x-0
 
-        {items.map((item) => (
-          <div key={item.sku} className="rounded-lg border p-3 sm:p-4">
-            <img
-              src={item.image}
-              alt={item.name}
-              className="mb-3 h-24 w-full rounded object-cover sm:h-28"
-            />
+          ${isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
+        `}
+      >
+        <div className="relative border-b p-4">
+          <h1 className="text-lg font-bold sm:text-xl">Shopping Cart</h1>
 
-            <h3 className="font-semibold">{item.name}</h3>
+          <p className="text-sm text-gray-500">Current Sale</p>
 
-            <p className="text-sm text-gray-500">
-              {item.color} / {item.size}
-            </p>
+          <button
+            onClick={closeCart}
+            className="absolute right-4 top-4 text-2xl lg:hidden"
+          >
+            ×
+          </button>
+        </div>
 
-            <p className="font-bold">{formatCurrency(item.unitPrice)}</p>
+        <div className="flex-1 space-y-4 overflow-y-auto p-3 sm:p-4">
+          {items.length === 0 && (
+            <p className="text-center text-gray-500">Your cart is empty.</p>
+          )}
 
-            <div className="mt-3 flex items-center gap-2">
-              <button
-                onClick={() => decreaseQuantity(item.sku)}
-                className="rounded border px-3 py-1"
-              >
-                −
-              </button>
+          {items.map((item) => (
+            <div key={item.sku} className="rounded-lg border p-3 sm:p-4">
+              <img
+                src={item.image}
+                alt={item.name}
+                className="mb-3 h-24 w-full rounded object-cover sm:h-28"
+              />
 
-              <span className="min-w-[24px] text-center">{item.quantity}</span>
+              <h3 className="font-semibold">{item.name}</h3>
 
-              <button
-                onClick={() => increaseQuantity(item.sku)}
-                className="rounded border px-3 py-1"
-              >
-                +
-              </button>
+              <p className="text-sm text-gray-500">
+                {item.color} / {item.size}
+              </p>
 
-              <button
-                onClick={() => removeItem(item.sku)}
-                className="ml-auto text-sm font-medium text-red-500 hover:text-red-700"
-              >
-                Remove
-              </button>
+              <p className="font-bold">{formatCurrency(item.unitPrice)}</p>
+
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  onClick={() => decreaseQuantity(item.sku)}
+                  className="rounded border px-3 py-1"
+                >
+                  −
+                </button>
+
+                <span className="min-w-[24px] text-center">
+                  {item.quantity}
+                </span>
+
+                <button
+                  onClick={() => increaseQuantity(item.sku)}
+                  className="rounded border px-3 py-1"
+                >
+                  +
+                </button>
+
+                <button
+                  onClick={() => removeItem(item.sku)}
+                  className="ml-auto text-sm font-medium text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
+
+        <div className="space-y-2 border-t bg-white p-4">
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+
+            <span>{formatCurrency(subtotal())}</span>
           </div>
-        ))}
+
+          <div className="flex justify-between">
+            <span>Tax</span>
+
+            <span>{formatCurrency(tax())}</span>
+          </div>
+
+          <div className="flex justify-between text-lg font-bold">
+            <span>Total</span>
+
+            <span>{formatCurrency(total())}</span>
+          </div>
+
+          <CheckoutButton />
+        </div>
       </div>
-
-      <div className="space-y-2 border-t bg-white p-4">
-        <div className="flex justify-between">
-          <span>Subtotal</span>
-
-          <span>{formatCurrency(subtotal())}</span>
-        </div>
-
-        <div className="flex justify-between">
-          <span>Tax</span>
-
-          <span>{formatCurrency(tax())}</span>
-        </div>
-
-        <div className="flex justify-between text-lg font-bold">
-          <span>Total</span>
-
-          <span>{formatCurrency(total())}</span>
-        </div>
-
-        <CheckoutButton />
-      </div>
-    </div>
+    </>
   );
 };
 

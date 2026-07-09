@@ -58,11 +58,11 @@ const ProductQuickView = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={closeProduct}>
-      <SheetContent className="w-112.5 overflow-y-auto p-6">
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-6">
+        {" "}
         <SheetHeader>
           <SheetTitle>{selectedProduct.name}</SheetTitle>
         </SheetHeader>
-
         <div className="mt-6 space-y-6">
           <img
             src={selectedProduct.images?.[0]}

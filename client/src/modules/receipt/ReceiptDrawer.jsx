@@ -1,4 +1,7 @@
+import ResponsiveDrawer from "../../components/layout/ResponsiveDrawer";
+
 import useReceiptStore from "../../store/receipt/useReceiptStore";
+import usePanelStore from "../../store/ui/usePanelStore";
 
 import ReceiptHeader from "./ReceiptHeader";
 import ReceiptItems from "./ReceiptItems";
@@ -7,25 +10,35 @@ import ReceiptFooter from "./ReceiptFooter";
 
 const ReceiptDrawer = () => {
   const receipt = useReceiptStore((state) => state.receipt);
+
   const isOpen = useReceiptStore((state) => state.isOpen);
+
   const closeReceipt = useReceiptStore((state) => state.closeReceipt);
 
-  if (!isOpen || !receipt) return null;
+  const showCart = usePanelStore((state) => state.showCart);
+
+  if (!receipt) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/50">
-      <div className="absolute right-0 top-0 flex h-full w-[500px] flex-col bg-white shadow-xl">
+    <ResponsiveDrawer open={isOpen} onClose={closeReceipt} width="500px">
+      <div className="flex h-full flex-col bg-white">
         {/* Header */}
-        <div className="flex items-center justify-between border-b p-5">
+        <div className="relative border-b p-5">
           <h2 className="text-2xl font-bold">Receipt</h2>
 
-          <button onClick={closeReceipt} className="text-2xl">
+          <button
+            onClick={() => {
+              showCart();
+              closeReceipt();
+            }}
+            className="absolute right-5 top-5 text-2xl"
+          >
             ×
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 space-y-6 overflow-y-auto p-6">
           <ReceiptHeader />
 
           <div className="rounded-lg bg-gray-50 p-4">
@@ -53,6 +66,7 @@ const ReceiptDrawer = () => {
           />
 
           <ReceiptFooter />
+
           <div className="rounded-lg bg-green-50 p-4 text-center">
             <p className="font-semibold">Sale Completed Successfully</p>
 
@@ -66,13 +80,13 @@ const ReceiptDrawer = () => {
         <div className="border-t p-6">
           <button
             onClick={closeReceipt}
-            className="w-full rounded-lg bg-black py-3 text-white"
+            className="w-full rounded-lg bg-black py-3 text-white transition hover:bg-gray-900"
           >
             Close Receipt
           </button>
         </div>
       </div>
-    </div>
+    </ResponsiveDrawer>
   );
 };
 
