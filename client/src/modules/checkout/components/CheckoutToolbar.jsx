@@ -1,6 +1,8 @@
 import useProductStore from "../../../store/product/useProductStore";
 import CartSummary from "./CustomerSummary";
 import CustomerAutocomplete from "../../customer/CustomerAutoComplete";
+import { Search } from "lucide-react";
+import { useRef, useEffect } from "react";
 
 const categories = ["All", "Men", "Women", "Kids", "Accessories", "Shoes"];
 
@@ -17,6 +19,32 @@ const POSHeader = () => {
     setSort,
   } = useProductStore();
 
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+
+        searchRef.current?.focus();
+        searchRef.current?.select();
+      }
+      if (event.key === "Escape") {
+        setSearch("");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
+    searchRef.current?.focus();
+  }, []);
+
   return (
     <div className="space-y-4 border-b bg-white p-4">
       <div className="flex items-center justify-between">
@@ -32,13 +60,21 @@ const POSHeader = () => {
         <CustomerAutocomplete />
       </div>
 
-      <input
-        type="text"
-        placeholder="Search products..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full rounded-lg border p-3"
-      />
+      <div className="relative">
+        <Search
+          size={18}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+        />
+
+        <input
+          ref={searchRef}
+          type="text"
+          placeholder="Search products, SKU, or barcode..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-lg border py-3 pl-10 pr-4"
+        />
+      </div>
 
       <div className="flex flex-wrap items-center gap-2">
         {categories.map((item) => (

@@ -23,7 +23,7 @@ const ReportsPage = () => {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <h1 className="text-3xl font-bold">Reports</h1>
 
-        <ExportButtons />
+        <ExportButtons orders={data.recentOrders} />
       </div>
 
       <ReportFilters />

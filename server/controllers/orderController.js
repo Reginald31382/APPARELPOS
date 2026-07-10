@@ -2,12 +2,8 @@ import Order from "../models/Order.js";
 
 import { reduceInventory } from "../services/inventoryService.js";
 
-let orderSequence = 1;
-
 const generateOrderNumber = () => {
-  const year = new Date().getFullYear();
-
-  return `JR-${year}-${String(orderSequence++).padStart(6, "0")}`;
+  return `JR-${Date.now()}`;
 };
 
 /*
@@ -54,9 +50,12 @@ POST /api/orders
 export const createOrder = async (req, res) => {
   try {
     console.log("Incoming Order:");
-    // console.dir(req.body, { depth: null });
+    console.dir(req.body, { depth: null });
 
-    const order = await Order.create(req.body);
+    const order = await Order.create({
+      ...req.body,
+      orderNumber: generateOrderNumber(),
+    });
 
     await reduceInventory(order.items);
 

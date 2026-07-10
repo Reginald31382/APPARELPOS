@@ -4,6 +4,7 @@ import ReceiptHeader from "./ReceiptHeader";
 import ReceiptItems from "./ReceiptItems";
 import ReceiptTotals from "./ReceiptTotals";
 import ReceiptFooter from "./ReceiptFooter";
+import useReceiptPrint from "./hooks/useReceiptPrint";
 
 const ReceiptDrawer = () => {
   const receipt = useReceiptStore((state) => state.receipt);
@@ -11,6 +12,8 @@ const ReceiptDrawer = () => {
   const isOpen = useReceiptStore((state) => state.isOpen);
 
   const closeReceipt = useReceiptStore((state) => state.closeReceipt);
+
+  const { printReceipt } = useReceiptPrint();
 
   if (!isOpen || !receipt) return null;
 
@@ -67,6 +70,12 @@ const ReceiptDrawer = () => {
 
         {/* Footer */}
         <div className="border-t p-6">
+          <button
+            onClick={printReceipt}
+            className="mb-3 w-full rounded-lg bg-blue-600 py-3 text-white hover:bg-blue-700"
+          >
+            Print Receipt
+          </button>
           <button
             onClick={closeReceipt}
             className="w-full rounded-lg bg-black py-3 text-white hover:bg-gray-900"
