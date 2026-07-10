@@ -8,6 +8,7 @@ import {
   FaWarehouse,
   FaChartLine,
 } from "react-icons/fa";
+import { IoSettingsSharp } from "react-icons/io5";
 
 const Sidebar = () => {
   const linkClasses = ({ isActive }) =>
@@ -50,6 +51,11 @@ const Sidebar = () => {
         <NavLink to="/admin/reports" className={linkClasses}>
           <FaChartLine />
           Reports
+        </NavLink>
+
+        <NavLink to="/admin/settings" className={linkClasses}>
+          <IoSettingsSharp />
+          Settings
         </NavLink>
       </nav>
     </aside>
