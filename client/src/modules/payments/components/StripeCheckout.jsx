@@ -6,7 +6,6 @@ import useCustomerStore from "../../../store/customer/useCustomerStore";
 import useReceiptStore from "../../../store/receipt/useReceiptStore";
 
 import useCheckout from "../../../hooks/useCheckout";
-import usePanelStore from "../../../store/ui/usePanelStore";
 
 import { notifySuccess, notifyError } from "../../../utils/notifications";
 
@@ -39,8 +38,6 @@ const StripeCheckout = ({ total }) => {
   const clearCustomer = useCustomerStore((state) => state.clearCustomer);
 
   const openReceipt = useReceiptStore((state) => state.openReceipt);
-
-  const showReceipt = usePanelStore((state) => state.showReceipt);
 
   const checkout = useCheckout();
 
@@ -80,7 +77,6 @@ const StripeCheckout = ({ total }) => {
       order,
       checkout,
       openReceipt,
-      showReceipt,
       clearCart,
       clearCustomer,
       clearClientSecret,

@@ -12,8 +12,7 @@ import Products from "../pages/admin/Products";
 import Orders from "../pages/admin/Orders";
 import Customers from "../pages/admin/Customers";
 import Inventory from "../pages/admin/Inventory";
-import Reports from "../pages/admin/Reports";
-
+import ReportsPage from "../modules/reports/ReportsPage";
 import Login from "../pages/auth/Login";
 
 import NotFound from "../pages/NotFound";
@@ -38,7 +37,7 @@ const AppRoutes = () => {
         <Route path="orders" element={<Orders />} />
         <Route path="customers" element={<Customers />} />
         <Route path="inventory" element={<Inventory />} />
-        <Route path="reports" element={<Reports />} />
+        <Route path="reports" element={<ReportsPage />} />
       </Route>
 
       {/* 404 */}

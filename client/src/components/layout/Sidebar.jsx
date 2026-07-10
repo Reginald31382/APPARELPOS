@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import {
   FaHome,
@@ -17,7 +17,9 @@ const Sidebar = () => {
 
   return (
     <aside className="hidden w-64 bg-white shadow-lg md:block">
-      <div className="border-b p-6 text-2xl font-bold">J.Rome</div>
+      <Link to="/" className="flex items-center gap-2 p-6 text-2xl font-bold">
+        <div className="text-2xl font-bold">J.Rome</div>
+      </Link>
 
       <nav className="space-y-2 p-4">
         <NavLink to="/admin" end className={linkClasses}>

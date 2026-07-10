@@ -3,7 +3,6 @@ import useCartStore from "../../../store/cart/useCartStore";
 import useCustomerStore from "../../../store/customer/useCustomerStore";
 import useReceiptStore from "../../../store/receipt/useReceiptStore";
 import useCheckout from "../../../hooks/useCheckout";
-import usePanelStore from "../../../store/ui/usePanelStore";
 
 import { notifySuccess } from "../../../utils/notifications";
 import { buildCheckoutOrder } from "../../../services/checkoutWorkflow";
@@ -34,8 +33,6 @@ const CompleteSaleButton = () => {
 
   const openReceipt = useReceiptStore((state) => state.openReceipt);
 
-  const showReceipt = usePanelStore((state) => state.showReceipt);
-
   const handleCompleteSale = async () => {
     if (items.length === 0) return;
 
@@ -59,7 +56,6 @@ const CompleteSaleButton = () => {
         closeCheckout,
         notifySuccess,
         notifyError,
-        showReceipt,
       });
 
       return;

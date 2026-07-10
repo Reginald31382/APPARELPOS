@@ -1,7 +1,4 @@
-import ResponsiveDrawer from "../../components/layout/ResponsiveDrawer";
-
 import useReceiptStore from "../../store/receipt/useReceiptStore";
-import usePanelStore from "../../store/ui/usePanelStore";
 
 import ReceiptHeader from "./ReceiptHeader";
 import ReceiptItems from "./ReceiptItems";
@@ -15,29 +12,21 @@ const ReceiptDrawer = () => {
 
   const closeReceipt = useReceiptStore((state) => state.closeReceipt);
 
-  const showCart = usePanelStore((state) => state.showCart);
-
-  if (!receipt) return null;
+  if (!isOpen || !receipt) return null;
 
   return (
-    <ResponsiveDrawer open={isOpen} onClose={closeReceipt} width="500px">
-      <div className="flex h-full flex-col bg-white">
+    <div className="fixed inset-0 z-[60] bg-black/50">
+      <div className="absolute right-0 top-0 flex h-full w-[500px] flex-col bg-white shadow-xl">
         {/* Header */}
-        <div className="relative border-b p-5">
+        <div className="flex items-center justify-between border-b p-5">
           <h2 className="text-2xl font-bold">Receipt</h2>
 
-          <button
-            onClick={() => {
-              showCart();
-              closeReceipt();
-            }}
-            className="absolute right-5 top-5 text-2xl"
-          >
+          <button onClick={closeReceipt} className="text-2xl">
             ×
           </button>
         </div>
 
-        {/* Scrollable Content */}
+        {/* Content */}
         <div className="flex-1 space-y-6 overflow-y-auto p-6">
           <ReceiptHeader />
 
@@ -80,13 +69,13 @@ const ReceiptDrawer = () => {
         <div className="border-t p-6">
           <button
             onClick={closeReceipt}
-            className="w-full rounded-lg bg-black py-3 text-white transition hover:bg-gray-900"
+            className="w-full rounded-lg bg-black py-3 text-white hover:bg-gray-900"
           >
             Close Receipt
           </button>
         </div>
       </div>
-    </ResponsiveDrawer>
+    </div>
   );
 };
 

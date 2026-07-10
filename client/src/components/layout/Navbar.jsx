@@ -1,5 +1,7 @@
 import { FaBell, FaRegUserCircle, FaSearch } from "react-icons/fa";
+import { GiShoppingCart } from "react-icons/gi";
 import { MdOutlineSettings } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -28,13 +30,23 @@ const Navbar = () => {
             <MdOutlineSettings size={22} />
           </button>
 
-          <div className="flex items-center gap-3 border-l pl-6">
-            <FaRegUserCircle size={30} className="text-gray-600" />
+          <div className="flex items-center gap-4">
+            <Link
+              to="/admin"
+              className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-black"
+            >
+              Admin
+            </Link>
 
-            <div className="text-sm">
-              <p className="font-semibold">Administrator</p>
-              <p className="text-gray-500">J.Rome LLC</p>
-            </div>
+            <GiShoppingCart
+              size={22}
+              className="cursor-pointer transition hover:text-blue-600"
+            />
+
+            <FaRegUserCircle
+              size={22}
+              className="cursor-pointer transition hover:text-blue-600"
+            />
           </div>
         </div>
       </div>
