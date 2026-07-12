@@ -12,6 +12,7 @@ import dashboardRoutes from "./routes/dashboard.js";
 import reportRoutes from "./routes/reports.js";
 import settingsRoutes from "./routes/settings.js";
 import authRoutes from "./routes/auth.js";
+import userRoutes from "./routes/user.js";
 
 import stripeRoutes from "./routes/stripe.js";
 
@@ -32,6 +33,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 app.use("/api/stripe", stripeRoutes);
 

@@ -1,9 +1,11 @@
 import express from "express";
-import { getDashboardStats } from "../controllers/dashboardController.js";
+
+import { getUsers } from "../controllers/userController.js";
+
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", protect, authorize("Admin", "Manager"), getDashboardStats);
+router.get("/", protect, authorize("Admin"), getUsers);
 
 export default router;

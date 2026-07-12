@@ -93,3 +93,17 @@ export const login = async (req, res) => {
     });
   }
 };
+
+export const hasUsers = async (req, res) => {
+  try {
+    const count = await User.countDocuments();
+
+    res.json({
+      hasUsers: count > 0,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};

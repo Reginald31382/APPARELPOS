@@ -13,8 +13,11 @@ import Orders from "../pages/admin/Orders";
 import Customers from "../pages/admin/Customers";
 import Inventory from "../pages/admin/Inventory";
 import ReportsPage from "../modules/reports/ReportsPage";
+import Setup from "../pages/auth/Setup";
 import Login from "../pages/auth/Login";
 import Settings from "../pages/admin/Settings";
+import Employees from "../pages/admin/Employees";
+import ProtectedRoute from "../modules/auth/components/ProtectedRoute";
 
 import NotFound from "../pages/NotFound";
 
@@ -29,14 +32,23 @@ const AppRoutes = () => {
       </Route>
 
       {/* Authentication */}
+      <Route path="/setup" element={<Setup />} />
       <Route path="/login" element={<Login />} />
 
       {/* Admin */}
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute roles={["Admin", "Manager"]}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<DashboardPage />} />
         <Route path="products" element={<Products />} />
         <Route path="orders" element={<Orders />} />
         <Route path="customers" element={<Customers />} />
+        <Route path="employees" element={<Employees />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="settings" element={<Settings />} />

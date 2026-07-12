@@ -1,4 +1,5 @@
 import express from "express";
+import { protect, authorize } from "../middleware/authMiddleware.js";
 
 import {
   getSettings,
@@ -7,8 +8,8 @@ import {
 
 const router = express.Router();
 
-router.get("/", getSettings);
+router.get("/", protect, authorize("Admin"), getSettings);
 
-router.put("/", updateSettings);
+router.put("/", protect, authorize("Admin"), updateSettings);
 
 export default router;

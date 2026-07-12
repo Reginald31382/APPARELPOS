@@ -9,6 +9,7 @@ import {
   FaChartLine,
 } from "react-icons/fa";
 import { IoSettingsSharp } from "react-icons/io5";
+import { BsPeopleFill } from "react-icons/bs";
 
 const Sidebar = () => {
   const linkClasses = ({ isActive }) =>
@@ -41,6 +42,11 @@ const Sidebar = () => {
         <NavLink to="/admin/customers" className={linkClasses}>
           <FaUsers />
           Customers
+        </NavLink>
+
+        <NavLink to="/admin/employees" className={linkClasses}>
+          <BsPeopleFill />
+          Employees
         </NavLink>
 
         <NavLink to="/admin/inventory" className={linkClasses}>
