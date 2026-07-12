@@ -23,3 +23,19 @@ export const reduceInventory = async (items) => {
     await product.save();
   }
 };
+
+export const restoreInventory = async (items) => {
+  for (const item of items) {
+    const product = await Product.findById(item.productId);
+
+    if (!product) continue;
+
+    const variant = product.variants.find((v) => v.sku === item.sku);
+
+    if (variant) {
+      variant.quantity += item.quantity;
+    }
+
+    await product.save();
+  }
+};

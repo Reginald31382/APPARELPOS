@@ -1,5 +1,10 @@
-import Product from "../models/Product.js";
+import api from "../../../api/axios";
 
+export const getInventory = async () => {
+  const { data } = await api.get("/products");
+
+  return data;
+};
 export const reduceInventory = async (items) => {
   for (const item of items) {
     const product = await Product.findById(item.productId);
