@@ -121,7 +121,7 @@ const Setup = () => {
             disabled={loading}
             className="w-full rounded-lg bg-black py-3 text-white transition hover:bg-gray-800"
           >
-            {loading ? "Creating Store..." : "Create Store"}
+            {loading ? "Creating Store..." : "Create"}
           </button>
         </div>
       </form>

@@ -1,9 +1,20 @@
+import useAuthStore from "../../modules/auth/store/useAuthStore";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 import { FaBell, FaRegUserCircle, FaSearch } from "react-icons/fa";
 import { GiShoppingCart } from "react-icons/gi";
 import { MdOutlineSettings } from "react-icons/md";
-import { Link } from "react-router-dom";
 
 const Navbar = () => {
+  const logout = useAuthStore((state) => state.logout);
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   return (
     <header className="sticky top-0 z-40 border-b bg-white">
       <div className="flex h-16 items-center justify-between px-8">
@@ -20,15 +31,15 @@ const Navbar = () => {
 
         {/* Right Side */}
         <div className="ml-8 flex items-center gap-6">
-          <button className="relative text-gray-600 transition hover:text-black">
+          {/* <button className="relative text-gray-600 transition hover:text-black">
             <FaBell size={20} />
 
             <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500" />
-          </button>
-
+          </button> */}
+          {/* 
           <button className="text-gray-600 transition hover:text-black">
             <MdOutlineSettings size={22} />
-          </button>
+          </button> */}
 
           <div className="flex items-center gap-4">
             <Link
@@ -38,15 +49,17 @@ const Navbar = () => {
               Admin
             </Link>
 
-            <GiShoppingCart
+            {/* <GiShoppingCart
               size={22}
               className="cursor-pointer transition hover:text-blue-600"
-            />
+            /> */}
 
-            <FaRegUserCircle
-              size={22}
-              className="cursor-pointer transition hover:text-blue-600"
-            />
+            <button
+              onClick={handleLogout}
+              className="rounded-md border px-3 py-2 hover:bg-gray-100"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>

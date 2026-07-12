@@ -18,6 +18,14 @@ const generateToken = (user) => {
 
 // Register
 export const register = async (req, res) => {
+  const userCount = await User.countDocuments();
+
+  if (userCount > 0) {
+    return res.status(403).json({
+      message: "Registration is disabled. Please contact an administrator.",
+    });
+  }
+
   try {
     const { firstName, lastName, email, password, role } = req.body;
 

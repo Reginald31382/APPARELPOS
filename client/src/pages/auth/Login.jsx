@@ -1,11 +1,17 @@
 import { useState } from "react";
 import useSetup from "../../modules/auth/hooks/useSetup";
-import { Navigate } from "react-router-dom";
-
+import { Link, Navigate } from "react-router-dom";
+import { MdOutlineCancel } from "react-icons/md";
 import useLogin from "../../modules/auth/hooks/useLogin";
 
 const Login = () => {
   const { data, isLoading } = useSetup();
+
+  const { mutate, isPending, error } = useLogin();
+
+  const [email, setEmail] = useState("");
+
+  const [password, setPassword] = useState("");
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -14,11 +20,6 @@ const Login = () => {
   if (data && !data.hasUsers) {
     return <Navigate to="/setup" replace />;
   }
-  const { mutate, isPending, error } = useLogin();
-
-  const [email, setEmail] = useState("");
-
-  const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -35,6 +36,9 @@ const Login = () => {
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg"
       >
+        <Link to="/" className="absolute top-4 left-4 text-2xl">
+          <MdOutlineCancel />
+        </Link>
         <h1 className="mb-6 text-center text-3xl font-bold">
           J.Rome POS Login
         </h1>
