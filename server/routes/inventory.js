@@ -1,9 +1,9 @@
 import express from "express";
-
-import { updateInventory } from "../controllers/inventoryController.js";
+import { protect, authorize } from "../middleware/authMiddleware.js";
+import { updateInventory } from "../controllers/productController.js";
 
 const router = express.Router();
 
-router.post("/", updateInventory);
+router.put("/", protect, authorize("Admin", "Manager"), updateInventory);
 
 export default router;

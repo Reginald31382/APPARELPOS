@@ -71,3 +71,31 @@ export const createProduct = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const updateInventory = async (req, res) => {
+  try {
+    const { sku, quantity } = req.body;
+
+    const product = await Product.findOne({
+      "variants.sku": sku,
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Variant not found.",
+      });
+    }
+
+    const variant = product.variants.find((v) => v.sku === sku);
+
+    variant.quantity = quantity;
+
+    await product.save();
+
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};

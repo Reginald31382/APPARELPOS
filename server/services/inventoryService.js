@@ -1,5 +1,10 @@
 import Product from "../models/Products.js";
 
+/*
+|--------------------------------------------------------------------------
+| Reduce Inventory
+|--------------------------------------------------------------------------
+*/
 export const reduceInventory = async (items) => {
   for (const item of items) {
     const product = await Product.findById(item.productId);
@@ -15,7 +20,7 @@ export const reduceInventory = async (items) => {
     }
 
     if (variant.quantity < item.quantity) {
-      throw new Error(`${product.name} does not have enough inventory`);
+      throw new Error(`${product.name} does not have enough inventory.`);
     }
 
     variant.quantity -= item.quantity;
@@ -24,6 +29,11 @@ export const reduceInventory = async (items) => {
   }
 };
 
+/*
+|--------------------------------------------------------------------------
+| Restore Inventory
+|--------------------------------------------------------------------------
+*/
 export const restoreInventory = async (items) => {
   for (const item of items) {
     const product = await Product.findById(item.productId);
@@ -32,10 +42,37 @@ export const restoreInventory = async (items) => {
 
     const variant = product.variants.find((v) => v.sku === item.sku);
 
-    if (variant) {
-      variant.quantity += item.quantity;
-    }
+    if (!variant) continue;
+
+    variant.quantity += item.quantity;
 
     await product.save();
   }
+};
+
+/*
+|--------------------------------------------------------------------------
+| Manual Inventory Adjustment
+|--------------------------------------------------------------------------
+*/
+export const adjustInventory = async (sku, quantity) => {
+  const product = await Product.findOne({
+    "variants.sku": sku,
+  });
+
+  if (!product) {
+    throw new Error("Variant not found.");
+  }
+
+  const variant = product.variants.find((v) => v.sku === sku);
+
+  if (!variant) {
+    throw new Error("Variant not found.");
+  }
+
+  variant.quantity = quantity;
+
+  await product.save();
+
+  return product;
 };

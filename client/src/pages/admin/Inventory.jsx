@@ -1,3 +1,4 @@
+import InventoryAdjustmentModal from "../../modules/inventory/components/InventoryAdjustmentModal";
 import { useMemo, useState } from "react";
 
 import useInventory from "../../modules/inventory/hooks/useInventory";
@@ -7,7 +8,9 @@ const Inventory = () => {
 
   const [search, setSearch] = useState("");
 
+  const [selectedItem, setSelectedItem] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [modalOpen, setModalOpen] = useState(false);
 
   const inventory = useMemo(() => {
     return products.flatMap((product) =>
@@ -96,6 +99,7 @@ const Inventory = () => {
               <th className="p-4 text-left">Variant</th>
               <th className="p-4 text-center">Stock</th>
               <th className="p-4 text-center">Status</th>
+              <th className="p-4 text-center">Actions</th>
             </tr>
           </thead>
 
@@ -139,10 +143,26 @@ const Inventory = () => {
                     </span>
                   )}
                 </td>
+                <td className="p-4 text-center">
+                  <button
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setModalOpen(true);
+                    }}
+                    className="rounded-lg bg-black px-3 py-2 text-white"
+                  >
+                    Edit
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+        <InventoryAdjustmentModal
+          item={selectedItem}
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+        />
       </div>
     </div>
   );
