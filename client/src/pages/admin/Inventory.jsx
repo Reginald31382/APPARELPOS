@@ -55,9 +55,13 @@ const Inventory = () => {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Inventory</h1>
       <InventoryStats />
-      <InventoryStats />
 
-      <LowStockAlert />
+      <LowStockAlert
+        onSelectItem={(item) => {
+          setSelectedItem(item);
+          setModalOpen(true);
+        }}
+      />
       <div className="flex flex-wrap items-center gap-3">
         <input
           type="text"
