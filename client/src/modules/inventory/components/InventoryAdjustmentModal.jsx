@@ -39,14 +39,12 @@ const InventoryAdjustmentModal = ({ item, open, onOpenChange }) => {
   const adjustment = quantity - item.quantity;
 
   const handleSave = () => {
-    console.log("Saving", {
-      sku: item.sku,
-      quantity,
-    });
     mutate(
       {
         sku: item.sku,
         quantity,
+        reason,
+        notes,
       },
       {
         onSuccess: () => {

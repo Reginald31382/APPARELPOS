@@ -6,7 +6,8 @@ const useUpdateInventory = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ sku, quantity }) => updateInventory({ sku, quantity }),
+    mutationFn: updateInventory,
+
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["inventory"],
@@ -18,6 +19,10 @@ const useUpdateInventory = () => {
 
       queryClient.invalidateQueries({
         queryKey: ["dashboard"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["inventory-history"],
       });
     },
   });

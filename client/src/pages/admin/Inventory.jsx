@@ -1,6 +1,9 @@
 import InventoryAdjustmentModal from "../../modules/inventory/components/InventoryAdjustmentModal";
-import { useMemo, useState } from "react";
+import InventoryHistoryTable from "../../modules/inventory/components/InventoryHistoryTable";
+import InventoryStats from "../../modules/inventory/components/InventoryStats";
+import LowStockAlert from "../../modules/inventory/components/LowStockAlert";
 
+import { useMemo, useState } from "react";
 import useInventory from "../../modules/inventory/hooks/useInventory";
 
 const Inventory = () => {
@@ -51,7 +54,10 @@ const Inventory = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Inventory</h1>
+      <InventoryStats />
+      <InventoryStats />
 
+      <LowStockAlert />
       <div className="flex flex-wrap items-center gap-3">
         <input
           type="text"
@@ -164,6 +170,10 @@ const Inventory = () => {
           onOpenChange={setModalOpen}
         />
       </div>
+      <hr />
+      <h1 className="text-3xl font-bold">Inventory History</h1>
+      <hr />
+      <InventoryHistoryTable />
     </div>
   );
 };

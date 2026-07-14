@@ -6,10 +6,12 @@ export const getInventory = async () => {
   return data;
 };
 
-export const updateInventory = async ({ sku, quantity }) => {
+export const updateInventory = async ({ sku, quantity, reason, notes }) => {
   const { data } = await api.put("/inventory", {
     sku,
     quantity,
+    reason,
+    notes,
   });
 
   return data;

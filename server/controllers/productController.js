@@ -1,4 +1,5 @@
 import Product from "../models/Products.js";
+import InventoryHistory from "../models/InventoryHistory.js";
 
 export const getProducts = async (req, res) => {
   try {
@@ -74,7 +75,7 @@ export const createProduct = async (req, res) => {
 
 export const updateInventory = async (req, res) => {
   try {
-    const { sku, quantity } = req.body;
+    const { sku, quantity, reason, notes } = req.body;
 
     const product = await Product.findOne({
       "variants.sku": sku,
@@ -88,9 +89,23 @@ export const updateInventory = async (req, res) => {
 
     const variant = product.variants.find((v) => v.sku === sku);
 
+    const previousQuantity = variant.quantity;
+
     variant.quantity = quantity;
 
     await product.save();
+
+    await InventoryHistory.create({
+      product: product._id,
+      sku,
+      productName: product.name,
+      previousQuantity,
+      newQuantity: quantity,
+      adjustment: quantity - previousQuantity,
+      reason,
+      notes,
+      performedBy: req.user._id,
+    });
 
     res.json(product);
   } catch (error) {

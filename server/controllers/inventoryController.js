@@ -1,3 +1,4 @@
+import InventoryHistory from "../models/InventoryHistory.js";
 import { reduceInventory } from "../services/inventoryService.js";
 
 export const updateInventory = async (req, res) => {
@@ -10,6 +11,22 @@ export const updateInventory = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       message: err.message,
+    });
+  }
+};
+
+export const getInventoryHistory = async (req, res) => {
+  try {
+    const history = await InventoryHistory.find()
+      .populate("performedBy", "firstName lastName")
+      .sort({
+        createdAt: -1,
+      });
+
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
     });
   }
 };
