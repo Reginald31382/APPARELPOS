@@ -15,8 +15,7 @@ export const getUsers = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, role } = req.body;
-
+    const { firstName, lastName, email, phone, password, role } = req.body;
     const exists = await User.findOne({ email });
 
     if (exists) {
@@ -31,6 +30,7 @@ export const createUser = async (req, res) => {
       firstName,
       lastName,
       email,
+      phone,
       password: hashedPassword,
       role,
     });

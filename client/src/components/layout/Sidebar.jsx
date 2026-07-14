@@ -39,10 +39,10 @@ const Sidebar = () => {
           Orders
         </NavLink>
 
-        <NavLink to="/admin/customers" className={linkClasses}>
+        {/* <NavLink to="/admin/customers" className={linkClasses}>
           <FaUsers />
           Customers
-        </NavLink>
+        </NavLink> */}
 
         <NavLink to="/admin/employees" className={linkClasses}>
           <BsPeopleFill />
