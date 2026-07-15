@@ -2,6 +2,9 @@ const buildOrder = ({
   items,
   customer,
   subtotal,
+  discount = 0,
+  discountType = "Amount",
+  discountReason = "",
   tax,
   total,
   paymentMethod,
@@ -12,6 +15,12 @@ const buildOrder = ({
     items,
 
     subtotal,
+
+    discount,
+
+    discountType,
+
+    discountReason,
 
     tax,
 

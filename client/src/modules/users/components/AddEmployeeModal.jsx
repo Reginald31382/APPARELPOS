@@ -1,3 +1,4 @@
+import EmployeeForm from "./EmployeeForm";
 import { useState } from "react";
 
 import {
@@ -72,67 +73,7 @@ const AddEmployeeModal = ({ open, onOpenChange }) => {
         </DialogHeader>
 
         <div className="grid gap-4">
-          <input
-            name="firstName"
-            placeholder="First Name"
-            value={form.firstName}
-            onChange={handleChange}
-            className="rounded-lg border p-3"
-          />
-
-          <input
-            name="lastName"
-            placeholder="Last Name"
-            value={form.lastName}
-            onChange={handleChange}
-            className="rounded-lg border p-3"
-          />
-
-          <input
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            className="rounded-lg border p-3"
-          />
-
-          <input
-            name="phone"
-            placeholder="Phone"
-            value={form.phone}
-            onChange={handleChange}
-            className="rounded-lg border p-3"
-          />
-
-          <select
-            name="role"
-            value={form.role}
-            onChange={handleChange}
-            className="rounded-lg border p-3"
-          >
-            {roles.map((role) => (
-              <option key={role}>{role}</option>
-            ))}
-          </select>
-
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            className="rounded-lg border p-3"
-          />
-
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            className="rounded-lg border p-3"
-          />
-
+          <EmployeeForm form={form} onChange={handleChange} />
           <div className="flex justify-end gap-3">
             <button
               onClick={() => onOpenChange(false)}

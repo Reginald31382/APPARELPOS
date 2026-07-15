@@ -19,6 +19,11 @@ const CompleteSaleButton = () => {
   const subtotal = useCartStore((state) => state.subtotal());
   const tax = useCartStore((state) => state.tax());
   const total = useCartStore((state) => state.total());
+  const discountInfo = useCartStore((state) => state.discount);
+
+  const discountAmount = useCartStore((state) => state.discountAmount);
+
+  const clearDiscount = useCartStore((state) => state.clearDiscount);
   const clearCart = useCartStore((state) => state.clearCart);
 
   const customer = useCustomerStore((state) => state.selectedCustomer);
@@ -40,6 +45,9 @@ const CompleteSaleButton = () => {
       items,
       customer,
       subtotal,
+      discount: discountAmount(),
+      discountType: discountInfo.type,
+      discountReason: discountInfo.reason,
       tax,
       total,
       paymentMethod,
@@ -51,6 +59,7 @@ const CompleteSaleButton = () => {
         checkout,
         openReceipt,
         clearCart,
+        clearDiscount,
         clearCustomer,
         clearClientSecret,
         closeCheckout,

@@ -10,6 +10,12 @@ const useCartStore = create(
     (set, get) => ({
       items: [],
 
+      discount: {
+        type: null,
+        value: 0,
+        reason: "",
+      },
+
       addItem: (item) => {
         const items = [...get().items];
 
@@ -78,6 +84,19 @@ const useCartStore = create(
 
         set({ items });
       },
+      setDiscount: (discount) =>
+        set({
+          discount,
+        }),
+
+      clearDiscount: () =>
+        set({
+          discount: {
+            type: null,
+            value: 0,
+            reason: "",
+          },
+        }),
 
       clearCart: () => set({ items: [] }),
 
@@ -87,9 +106,27 @@ const useCartStore = create(
           0,
         ),
 
-      tax: () => get().subtotal() * TAX_RATE,
+      discountAmount: () => {
+        const { type, value } = get().discount;
 
-      total: () => get().subtotal() + get().tax(),
+        const subtotal = get().subtotal();
+
+        if (!type) return 0;
+
+        if (type === "Percentage") {
+          return subtotal * (value / 100);
+        }
+
+        return value;
+      },
+
+      tax: () => {
+        const taxable = get().subtotal() - get().discountAmount();
+
+        return taxable * TAX_RATE;
+      },
+
+      total: () => get().subtotal() - get().discountAmount() + get().tax(),
     }),
     {
       name: "jrome-pos-cart",

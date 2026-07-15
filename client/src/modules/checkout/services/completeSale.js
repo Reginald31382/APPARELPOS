@@ -16,7 +16,13 @@ export const completeCashSale = async ({
         clearClientSecret();
 
         clearCart();
+
+        clearDiscount();
+
         clearCustomer();
+
+        clearClientSecret();
+
         closeCheckout();
 
         notifySuccess("Sale completed");

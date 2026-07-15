@@ -1,13 +1,14 @@
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
 import CheckoutButton from "../checkout/components/CheckoutButton";
-
+import DiscountModal from "../checkout/components/DiscountModal";
+import { useState } from "react";
 import useCartStore from "../../store/cart/useCartStore";
 
 import { formatCurrency } from "../../utils/currency";
 
 const CartDrawer = () => {
   const items = useCartStore((state) => state.items);
-
+  const [discountOpen, setDiscountOpen] = useState(false);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
 
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
@@ -17,6 +18,12 @@ const CartDrawer = () => {
   const subtotal = useCartStore((state) => state.subtotal);
 
   const tax = useCartStore((state) => state.tax);
+
+  const discount = useCartStore((state) => state.discountAmount);
+
+  const discountInfo = useCartStore((state) => state.discount);
+
+  const clearDiscount = useCartStore((state) => state.clearDiscount);
 
   const total = useCartStore((state) => state.total);
 
@@ -119,7 +126,34 @@ const CartDrawer = () => {
 
             <span>{formatCurrency(subtotal())}</span>
           </div>
+          {discount() > 0 && (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-green-700">
+                    Discount Applied
+                  </p>
 
+                  <p className="text-sm text-green-600">
+                    {discountInfo.reason || "Manual Discount"}
+                  </p>
+                </div>
+
+                <div className="text-right">
+                  <p className="font-bold text-green-700">
+                    -{formatCurrency(discount())}
+                  </p>
+
+                  <button
+                    onClick={clearDiscount}
+                    className="text-xs text-red-600 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="flex justify-between">
             <span>Tax</span>
 
@@ -131,10 +165,16 @@ const CartDrawer = () => {
 
             <span>{formatCurrency(total())}</span>
           </div>
-
+          <button
+            onClick={() => setDiscountOpen(true)}
+            className="w-full rounded-lg border border-dashed py-3 font-medium hover:bg-gray-50"
+          >
+            Apply Discount
+          </button>
           <CheckoutButton />
         </div>
       </div>
+      <DiscountModal open={discountOpen} onOpenChange={setDiscountOpen} />
     </>
   );
 };

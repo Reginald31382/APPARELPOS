@@ -42,6 +42,22 @@ const orderSchema = new mongoose.Schema(
 
     subtotal: Number,
 
+    discount: {
+      type: Number,
+      default: 0,
+    },
+
+    discountType: {
+      type: String,
+      enum: ["Percentage", "Amount"],
+      default: "Amount",
+    },
+
+    discountReason: {
+      type: String,
+      default: "",
+    },
+
     tax: Number,
 
     total: Number,

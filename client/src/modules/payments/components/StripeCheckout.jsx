@@ -31,6 +31,11 @@ const StripeCheckout = ({ total }) => {
 
   const items = useCartStore((state) => state.items);
   const subtotal = useCartStore((state) => state.subtotal());
+  const discountInfo = useCartStore((state) => state.discount);
+
+  const discountAmount = useCartStore((state) => state.discountAmount);
+
+  const clearDiscount = useCartStore((state) => state.clearDiscount);
   const tax = useCartStore((state) => state.tax());
   const clearCart = useCartStore((state) => state.clearCart);
 
@@ -68,6 +73,9 @@ const StripeCheckout = ({ total }) => {
       items,
       customer,
       subtotal,
+      discount: discountAmount(),
+      discountType: discountInfo.type,
+      discountReason: discountInfo.reason,
       tax,
       total,
       paymentMethod: "Stripe",
@@ -78,6 +86,7 @@ const StripeCheckout = ({ total }) => {
       checkout,
       openReceipt,
       clearCart,
+      clearDiscount,
       clearCustomer,
       clearClientSecret,
       closeCheckout,

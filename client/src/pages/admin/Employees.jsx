@@ -1,4 +1,6 @@
 import AddEmployeeModal from "../../modules/users/components/AddEmployeeModal";
+import EditEmployeeModal from "../../modules/users/components/EditEmployeeModal";
+import ResetPasswordModal from "../../modules/users/components/ResetPasswordModal";
 
 import { useState } from "react";
 
@@ -6,6 +8,9 @@ import useUsers from "../../modules/users/hooks/useUsers";
 
 const Employees = () => {
   const { data: users = [], isLoading } = useUsers();
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -85,18 +90,51 @@ const Employees = () => {
 
                 <td className="p-4 text-center">
                   {user.lastLogin
-                    ? new Date(user.lastLogin).toLocaleDateString()
+                    ? new Date(user.lastLogin).toLocaleString([], {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })
                     : "Never"}
                 </td>
 
                 <td className="p-4 text-center">
-                  <button className="rounded-lg border px-3 py-1">Edit</button>
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedEmployee(user);
+                        setEditOpen(true);
+                      }}
+                      className="rounded-lg border px-3 py-1"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setSelectedEmployee(user);
+                        setPasswordOpen(true);
+                      }}
+                      className="rounded-lg bg-gray-200 px-3 py-1"
+                    >
+                      Password
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
         <AddEmployeeModal open={modalOpen} onOpenChange={setModalOpen} />
+        <EditEmployeeModal
+          employee={selectedEmployee}
+          open={editOpen}
+          onOpenChange={setEditOpen}
+        />
+        <ResetPasswordModal
+          employee={selectedEmployee}
+          open={passwordOpen}
+          onOpenChange={setPasswordOpen}
+        />
       </div>
     </div>
   );
