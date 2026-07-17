@@ -1,13 +1,14 @@
-import useOrderDrawerStore from "../../store/orders/useOrderDrawerStore";
 import OrderDetailsModal from "../../modules/orders/components/OrderDetailsModal";
-
 import useOrders from "../../modules/orders/hooks/useOrders";
+import useRefundOrder from "../../modules/orders/hooks/useRefundOrder";
 import { useState } from "react";
 
 import { formatCurrency } from "../../utils/currency";
 
 const Orders = () => {
   const { data: orders = [], isLoading } = useOrders();
+
+  const { mutate: refundOrder } = useRefundOrder();
 
   const [search, setSearch] = useState("");
 
@@ -103,6 +104,17 @@ const Orders = () => {
           order={selectedOrder}
           open={isModalOpen}
           onOpenChange={setIsModalOpen}
+          onRefund={({ orderId, reason }) => {
+            refundOrder(
+              { orderId, reason },
+              {
+                onSuccess: () => {
+                  setIsModalOpen(false);
+                  setSelectedOrder(null);
+                },
+              },
+            );
+          }}
         />
       </div>
     </div>

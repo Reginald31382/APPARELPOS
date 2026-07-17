@@ -83,6 +83,22 @@ const orderSchema = new mongoose.Schema(
       enum: ["Pending", "Paid", "Failed", "Refunded"],
       default: "Pending",
     },
+
+    refund: {
+      amount: {
+        type: Number,
+        default: 0,
+      },
+      reason: {
+        type: String,
+        default: "",
+      },
+      refundedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      refundedAt: Date,
+    },
   },
   {
     timestamps: true,

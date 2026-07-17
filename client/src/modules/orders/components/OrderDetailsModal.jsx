@@ -1,3 +1,5 @@
+import RefundOrderModal from "../../refunds/RefundOrderModal";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +9,8 @@ import {
 
 import { formatCurrency } from "../../../utils/currency";
 
-const OrderDetailsModal = ({ order, open, onOpenChange }) => {
+const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
+  const [refundOpen, setRefundOpen] = useState(false);
   if (!order) return null;
 
   return (
@@ -32,9 +35,23 @@ const OrderDetailsModal = ({ order, open, onOpenChange }) => {
             <div>
               <h3 className="font-semibold">Payment</h3>
 
-              <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
-                {order.paymentMethod}
-              </span>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
+                  {order.paymentMethod}
+                </span>
+
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${
+                    order.paymentStatus === "Paid"
+                      ? "bg-green-100 text-green-700"
+                      : order.paymentStatus === "Refunded"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
+                  {order.paymentStatus}
+                </span>
+              </div>
             </div>
 
             <div>
@@ -73,7 +90,7 @@ const OrderDetailsModal = ({ order, open, onOpenChange }) => {
               <table className="w-full min-w-700px">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="p-3 text-left">Product</th>{" "}
+                    <th className="p-3 text-left">Product</th>
                     <th className="p-3">Color</th>
                     <th className="p-3">Size</th>
                     <th className="p-3">Qty</th>
@@ -116,12 +133,27 @@ const OrderDetailsModal = ({ order, open, onOpenChange }) => {
           </div>
 
           <div className="rounded-lg bg-gray-100 p-5">
+            <h3 className="text-lg font-semibold">Order Summary</h3>
             <div className="flex justify-between">
               <span>Subtotal</span>
 
               <span>{formatCurrency(order.subtotal)}</span>
             </div>
+            {order.discount > 0 && (
+              <>
+                <div className="flex justify-between text-green-700">
+                  <span>Discount</span>
 
+                  <span>-{formatCurrency(order.discount)}</span>
+                </div>
+
+                {order.discountReason && (
+                  <div className="pl-2 text-sm italic text-gray-500">
+                    {order.discountReason}
+                  </div>
+                )}
+              </>
+            )}
             <div className="mt-2 flex justify-between">
               <span>Tax</span>
 
@@ -133,19 +165,60 @@ const OrderDetailsModal = ({ order, open, onOpenChange }) => {
 
               <span>{formatCurrency(order.total)}</span>
             </div>
+            {order.refund?.refundedAt && (
+              <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                <h3 className="mb-3 font-semibold text-red-700">
+                  Refund Information
+                </h3>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Refund Amount</span>
+
+                    <span>{formatCurrency(order.refund.amount)}</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span>Reason</span>
+
+                    <span>{order.refund.reason}</span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span>Refunded On</span>
+
+                    <span>
+                      {new Date(order.refund.refundedAt).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex justify-end gap-3 border-t pt-6">
               <button className="rounded-lg border px-4 py-2 hover:bg-gray-100">
                 Print Receipt
               </button>
 
               {order.status !== "Refunded" && (
-                <button className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">
+                <button
+                  onClick={() => setRefundOpen(true)}
+                  className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                >
                   Refund Order
                 </button>
               )}
             </div>
           </div>
         </div>
+        <RefundOrderModal
+          order={order}
+          open={refundOpen}
+          onOpenChange={setRefundOpen}
+          onRefund={(data) => {
+            onRefund(data);
+            setRefundOpen(false);
+          }}
+        />
       </DialogContent>
     </Dialog>
   );

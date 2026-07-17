@@ -24,6 +24,13 @@ export const refundOrder = async (req, res) => {
 
     order.paymentStatus = "Refunded";
 
+    order.refund = {
+      amount: order.total,
+      reason: req.body.reason || "Customer Return",
+      refundedBy: req.user._id,
+      refundedAt: new Date(),
+    };
+
     await order.save();
 
     res.json(order);

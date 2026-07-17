@@ -6,6 +6,8 @@ const OrderSummary = () => {
   const subtotal = useCartStore((state) => state.subtotal());
   const tax = useCartStore((state) => state.tax());
   const total = useCartStore((state) => state.total());
+  const discountAmount = useCartStore((state) => state.discountAmount());
+  const discountInfo = useCartStore((state) => state.discount);
 
   return (
     <div className="rounded-lg border bg-white p-4">
@@ -26,11 +28,21 @@ const OrderSummary = () => {
 
         {/* Future Discounts */}
 
-        <div className="flex justify-between text-gray-500">
-          <span>Discount</span>
+        {discountAmount > 0 && (
+          <>
+            <div className="flex justify-between text-green-700">
+              <span>Discount</span>
 
-          <span>$0.00</span>
-        </div>
+              <span>-{formatCurrency(discountAmount)}</span>
+            </div>
+
+            {discountInfo.reason && (
+              <div className="pl-2 text-sm italic text-gray-500">
+                {discountInfo.reason}
+              </div>
+            )}
+          </>
+        )}
 
         <hr />
 
