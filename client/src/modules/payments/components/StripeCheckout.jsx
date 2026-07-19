@@ -4,7 +4,7 @@ import useCheckoutStore from "../../../store/checkout/useCheckoutStore";
 import useCartStore from "../../../store/cart/useCartStore";
 import useCustomerStore from "../../../store/customer/useCustomerStore";
 import useReceiptStore from "../../../store/receipt/useReceiptStore";
-
+import useMobileCartStore from "../../../store/ui/useMobileCartStore";
 import useCheckout from "../../../hooks/useCheckout";
 
 import { notifySuccess, notifyError } from "../../../utils/notifications";
@@ -38,7 +38,7 @@ const StripeCheckout = ({ total }) => {
   const clearDiscount = useCartStore((state) => state.clearDiscount);
   const tax = useCartStore((state) => state.tax());
   const clearCart = useCartStore((state) => state.clearCart);
-
+  const closeCart = useMobileCartStore((state) => state.closeCart);
   const customer = useCustomerStore((state) => state.selectedCustomer);
   const clearCustomer = useCustomerStore((state) => state.clearCustomer);
 
@@ -90,6 +90,7 @@ const StripeCheckout = ({ total }) => {
       clearCustomer,
       clearClientSecret,
       closeCheckout,
+      closeCart,
       notifySuccess,
     });
   };

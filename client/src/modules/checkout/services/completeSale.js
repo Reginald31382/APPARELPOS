@@ -7,6 +7,7 @@ export const completeCashSale = async ({
   clearCustomer,
   clearClientSecret,
   closeCheckout,
+  closeCart,
   notifySuccess,
 }) => {
   return new Promise((resolve, reject) => {
@@ -25,6 +26,7 @@ export const completeCashSale = async ({
         clearClientSecret();
 
         closeCheckout();
+        closeCart();
 
         notifySuccess("Sale completed");
 

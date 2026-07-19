@@ -5,6 +5,7 @@ import ReceiptItems from "./ReceiptItems";
 import ReceiptTotals from "./ReceiptTotals";
 import ReceiptFooter from "./ReceiptFooter";
 import useReceiptPrint from "./hooks/useReceiptPrint";
+import EmailReceiptButton from "./EmailReceiptButton";
 
 const ReceiptDrawer = () => {
   const receipt = useReceiptStore((state) => state.receipt);
@@ -78,9 +79,12 @@ const ReceiptDrawer = () => {
           >
             Print Receipt
           </button>
+
+          <EmailReceiptButton />
+
           <button
             onClick={closeReceipt}
-            className="w-full rounded-lg bg-black py-3 text-white hover:bg-gray-900"
+            className="w-full rounded-lg bg-black py-3 text-white hover:bg-gray-900 mt-3"
           >
             Close Receipt
           </button>

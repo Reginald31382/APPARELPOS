@@ -3,6 +3,7 @@ import useCartStore from "../../../store/cart/useCartStore";
 import useCustomerStore from "../../../store/customer/useCustomerStore";
 import useReceiptStore from "../../../store/receipt/useReceiptStore";
 import useCheckout from "../../../hooks/useCheckout";
+import useMobileCartStore from "../../../store/ui/useMobileCartStore";
 
 import { notifySuccess } from "../../../utils/notifications";
 import { buildCheckoutOrder } from "../../../services/checkoutWorkflow";
@@ -25,7 +26,7 @@ const CompleteSaleButton = () => {
 
   const clearDiscount = useCartStore((state) => state.clearDiscount);
   const clearCart = useCartStore((state) => state.clearCart);
-
+  const closeCart = useMobileCartStore((state) => state.closeCart);
   const customer = useCustomerStore((state) => state.selectedCustomer);
 
   const clearCustomer = useCustomerStore((state) => state.clearCustomer);
@@ -63,6 +64,7 @@ const CompleteSaleButton = () => {
         clearCustomer,
         clearClientSecret,
         closeCheckout,
+        closeCart,
         notifySuccess,
         notifyError,
       });

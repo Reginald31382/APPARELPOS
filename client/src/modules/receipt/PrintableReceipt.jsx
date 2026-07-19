@@ -1,3 +1,4 @@
+import ReceiptQRCode from "./ReceiptQRCode";
 import { formatCurrency } from "../../../utils/currency";
 
 const PrintableReceipt = ({ receipt }) => {
@@ -89,6 +90,7 @@ const PrintableReceipt = ({ receipt }) => {
 
         <p className="mt-4 font-semibold">Thank you for shopping!</p>
       </div>
+      <ReceiptQRCode value="https://www.jromeapparel.com" />
     </div>
   );
 };
