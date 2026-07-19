@@ -6,13 +6,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
+import useReceiptStore from "../../../store/receipt/useReceiptStore";
 import { formatCurrency } from "../../../utils/currency";
 
 const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
   const [refundOpen, setRefundOpen] = useState(false);
-  if (!order) return null;
+  const openReceipt = useReceiptStore((state) => state.openReceipt);
 
+  if (!order) return null;
+  const handlePrintReceipt = () => {
+    openReceipt({
+      _id: order._id,
+      customer: order.customer,
+      items: order.items,
+      subtotal: order.subtotal,
+      tax: order.tax,
+      total: order.total,
+      paymentMethod: order.paymentMethod,
+
+      // Include discount information if it exists
+      discount: order.discount || {
+        amount: 0,
+        reason: "",
+      },
+    });
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[95vh] max-w-3xl overflow-y-auto">
@@ -195,7 +213,10 @@ const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
               </div>
             )}
             <div className="flex justify-end gap-3 border-t pt-6">
-              <button className="rounded-lg border px-4 py-2 hover:bg-gray-100">
+              <button
+                onClick={handlePrintReceipt}
+                className="rounded-lg border px-4 py-2 hover:bg-gray-100"
+              >
                 Print Receipt
               </button>
 

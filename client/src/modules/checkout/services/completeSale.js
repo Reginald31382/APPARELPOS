@@ -3,6 +3,7 @@ export const completeCashSale = async ({
   checkout,
   openReceipt,
   clearCart,
+  clearDiscount,
   clearCustomer,
   clearClientSecret,
   closeCheckout,
@@ -40,6 +41,7 @@ export const completeStripeSale = async ({
   checkout,
   openReceipt,
   clearCart,
+  clearDiscount,
   clearCustomer,
   clearClientSecret,
   closeCheckout,
@@ -53,6 +55,7 @@ export const completeStripeSale = async ({
         clearClientSecret();
 
         clearCart();
+        clearDiscount();
         clearCustomer();
         closeCheckout();
 
