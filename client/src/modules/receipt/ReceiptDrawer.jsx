@@ -53,6 +53,8 @@ const ReceiptDrawer = () => {
 
           <ReceiptTotals
             subtotal={receipt.subtotal}
+            discount={receipt.discount?.amount || 0}
+            discountReason={receipt.discount?.reason || ""}
             tax={receipt.tax}
             total={receipt.total}
           />

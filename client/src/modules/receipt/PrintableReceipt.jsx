@@ -21,7 +21,7 @@ const PrintableReceipt = ({ receipt }) => {
         <p>Date: {new Date().toLocaleString()}</p>
 
         <p>
-          Customer:{" "}
+          Customer:
           {receipt.customer?.firstName
             ? `${receipt.customer.firstName} ${receipt.customer.lastName}`
             : "Walk-in Customer"}
@@ -52,6 +52,22 @@ const PrintableReceipt = ({ receipt }) => {
 
           <span>{formatCurrency(receipt.subtotal)}</span>
         </div>
+
+        {receipt.discount?.amount > 0 && (
+          <>
+            <div className="flex justify-between">
+              <span>Discount</span>
+
+              <span>-{formatCurrency(receipt.discount.amount)}</span>
+            </div>
+
+            {receipt.discount.reason && (
+              <div className="text-xs italic text-gray-500">
+                {receipt.discount.reason}
+              </div>
+            )}
+          </>
+        )}
 
         <div className="flex justify-between">
           <span>Tax</span>

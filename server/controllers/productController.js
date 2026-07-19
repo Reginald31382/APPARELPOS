@@ -29,7 +29,7 @@ export const getProducts = async (req, res) => {
       query.featured = featured === "true";
     }
 
-    console.log("FINAL QUERY:", JSON.stringify(query, null, 2));
+    // console.log("FINAL QUERY:", JSON.stringify(query, null, 2));
 
     let sortQuery = {};
 
