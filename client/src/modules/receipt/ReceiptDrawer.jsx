@@ -1,9 +1,7 @@
 import useReceiptStore from "../../store/receipt/useReceiptStore";
 
-import ReceiptHeader from "./ReceiptHeader";
-import ReceiptItems from "./ReceiptItems";
-import ReceiptTotals from "./ReceiptTotals";
-import ReceiptFooter from "./ReceiptFooter";
+import { useRef } from "react";
+import PrintableReceipt from "./PrintableReceipt";
 import useReceiptPrint from "./hooks/useReceiptPrint";
 import EmailReceiptButton from "./EmailReceiptButton";
 
@@ -14,7 +12,8 @@ const ReceiptDrawer = () => {
 
   const closeReceipt = useReceiptStore((state) => state.closeReceipt);
 
-  const { printReceipt } = useReceiptPrint();
+  const { printReceipt } = useReceiptPrint(receiptRef);
+  const receiptRef = useRef(null);
 
   if (!isOpen || !receipt) return null;
 
@@ -32,35 +31,7 @@ const ReceiptDrawer = () => {
 
         {/* Content */}
         <div className="flex-1 space-y-6 overflow-y-auto p-6">
-          <ReceiptHeader />
-
-          <div className="rounded-lg bg-gray-50 p-4">
-            <h3 className="mb-3 font-semibold">Customer</h3>
-
-            <p>
-              {receipt.customer?.firstName && receipt.customer?.lastName
-                ? `${receipt.customer.firstName} ${receipt.customer.lastName}`
-                : "Walk-in Customer"}
-            </p>
-          </div>
-
-          <div className="rounded-lg bg-gray-50 p-4">
-            <h3 className="mb-3 font-semibold">Payment</h3>
-
-            <p>{receipt.paymentMethod}</p>
-          </div>
-
-          <ReceiptItems items={receipt.items} />
-
-          <ReceiptTotals
-            subtotal={receipt.subtotal}
-            discount={receipt.discount?.amount || 0}
-            discountReason={receipt.discount?.reason || ""}
-            tax={receipt.tax}
-            total={receipt.total}
-          />
-
-          <ReceiptFooter />
+          <PrintableReceipt ref={receiptRef} receipt={receipt} />
 
           <div className="rounded-lg bg-green-50 p-4 text-center">
             <p className="font-semibold">Sale Completed Successfully</p>

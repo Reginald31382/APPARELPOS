@@ -1,11 +1,15 @@
+import { forwardRef } from "react";
 import ReceiptQRCode from "./ReceiptQRCode";
 import { formatCurrency } from "../../../utils/currency";
 
-const PrintableReceipt = ({ receipt }) => {
+const PrintableReceipt = forwardRef(({ receipt }, ref) => {
   if (!receipt) return null;
 
   return (
-    <div className="mx-auto w-[300px] bg-white p-4 text-sm text-black">
+    <div
+      ref={ref}
+      className="mx-auto w-[340px] rounded-lg bg-white p-6 text-sm text-black"
+    >
       <div className="text-center">
         <h1 className="text-xl font-bold">J.Rome Apparel</h1>
 
@@ -90,9 +94,9 @@ const PrintableReceipt = ({ receipt }) => {
 
         <p className="mt-4 font-semibold">Thank you for shopping!</p>
       </div>
-      <ReceiptQRCode value="https://www.jromeapparel.com" />
+      <ReceiptQRCode value="https://www.jrome-studios.com" />
     </div>
   );
-};
+});
 
 export default PrintableReceipt;

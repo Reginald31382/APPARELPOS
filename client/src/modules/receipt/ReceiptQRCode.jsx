@@ -1,13 +1,15 @@
 import QRCode from "react-qr-code";
 
-const ReceiptQRCode = ({ value = "https://www.jrome-studios.com" }) => {
+const ReceiptQRCode = ({ value }) => {
   return (
-    <div className="mt-8 flex flex-col items-center gap-3">
-      <QRCode value={value} size={110} level="M" />
+    <div className="mt-8 flex flex-col items-center">
+      <QRCode value={value} size={90} level="H" />
 
-      <p className="text-center text-xs text-gray-500">
-        Scan to shop our latest arrivals
+      <p className="mt-2 text-center text-[10px] text-gray-500">
+        Scan to shop online
       </p>
+
+      <p className="text-[10px] text-gray-400">www.jrome-studios.com</p>
     </div>
   );
 };
