@@ -68,7 +68,7 @@ const StripeCheckout = ({ total }) => {
   }
 
   const handlePaymentSuccess = async () => {
-    console.log("Stripe payment succeeded. Saving order...");
+    // console.log("Stripe payment succeeded. Saving order...");
     const order = buildCheckoutOrder({
       items,
       customer,

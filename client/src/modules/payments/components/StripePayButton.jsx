@@ -9,11 +9,11 @@ const StripePayButton = ({ amount, onSuccess, onError }) => {
 
   const handlePayment = async () => {
     if (!stripe || !elements) {
-      console.log("Stripe not ready");
+      // console.log("Stripe not ready");
       return;
     }
 
-    console.log("Starting payment...");
+    // console.log("Starting payment...");
 
     setLoading(true);
 
@@ -22,7 +22,7 @@ const StripePayButton = ({ amount, onSuccess, onError }) => {
       redirect: "if_required",
     });
 
-    console.log("Stripe Result:", result);
+    // console.log("Stripe Result:", result);
 
     setLoading(false);
 
@@ -34,7 +34,7 @@ const StripePayButton = ({ amount, onSuccess, onError }) => {
       return;
     }
 
-    console.log("Payment Intent:", result.paymentIntent);
+    // console.log("Payment Intent:", result.paymentIntent);
 
     onSuccess?.(result.paymentIntent);
   };
