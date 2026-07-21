@@ -12,8 +12,8 @@ const ReceiptDrawer = () => {
 
   const closeReceipt = useReceiptStore((state) => state.closeReceipt);
 
-  const { printReceipt } = useReceiptPrint(receiptRef);
   const receiptRef = useRef(null);
+  const { printReceipt } = useReceiptPrint(receiptRef);
 
   if (!isOpen || !receipt) return null;
 

@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import ReceiptQRCode from "./ReceiptQRCode";
-import { formatCurrency } from "../../../utils/currency";
+import { formatCurrency } from "../../utils/currency";
+import formatReceiptNumber from "../../utils/formatReceiptNumber";
 
 const PrintableReceipt = forwardRef(({ receipt }, ref) => {
   if (!receipt) return null;
@@ -21,8 +22,7 @@ const PrintableReceipt = forwardRef(({ receipt }, ref) => {
       </div>
 
       <div className="space-y-1">
-        <p>Receipt #: {receipt._id?.slice(-8) || "N/A"}</p>
-
+        <p>Receipt #: {formatReceiptNumber(receipt)}</p>
         <p>Date: {new Date().toLocaleString()}</p>
 
         <p>

@@ -1,4 +1,5 @@
 import { formatCurrency } from "../../../utils/currency";
+import formatReceiptNumber from "../../../utils/formatReceiptNumber";
 
 const buildReceiptEmail = (receipt, email) => {
   const items = receipt.items
@@ -11,7 +12,7 @@ const buildReceiptEmail = (receipt, email) => {
   return {
     customer_email: email,
 
-    receipt_number: receipt._id?.slice(-8),
+    receipt_number: formatReceiptNumber(receipt),
 
     purchase_date: new Date(receipt.createdAt || Date.now()).toLocaleString(),
     customer_name:
