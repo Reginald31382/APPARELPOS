@@ -51,7 +51,14 @@ export const createOrder = async (req, res) => {
   try {
     console.log("Incoming Order:");
     console.dir(req.body, { depth: null });
+    // Only Admins may apply discounts
+    const discount = Number(req.body.discount || 0);
 
+    if (discount > 0 && req.user.role !== "Admin") {
+      return res.status(403).json({
+        message: "Only administrators can apply discounts.",
+      });
+    }
     const order = await Order.create({
       ...req.body,
       orderNumber: generateOrderNumber(),

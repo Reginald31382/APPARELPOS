@@ -1,6 +1,6 @@
 import useProductStore from "../../../store/product/useProductStore";
-import CartSummary from "./CustomerSummary";
-import CustomerAutocomplete from "../../customer/CustomerAutoComplete";
+// import CartSummary from "./CustomerSummary";
+// import CustomerAutocomplete from "../../customer/CustomerAutoComplete";
 import { Search } from "lucide-react";
 import { useRef, useEffect } from "react";
 
@@ -48,17 +48,22 @@ const POSHeader = () => {
   return (
     <div className="space-y-4 border-b bg-white p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">J.Rome POS</h1>
+        {/* <h1 className="text-3xl font-bold">J.Rome POS</h1> */}
+        <img
+          src="https://i.postimg.cc/9QCLhrdv/jrome-leo-szn.png"
+          alt="logo"
+          className="h-50 w-auto"
+        />
 
-        <CartSummary />
+        {/* <CartSummary /> */}
       </div>
 
       {/* Customer Section */}
-      <div>
+      {/* <div>
         <h2 className="mb-2 font-semibold">Customer</h2>
 
         <CustomerAutocomplete />
-      </div>
+      </div> */}
 
       <div className="relative">
         <Search
@@ -69,7 +74,7 @@ const POSHeader = () => {
         <input
           ref={searchRef}
           type="text"
-          placeholder="Search products, SKU, or barcode..."
+          placeholder="Search producsts..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-lg border py-3 pl-10 pr-4"

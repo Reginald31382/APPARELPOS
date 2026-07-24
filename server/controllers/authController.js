@@ -106,6 +106,54 @@ export const login = async (req, res) => {
   }
 };
 
+// Manager Override
+// Looks up the user by email.
+// Verifies the password with bcrypt.compare().
+// Ensures the user's role is either Admin or Manager.
+// Returns the approver's information if successful.
+export const managerOverride = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid manager credentials.",
+      });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword) {
+      return res.status(401).json({
+        message: "Invalid manager credentials.",
+      });
+    }
+
+    if (!["Admin", "Manager"].includes(user.role)) {
+      return res.status(403).json({
+        message: "User is not authorized to approve discounts.",
+      });
+    }
+
+    res.json({
+      approved: true,
+      approver: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 export const hasUsers = async (req, res) => {
   try {
     const count = await User.countDocuments();

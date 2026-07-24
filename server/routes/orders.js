@@ -8,13 +8,15 @@ import {
   deleteOrder,
 } from "../controllers/orderController.js";
 
+import { protect } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
 router.get("/", getOrders);
 
 router.get("/:id", getOrder);
 
-router.post("/", createOrder);
+router.post("/", protect, createOrder);
 
 router.put("/:id", updateOrder);
 

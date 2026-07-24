@@ -1,3 +1,5 @@
+import useMobileCartStore from "../store/ui/useMobileCartStore";
+import DesktopCartToggle from "../modules/cart/DesktopCartToggle";
 import CheckoutToolbar from "../modules/checkout/components/CheckoutToolbar";
 import ProductGrid from "../modules/product/ProductGrid";
 
@@ -9,6 +11,9 @@ import ProductQuickView from "../modules/product/ProductQuickView";
 import FloatingCartButton from "../modules/cart/FloatingCartButton";
 
 const PosLayout = () => {
+  const isDesktopCollapsed = useMobileCartStore(
+    (state) => state.isDesktopCollapsed,
+  );
   return (
     <div className="flex h-screen flex-col lg:flex-row">
       {/* Product Area */}
@@ -21,8 +26,20 @@ const PosLayout = () => {
       </div>
 
       {/* Desktop Cart */}
-      <aside className="hidden w-[420px] shrink-0 border-l bg-white lg:block">
-        <CartDrawer />
+      <aside
+        className={`
+    hidden overflow-hidden border-l bg-white transition-all duration-300 ease-in-out lg:block
+    ${isDesktopCollapsed ? "w-0 border-l-0" : "w-[420px]"}
+  `}
+      >
+        <div
+          className={`
+      h-full w-[420px] transition-transform duration-300 ease-in-out
+      ${isDesktopCollapsed ? "translate-x-full" : "translate-x-0"}
+    `}
+        >
+          <CartDrawer />
+        </div>
       </aside>
 
       {/* Mobile Cart */}
@@ -34,6 +51,8 @@ const PosLayout = () => {
       <ProductQuickView />
       <CheckoutDrawer />
       <ReceiptDrawer />
+
+      <DesktopCartToggle />
 
       {/* Floating Cart */}
       <FloatingCartButton />

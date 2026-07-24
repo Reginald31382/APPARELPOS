@@ -3,7 +3,7 @@ import { create } from "zustand";
 const token = localStorage.getItem("token");
 const storedUser = localStorage.getItem("user");
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
   token,
   user: storedUser ? JSON.parse(storedUser) : null,
 
@@ -25,6 +25,26 @@ const useAuthStore = create((set) => ({
       token: null,
       user: null,
     });
+  },
+
+  isAuthenticated: () => {
+    return !!get().token;
+  },
+
+  hasRole: (...roles) => {
+    return roles.includes(get().user?.role);
+  },
+
+  isAdmin: () => {
+    return get().user?.role === "Admin";
+  },
+
+  isManager: () => {
+    return get().user?.role === "Manager";
+  },
+
+  isEmployee: () => {
+    return get().user?.role === "Employee";
   },
 }));
 

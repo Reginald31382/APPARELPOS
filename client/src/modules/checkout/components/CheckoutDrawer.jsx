@@ -1,7 +1,7 @@
 import useCheckoutStore from "../../../store/checkout/useCheckoutStore";
 import useCartStore from "../../../store/cart/useCartStore";
 
-import CustomerSummary from "./CustomerSummary";
+// import CustomerSummary from "./CustomerSummary";
 import CartReview from "./CartReview";
 import OrderSummary from "./OrderSummary";
 import PaymentSelector from "./PaymentSelector";
@@ -46,7 +46,7 @@ const CheckoutDrawer = () => {
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="space-y-4">
-            <CustomerSummary />
+            {/* <CustomerSummary /> */}
 
             <CartReview />
 

@@ -8,9 +8,9 @@ import Product from "../pages/customer/Product";
 import Checkout from "../pages/customer/Checkout";
 
 import DashboardPage from "../modules/dashboard/DashboardPage";
-import Products from "../pages/admin/Products";
+// import Products from "../pages/admin/Products";
 import Orders from "../pages/admin/Orders";
-import Customers from "../pages/admin/Customers";
+// import Customers from "../pages/admin/Customers";
 import Inventory from "../pages/admin/Inventory";
 import ReportsPage from "../modules/reports/ReportsPage";
 import Setup from "../pages/auth/Setup";
@@ -45,9 +45,9 @@ const AppRoutes = () => {
         }
       >
         <Route index element={<DashboardPage />} />
-        <Route path="products" element={<Products />} />
+        {/* <Route path="products" element={<Products />} /> */}
         <Route path="orders" element={<Orders />} />
-        <Route path="customers" element={<Customers />} />
+        {/* <Route path="customers" element={<Customers />} /> */}
         <Route path="employees" element={<Employees />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="reports" element={<ReportsPage />} />
