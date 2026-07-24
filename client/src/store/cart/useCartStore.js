@@ -84,6 +84,39 @@ const useCartStore = create(
 
         set({ items });
       },
+
+      updateQuantity: (sku, quantity) => {
+        const items = [...get().items];
+
+        const item = items.find((i) => i.sku === sku);
+
+        if (!item) return false;
+
+        const newQuantity = Number(quantity);
+
+        if (!Number.isInteger(newQuantity) || newQuantity < 0) {
+          return false;
+        }
+
+        if (newQuantity === 0) {
+          set({
+            items: items.filter((i) => i.sku !== sku),
+          });
+
+          return true;
+        }
+
+        if (newQuantity > item.stock) {
+          notifyError("Not enough inventory");
+          return false;
+        }
+
+        item.quantity = newQuantity;
+
+        set({ items });
+
+        return true;
+      },
       setDiscount: (discount) =>
         set({
           discount,

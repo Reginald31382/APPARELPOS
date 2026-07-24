@@ -3,7 +3,7 @@ import useAuthStore from "../../modules/auth/store/useAuthStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
 import CheckoutButton from "../checkout/components/CheckoutButton";
 import DiscountModal from "../checkout/components/DiscountModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useCartStore from "../../store/cart/useCartStore";
 
 import { formatCurrency } from "../../utils/currency";
@@ -12,9 +12,12 @@ const CartDrawer = () => {
   const items = useCartStore((state) => state.items);
   const [discountOpen, setDiscountOpen] = useState(false);
   const [managerApprovalOpen, setManagerApprovalOpen] = useState(false);
+  const [quantityInputs, setQuantityInputs] = useState({});
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
 
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
+
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
 
   const removeItem = useCartStore((state) => state.removeItem);
 
@@ -52,6 +55,16 @@ const CartDrawer = () => {
 
     setManagerApprovalOpen(true);
   };
+
+  useEffect(() => {
+    const values = {};
+
+    items.forEach((item) => {
+      values[item.sku] = String(item.quantity);
+    });
+
+    setQuantityInputs(values);
+  }, [items]);
 
   return (
     <>
@@ -121,23 +134,45 @@ const CartDrawer = () => {
                 <p className="font-bold">{formatCurrency(item.unitPrice)}</p>
 
                 <div className="mt-3 flex items-center gap-2">
-                  <button
-                    onClick={() => decreaseQuantity(item.sku)}
-                    className="rounded border px-3 py-1"
-                  >
-                    −
-                  </button>
+                  <input
+                    type="number"
+                    min="0"
+                    value={quantityInputs[item.sku] ?? ""}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) =>
+                      setQuantityInputs((prev) => ({
+                        ...prev,
+                        [item.sku]: e.target.value,
+                      }))
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        updateQuantity(item.sku, e.target.value);
+                        e.target.blur();
+                      }
 
-                  <span className="min-w-[24px] text-center">
-                    {item.quantity}
-                  </span>
+                      if (e.key === "Escape") {
+                        setQuantityInputs((prev) => ({
+                          ...prev,
+                          [item.sku]: String(item.quantity),
+                        }));
 
-                  <button
-                    onClick={() => increaseQuantity(item.sku)}
-                    className="rounded border px-3 py-1"
-                  >
-                    +
-                  </button>
+                        e.target.blur();
+                      }
+                    }}
+                    onBlur={(e) => {
+                      updateQuantity(item.sku, e.target.value);
+
+                      // Restore whatever quantity is actually in the cart.
+                      const currentItem = items.find((i) => i.sku === item.sku);
+
+                      setQuantityInputs((prev) => ({
+                        ...prev,
+                        [item.sku]: String(currentItem?.quantity ?? ""),
+                      }));
+                    }}
+                    className="w-16 rounded border text-center"
+                  />
 
                   <button
                     onClick={() => removeItem(item.sku)}
