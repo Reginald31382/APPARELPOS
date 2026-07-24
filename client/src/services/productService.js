@@ -13,3 +13,8 @@ export const fetchProducts = async (filters) => {
 
   return data;
 };
+
+export const fetchProductById = async (id) => {
+  const { data } = await api.get(`/products/${id}`);
+  return data;
+};

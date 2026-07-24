@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 
+import Home from "../pages/customer/Home";
 import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
@@ -26,7 +27,8 @@ const AppRoutes = () => {
     <Routes>
       {/* Customer */}
       <Route element={<MainLayout />}>
-        <Route path="/" element={<PosLayout />} />
+        <Route index element={<Home />} />
+        <Route path="shop" element={<PosLayout />} />
         <Route path="/product/:id" element={<Product />} />
         <Route path="/checkout" element={<Checkout />} />
       </Route>

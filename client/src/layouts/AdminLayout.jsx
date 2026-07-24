@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 
 import Sidebar from "../components/layout/Sidebar";
-import Navbar from "../components/layout/Navbar";
+import AdminNavbar from "../components/layout/AdminNavbar";
 import Breadcrumbs from "../components/layout/Breadcrumbs";
 
 const AdminLayout = () => {
@@ -10,7 +10,7 @@ const AdminLayout = () => {
       <Sidebar />
 
       <div className="flex flex-col flex-1">
-        <Navbar />
+        <AdminNavbar />
 
         <main className="p-8">
           <Breadcrumbs />

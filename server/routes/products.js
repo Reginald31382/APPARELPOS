@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   getProducts,
+  getProductById,
   createProduct,
   updateInventory,
 } from "../controllers/productController.js";
@@ -14,6 +15,7 @@ const router = express.Router();
 | Public Routes
 */
 router.get("/", getProducts);
+router.get("/:id", getProductById);
 
 /*
 | Protected Routes

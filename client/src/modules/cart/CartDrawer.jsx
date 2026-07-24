@@ -94,7 +94,7 @@ const CartDrawer = () => {
             onClick={toggleDesktopCart}
             className="absolute right-4 top-4 hidden rounded border bg-white px-2 py-1 text-lg hover:bg-gray-100 lg:block"
           >
-            {isDesktopCollapsed ? "◀" : "▶"}
+            {isDesktopCollapsed ? "◀" : "close"}
           </button>
           {!isDesktopCollapsed && (
             <>

@@ -9,7 +9,6 @@ const FloatingCartButton = () => {
   const openCart = useMobileCartStore((state) => state.openCart);
 
   const handleClick = () => {
-    // console.log("Opening cart...");
     openCart();
   };
 

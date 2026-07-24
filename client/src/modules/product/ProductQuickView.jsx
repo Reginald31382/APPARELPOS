@@ -20,12 +20,14 @@ const ProductQuickView = () => {
 
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   // Reset selections when product changes
   useEffect(() => {
     if (selectedProduct) {
       setSelectedColor(null);
       setSelectedSize(null);
+      setSelectedImage(0);
     }
   }, [selectedProduct]);
 
@@ -59,16 +61,39 @@ const ProductQuickView = () => {
   return (
     <Sheet open={isOpen} onOpenChange={closeProduct}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-6">
-        {" "}
         <SheetHeader>
           <SheetTitle>{selectedProduct.name}</SheetTitle>
         </SheetHeader>
         <div className="mt-6 space-y-6">
-          <img
-            src={selectedProduct.images?.[0]}
-            alt={selectedProduct.name}
-            className="w-full rounded-lg"
-          />
+          <div className="space-y-4">
+            <img
+              src={selectedProduct.images?.[selectedImage]}
+              alt={selectedProduct.name}
+              className="aspect-[4/5] w-full rounded-lg object-cover transition-all duration-300"
+            />
+
+            {selectedProduct.images?.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto">
+                {selectedProduct.images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`overflow-hidden rounded border-2 transition ${
+                      selectedImage === index
+                        ? "border-black"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      alt=""
+                      className="h-20 w-16 object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <p className="text-gray-600">{selectedProduct.description}</p>
 

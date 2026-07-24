@@ -49,11 +49,6 @@ const POSHeader = () => {
     <div className="space-y-4 border-b bg-white p-4">
       <div className="flex items-center justify-between">
         {/* <h1 className="text-3xl font-bold">J.Rome POS</h1> */}
-        <img
-          src="https://i.postimg.cc/9QCLhrdv/jrome-leo-szn.png"
-          alt="logo"
-          className="h-50 w-auto"
-        />
 
         {/* <CartSummary /> */}
       </div>
