@@ -2,6 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import useCartStore from "../../store/cart/useCartStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
 import { ShoppingBag } from "lucide-react";
+import { GrUserWorker } from "react-icons/gr";
 
 const links = [
   { name: "Shop", path: "/shop" },
@@ -63,6 +64,16 @@ const StoreNavbar = () => {
               </span>
             )}
           </button>
+          <NavLink
+            to="/admin"
+            className={({ isActive }) =>
+              `text-sm uppercase tracking-[0.25em] transition ${
+                isActive ? "text-black" : "text-gray-500 hover:text-black"
+              }`
+            }
+          >
+            <GrUserWorker className="h-6 w-6" />
+          </NavLink>
         </nav>
       </div>
     </header>

@@ -72,6 +72,13 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
 
+    weight: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
+    },
+
     images: [
       {
         type: String,

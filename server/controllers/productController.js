@@ -83,11 +83,39 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
+    const { name, price, weight, variants } = req.body;
+
+    if (!name?.trim()) {
+      return res.status(400).json({
+        message: "Product name is required.",
+      });
+    }
+
+    if (price === "" || price === undefined || price === null) {
+      return res.status(400).json({
+        message: "Price is required.",
+      });
+    }
+
+    if (weight === "" || weight === undefined || weight === null) {
+      return res.status(400).json({
+        message: "Weight is required.",
+      });
+    }
+
+    if (!variants?.length) {
+      return res.status(400).json({
+        message: "At least one product variant is required.",
+      });
+    }
+
     const product = await Product.create(req.body);
 
     res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 

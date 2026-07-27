@@ -6,16 +6,17 @@ import Breadcrumbs from "../components/layout/Breadcrumbs";
 
 const AdminLayout = () => {
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex h-screen overflow-hidden bg-gray-100">
       <Sidebar />
 
-      <div className="flex flex-col flex-1">
+      <div className="flex min-w-0 flex-1 flex-col">
         <AdminNavbar />
 
-        <main className="p-8">
-          <Breadcrumbs />
-
-          <Outlet />
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-7xl">
+            <Breadcrumbs />
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

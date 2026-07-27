@@ -2,11 +2,12 @@ import { X, Minus, Plus, Trash2 } from "lucide-react";
 import useCartStore from "../../store/cart/useCartStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
 import { formatCurrency } from "../../utils/currency";
+import { useNavigate } from "react-router-dom";
 
 const StoreCartModal = () => {
   const isOpen = useMobileCartStore((state) => state.isOpen);
   const closeCart = useMobileCartStore((state) => state.closeCart);
-
+  const navigate = useNavigate();
   const items = useCartStore((state) => state.items);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
@@ -120,7 +121,13 @@ const StoreCartModal = () => {
                 Continue Shopping
               </button>
 
-              <button className="rounded-xl bg-black py-3 font-medium text-white transition hover:bg-gray-800">
+              <button
+                onClick={() => {
+                  closeCart();
+                  navigate("/checkout");
+                }}
+                className="rounded-xl bg-black py-3 font-medium text-white transition hover:bg-gray-800"
+              >
                 Checkout
               </button>
             </div>
