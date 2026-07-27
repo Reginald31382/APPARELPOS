@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { createProduct } from "../../services/productService";
+import { createProduct, updateProduct } from "../../services/productService";
 
 const initialProduct = {
   name: "",
@@ -21,10 +21,32 @@ const initialProduct = {
   variants: [],
 };
 
-const ProductModal = ({ isOpen, onClose, onProductCreated }) => {
+const ProductModal = ({
+  isOpen,
+  onClose,
+  onProductCreated,
+  product: selectedProduct,
+}) => {
   const [product, setProduct] = useState(initialProduct);
   const [imageUrl, setImageUrl] = useState("");
   const [saving, setSaving] = useState(false);
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (selectedProduct) {
+      setProduct({
+        ...selectedProduct,
+        price: selectedProduct.price ?? "",
+        salePrice: selectedProduct.salePrice ?? "",
+        cost: selectedProduct.cost ?? "",
+        weight: selectedProduct.weight ?? "",
+      });
+    } else {
+      setProduct(initialProduct);
+    }
+
+    setImageUrl("");
+  }, [selectedProduct, isOpen]);
 
   const emptyVariant = {
     color: "",
@@ -123,13 +145,19 @@ const ProductModal = ({ isOpen, onClose, onProductCreated }) => {
     try {
       setSaving(true);
 
-      await createProduct({
+      const payload = {
         ...product,
         price: Number(product.price),
         salePrice: Number(product.salePrice || 0),
         cost: Number(product.cost || 0),
         weight: Number(product.weight),
-      });
+      };
+
+      if (selectedProduct) {
+        await updateProduct(selectedProduct._id, payload);
+      } else {
+        await createProduct(payload);
+      }
 
       handleClose();
 
@@ -158,9 +186,14 @@ const ProductModal = ({ isOpen, onClose, onProductCreated }) => {
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4">
           <div>
-            <h2 className="text-2xl font-bold">Add Product</h2>
+            <h2 className="text-2xl font-bold">
+              {selectedProduct ? "Edit Product" : "Add Product"}
+            </h2>
+
             <p className="text-sm text-gray-500">
-              Create a new product for your catalog.
+              {selectedProduct
+                ? "Update the details of your product."
+                : "Create a new product for your catalog."}
             </p>
           </div>
 
@@ -554,7 +587,13 @@ const ProductModal = ({ isOpen, onClose, onProductCreated }) => {
             disabled={saving}
             className="rounded-lg bg-black px-5 py-2 text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
           >
-            {saving ? "Saving..." : "Save Product"}
+            {saving
+              ? selectedProduct
+                ? "Updating..."
+                : "Saving..."
+              : selectedProduct
+                ? "Update Product"
+                : "Save Product"}{" "}
           </button>
         </div>
       </div>

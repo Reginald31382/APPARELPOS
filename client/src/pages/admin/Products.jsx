@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import ProductModal from "../../components/product/ProductModal";
-import { getProducts } from "../../services/productService";
+import { fetchProducts } from "../../services/productService";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const loadProducts = async () => {
     try {
       setLoading(true);
 
-      const data = await getProducts();
+      const data = await fetchProducts();
 
       setProducts(data);
     } catch (error) {
@@ -25,6 +27,21 @@ const Products = () => {
     loadProducts();
   }, []);
 
+  const handleAddProduct = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditProduct = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       <div className="mx-auto max-w-7xl">
@@ -36,7 +53,7 @@ const Products = () => {
           </div>
 
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleAddProduct}
             className="rounded-xl bg-black px-5 py-3 font-medium text-white transition hover:bg-gray-800"
           >
             + Add Product
@@ -56,7 +73,7 @@ const Products = () => {
             </p>
 
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleAddProduct}
               className="mt-6 rounded-xl bg-black px-6 py-3 font-medium text-white transition hover:bg-gray-800"
             >
               Add Your First Product
@@ -69,11 +86,13 @@ const Products = () => {
                 key={product._id}
                 className="overflow-hidden rounded-2xl border bg-white shadow-sm"
               >
-                <img
-                  src={product.images?.[0]}
-                  alt={product.name}
-                  className="h-64 w-full object-cover"
-                />
+                <div className="flex h-72 items-center justify-center bg-gray-100 p-6">
+                  <img
+                    src={product.images?.[0]}
+                    alt={product.name}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
 
                 <div className="space-y-2 p-5">
                   <h2 className="text-xl font-semibold">{product.name}</h2>
@@ -85,6 +104,13 @@ const Products = () => {
                   <p className="text-sm text-gray-500">
                     {product.variants.length} Variant(s)
                   </p>
+
+                  <button
+                    onClick={() => handleEditProduct(product)}
+                    className="mt-4 w-full rounded-xl border border-gray-300 px-4 py-2 font-medium transition hover:bg-gray-100"
+                  >
+                    Edit Product
+                  </button>
                 </div>
               </div>
             ))}
@@ -94,7 +120,8 @@ const Products = () => {
 
       <ProductModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
+        product={selectedProduct}
       />
     </>
   );
