@@ -1,3 +1,4 @@
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
@@ -23,12 +24,21 @@ connectDB();
 const app = express();
 
 app.use(cors());
+
+// Stripe webhook MUST receive the raw request body
+app.use(
+  "/api/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  stripeRoutes,
+);
+
+// Everything else uses JSON
 app.use(express.json());
 
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
-app.use("/api/orders", orderRoutes);
 app.use("/api/shipping", shippingRoutes);
+app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/dashboard", dashboardRoutes);
@@ -37,8 +47,6 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/refunds", refundRoutes);
-
-app.use("/api/stripe", stripeRoutes);
 
 // app.post("/test", (req, res) => {
 //   console.log("TEST BODY:", req.body);
@@ -55,6 +63,8 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use(notFound);
+app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

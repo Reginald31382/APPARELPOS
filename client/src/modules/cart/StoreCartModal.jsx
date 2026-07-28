@@ -1,5 +1,5 @@
 import { X, Minus, Plus, Trash2 } from "lucide-react";
-import useCartStore from "../../store/cart/useCartStore";
+import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
 import { formatCurrency } from "../../utils/currency";
 import { useNavigate } from "react-router-dom";
@@ -8,11 +8,15 @@ const StoreCartModal = () => {
   const isOpen = useMobileCartStore((state) => state.isOpen);
   const closeCart = useMobileCartStore((state) => state.closeCart);
   const navigate = useNavigate();
-  const items = useCartStore((state) => state.items);
-  const increaseQuantity = useCartStore((state) => state.increaseQuantity);
-  const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
-  const removeItem = useCartStore((state) => state.removeItem);
-  const subtotal = useCartStore((state) => state.subtotal);
+  const items = useCustomerCartStore((state) => state.items);
+  const increaseQuantity = useCustomerCartStore(
+    (state) => state.increaseQuantity,
+  );
+  const decreaseQuantity = useCustomerCartStore(
+    (state) => state.decreaseQuantity,
+  );
+  const removeItem = useCustomerCartStore((state) => state.removeItem);
+  const subtotal = useCustomerCartStore((state) => state.subtotal);
 
   if (!isOpen) return null;
 

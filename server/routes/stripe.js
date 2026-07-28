@@ -1,9 +1,8 @@
 import express from "express";
-
-import { createPaymentIntent } from "../controllers/stripeController.js";
+import { webhook } from "../controllers/stripeController.js";
 
 const router = express.Router();
 
-router.post("/create-payment-intent", createPaymentIntent);
+router.post("/", webhook);
 
 export default router;

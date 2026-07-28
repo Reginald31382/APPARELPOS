@@ -109,3 +109,27 @@ export const deleteOrder = async (req, res) => {
     });
   }
 };
+
+export const getSuccessOrder = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    const order = await Order.findOne({
+      stripeCheckoutSessionId: sessionId,
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found.",
+      });
+    }
+
+    res.json(order);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Unable to retrieve order.",
+    });
+  }
+};

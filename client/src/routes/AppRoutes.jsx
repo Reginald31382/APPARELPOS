@@ -9,6 +9,7 @@ import PosLayout from "../layouts/PosLayout";
 import Product from "../pages/customer/Product";
 import Checkout from "../pages/customer/Checkout";
 import Cart from "../pages/customer/Cart";
+import CheckoutSuccess from "../pages/customer/CheckoutSuccess";
 
 import DashboardPage from "../modules/dashboard/DashboardPage";
 import Products from "../pages/admin/Products";
@@ -34,6 +35,7 @@ const AppRoutes = () => {
         <Route path="/product/:id" element={<Product />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout/success" element={<CheckoutSuccess />} />
       </Route>
 
       {/* Authentication */}

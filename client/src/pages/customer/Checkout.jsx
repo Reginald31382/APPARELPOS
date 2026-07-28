@@ -64,6 +64,7 @@ const Checkout = () => {
 
   const handleContinueToPayment = async () => {
     try {
+      console.log("Customer Cart:", items);
       const payload = {
         items: items.map((item) => ({
           productId: item._id,
@@ -103,16 +104,12 @@ const Checkout = () => {
         paymentMethod: "Stripe",
       };
 
-      const { data } = await api.post("/orders", payload);
+      const { data } = await api.post(
+        "/payments/create-checkout-session",
+        payload,
+      );
 
-      const orderId = data._id;
-
-      console.log("Order Created:", orderId);
-
-      // Next:
-      // 1. Request USPS rates
-      // 2. Let customer select a shipping option
-      // 3. Create Stripe Checkout Session
+      window.location.href = data.url;
     } catch (error) {
       console.error(error);
     }

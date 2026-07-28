@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import useCartStore from "../../store/cart/useCartStore";
+import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
 import { ShoppingBag } from "lucide-react";
 import { GrUserWorker } from "react-icons/gr";
@@ -13,7 +13,7 @@ const links = [
 
 const StoreNavbar = () => {
   const openCart = useMobileCartStore((state) => state.openCart);
-  const items = useCartStore((state) => state.items);
+  const items = useCustomerCartStore((state) => state.items);
 
   const cartCount = (items ?? []).reduce(
     (total, item) => total + item.quantity,
