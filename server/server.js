@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-
+import "dotenv/config";
 import connectDB from "./config/db.js";
 
 import productRoutes from "./routes/products.js";
@@ -14,10 +13,10 @@ import settingsRoutes from "./routes/settings.js";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
 import refundRoutes from "./routes/refund.js";
+import shippingRoutes from "./routes/shipping.js";
+import paymentRoutes from "./routes/payment.js";
 
 import stripeRoutes from "./routes/stripe.js";
-
-dotenv.config();
 
 connectDB();
 
@@ -29,6 +28,8 @@ app.use(express.json());
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/shipping", shippingRoutes);
+app.use("/api/payments", paymentRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportRoutes);

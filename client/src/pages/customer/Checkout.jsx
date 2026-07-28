@@ -1,4 +1,5 @@
-import { useState } from "react";
+import api from "../../api/axios";
+import { useEffect, useState } from "react";
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import { formatCurrency } from "../../utils/currency";
 import { US_STATES } from "../../constants/usStates";
@@ -18,7 +19,9 @@ const Checkout = () => {
     zip: "",
     shippingMethod: null,
   });
-
+  const [shippingRates, setShippingRates] = useState([]);
+  const [loadingRates, setLoadingRates] = useState(false);
+  const [selectedShipping, setSelectedShipping] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -26,6 +29,93 @@ const Checkout = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const fetchShippingRates = async () => {
+    if (!isCheckoutValid) return;
+
+    try {
+      setLoadingRates(true);
+      setSelectedShipping(null);
+      const payload = {
+        items: items.map((item) => ({
+          productId: item._id,
+          quantity: item.quantity,
+        })),
+
+        shippingAddress: {
+          zipCode: checkout.zip,
+          state: checkout.state,
+          city: checkout.city,
+          address1: checkout.address1,
+          country: "US",
+        },
+      };
+
+      const { data } = await api.post("/shipping/rates", payload);
+
+      setShippingRates(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingRates(false);
+    }
+  };
+
+  const handleContinueToPayment = async () => {
+    try {
+      const payload = {
+        items: items.map((item) => ({
+          productId: item._id,
+          name: item.name,
+          sku: item.sku,
+          color: item.color,
+          size: item.size,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        })),
+
+        subtotal: subtotal(),
+
+        tax: 0,
+
+        shippingAddress: {
+          firstName: checkout.firstName,
+          lastName: checkout.lastName,
+          address1: checkout.address1,
+          address2: checkout.address2,
+          city: checkout.city,
+          state: checkout.state,
+          zipCode: checkout.zip,
+          country: "US",
+          phone: checkout.phone,
+          email: checkout.email,
+        },
+
+        shipping: {
+          carrier: selectedShipping.carrier,
+          service: selectedShipping.service,
+          cost: selectedShipping.cost,
+        },
+
+        total: subtotal() + selectedShipping.cost,
+
+        paymentMethod: "Stripe",
+      };
+
+      const { data } = await api.post("/orders", payload);
+
+      const orderId = data._id;
+
+      console.log("Order Created:", orderId);
+
+      // Next:
+      // 1. Request USPS rates
+      // 2. Let customer select a shipping option
+      // 3. Create Stripe Checkout Session
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const requiredFields = [
@@ -141,10 +231,48 @@ const Checkout = () => {
           {/* Shipping Method */}
           <section className="rounded-2xl border bg-white p-6 shadow-sm">
             <h2 className="mb-6 text-2xl font-semibold">Shipping Method</h2>
+            <button
+              type="button"
+              onClick={fetchShippingRates}
+              disabled={!isCheckoutValid || loadingRates}
+              className="mb-4 w-full rounded-lg bg-black px-4 py-3 font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
+            >
+              {loadingRates ? "Calculating..." : "Calculate Shipping"}
+            </button>
+            {loadingRates && (
+              <p className="text-gray-500">Calculating shipping...</p>
+            )}
 
-            <p className="text-gray-500">
-              USPS shipping options will appear after your address is entered.
-            </p>
+            {shippingRates.length > 0 &&
+              shippingRates.map((rate) => (
+                <label
+                  key={rate.id}
+                  className={`mb-3 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${
+                    selectedShipping?.id === rate.id
+                      ? "border-black bg-gray-100"
+                      : "border-gray-300"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="radio"
+                      name="shipping"
+                      checked={selectedShipping?.id === rate.id}
+                      onChange={() => setSelectedShipping(rate)}
+                    />
+
+                    <div>
+                      <p className="font-semibold">{rate.service}</p>
+
+                      <p className="text-sm text-gray-500">
+                        {rate.estimatedDays} Business Days
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="font-bold">{formatCurrency(rate.cost)}</div>
+                </label>
+              ))}
           </section>
         </div>
 
@@ -188,19 +316,26 @@ const Checkout = () => {
             <div className="flex justify-between">
               <span>Shipping</span>
 
-              <span>Calculated Next</span>
+              <span>
+                {selectedShipping
+                  ? formatCurrency(selectedShipping.cost)
+                  : "Not Selected"}
+              </span>
             </div>
 
             <div className="flex justify-between text-xl font-bold">
               <span>Total</span>
 
-              <span>{formatCurrency(subtotal())}</span>
+              <span>
+                {formatCurrency(subtotal() + (selectedShipping?.cost ?? 0))}
+              </span>
             </div>
 
             <button
-              disabled={!isCheckoutValid}
+              onClick={handleContinueToPayment}
+              disabled={!isCheckoutValid || !selectedShipping}
               className={`mt-6 w-full rounded-xl py-4 text-lg font-semibold transition ${
-                isCheckoutValid
+                isCheckoutValid && selectedShipping
                   ? "bg-black text-white hover:bg-gray-800"
                   : "cursor-not-allowed bg-gray-300 text-gray-500"
               }`}

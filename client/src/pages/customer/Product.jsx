@@ -77,11 +77,7 @@ const Product = () => {
   );
 
   const handleAddToCart = () => {
-    console.log("Add to Cart clicked");
-    console.log("Selected Variant:", selectedVariant);
-
     if (!selectedVariant) {
-      console.log("No variant selected");
       return;
     }
 

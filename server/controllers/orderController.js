@@ -11,9 +11,9 @@ GET /api/orders
 */
 export const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
-      .populate("customer")
-      .sort({ createdAt: -1 });
+    const orders = await Order.find().sort({
+      createdAt: -1,
+    });
 
     res.json(orders);
   } catch (error) {
@@ -28,8 +28,7 @@ GET /api/orders/:id
 */
 export const getOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate("customer");
-
+    const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).json({
         message: "Order not found",
@@ -54,7 +53,7 @@ export const createOrder = async (req, res) => {
     // Only Admins may apply discounts
     const discount = Number(req.body.discount || 0);
 
-    if (discount > 0 && req.user.role !== "Admin") {
+    if (discount > 0 && req.user?.role !== "Admin") {
       return res.status(403).json({
         message: "Only administrators can apply discounts.",
       });
@@ -64,7 +63,7 @@ export const createOrder = async (req, res) => {
       orderNumber: generateOrderNumber(),
     });
 
-    await reduceInventory(order.items);
+    // await reduceInventory(order.items);
 
     res.status(201).json(order);
   } catch (error) {

@@ -16,7 +16,7 @@ router.get("/", getOrders);
 
 router.get("/:id", getOrder);
 
-router.post("/", protect, createOrder);
+router.post("/", createOrder);
 
 router.put("/:id", updateOrder);
 

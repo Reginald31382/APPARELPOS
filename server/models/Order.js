@@ -32,15 +32,12 @@ const orderSchema = new mongoose.Schema(
       unique: true,
     },
 
-    customer: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Customer",
-      default: null,
-    },
-
     items: [orderItemSchema],
 
-    subtotal: Number,
+    subtotal: {
+      type: Number,
+      required: true,
+    },
 
     discount: {
       type: Number,
@@ -58,24 +55,59 @@ const orderSchema = new mongoose.Schema(
       default: "",
     },
 
-    tax: Number,
+    tax: {
+      type: Number,
+      default: 0,
+    },
 
-    total: Number,
+    shippingAddress: {
+      firstName: String,
+      lastName: String,
+      company: String,
+      address1: String,
+      address2: String,
+      city: String,
+      state: String,
+      zipCode: String,
+      country: {
+        type: String,
+        default: "US",
+      },
+      phone: String,
+      email: String,
+    },
+
+    shipping: {
+      carrier: {
+        type: String,
+        default: "",
+      },
+
+      service: {
+        type: String,
+        default: "",
+      },
+
+      trackingNumber: {
+        type: String,
+        default: "",
+      },
+
+      cost: {
+        type: Number,
+        default: 0,
+      },
+    },
+
+    total: {
+      type: Number,
+      required: true,
+    },
 
     paymentMethod: {
       type: String,
       enum: ["Cash", "Card", "Stripe"],
       default: "Stripe",
-    },
-
-    status: {
-      type: String,
-      enum: ["Pending", "Paid", "Refunded", "Cancelled"],
-      default: "Pending",
-    },
-    stripePaymentIntentId: {
-      type: String,
-      default: "",
     },
 
     paymentStatus: {
@@ -84,19 +116,45 @@ const orderSchema = new mongoose.Schema(
       default: "Pending",
     },
 
+    status: {
+      type: String,
+      enum: [
+        "Pending",
+        "Processing",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Refunded",
+      ],
+      default: "Pending",
+    },
+
+    stripeCheckoutSessionId: {
+      type: String,
+      default: "",
+    },
+
+    stripePaymentIntentId: {
+      type: String,
+      default: "",
+    },
+
     refund: {
       amount: {
         type: Number,
         default: 0,
       },
+
       reason: {
         type: String,
         default: "",
       },
+
       refundedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
+
       refundedAt: Date,
     },
   },
