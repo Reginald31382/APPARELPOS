@@ -1,10 +1,11 @@
 import { useState } from "react";
-import useCartStore from "../../store/cart/useCartStore";
+import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import { formatCurrency } from "../../utils/currency";
+import { US_STATES } from "../../constants/usStates";
 
 const Checkout = () => {
-  const items = useCartStore((state) => state.items);
-  const subtotal = useCartStore((state) => state.subtotal);
+  const items = useCustomerCartStore((state) => state.items);
+  const subtotal = useCustomerCartStore((state) => state.subtotal);
   const [checkout, setCheckout] = useState({
     email: "",
     phone: "",
@@ -113,13 +114,20 @@ const Checkout = () => {
                 placeholder="City"
                 className="rounded-xl border p-4"
               />
-              <input
+              <select
                 name="state"
                 value={checkout.state}
                 onChange={handleChange}
-                placeholder="State"
-                className="rounded-xl border p-4"
-              />
+                className="rounded-xl border bg-white p-4 outline-none focus:border-black"
+              >
+                <option value="">Select State</option>
+
+                {US_STATES.map((state) => (
+                  <option key={state.code} value={state.code}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
               <input
                 name="zip"
                 value={checkout.zip}

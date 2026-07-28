@@ -4,6 +4,8 @@ import {
   getProducts,
   getProductById,
   createProduct,
+  updateProduct,
+  deleteProduct,
   updateInventory,
 } from "../controllers/productController.js";
 
@@ -21,6 +23,8 @@ router.get("/:id", getProductById);
 | Protected Routes
 */
 router.post("/", protect, authorize("Admin", "Manager"), createProduct);
+router.put("/:id", protect, authorize("Admin", "Manager"), updateProduct);
+router.delete("/:id", protect, authorize("Admin", "Manager"), deleteProduct);
 router.put("/", protect, authorize("Admin", "Manager"), updateInventory);
 
 export default router;

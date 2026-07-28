@@ -1,13 +1,13 @@
 import ProductImageLightbox from "../../components/product/ProductImageLightbox";
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Minus, Plus } from "lucide-react";
-import useCartStore from "../../store/cart/useCartStore";
-
+import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useProduct from "../../hooks/useProduct";
 
 const Product = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -16,7 +16,7 @@ const Product = () => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const purchaseSectionRef = useRef(null);
   const [showStickyCart, setShowStickyCart] = useState(false);
-  const addItem = useCartStore((state) => state.addItem);
+  const addItem = useCustomerCartStore((state) => state.addItem);
   const { data: product, isLoading, isError } = useProduct(id);
 
   useEffect(() => {
@@ -95,9 +95,10 @@ const Product = () => {
       size: selectedSize,
       stock: selectedVariant.quantity,
       unitPrice: product.price,
+      quantity,
     });
 
-    console.log("Items after add:", useCartStore.getState().items);
+    navigate("/cart");
   };
 
   return (

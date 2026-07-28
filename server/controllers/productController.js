@@ -119,6 +119,75 @@ export const createProduct = async (req, res) => {
   }
 };
 
+export const updateProduct = async (req, res) => {
+  try {
+    const { name, price, weight, variants } = req.body;
+
+    if (!name?.trim()) {
+      return res.status(400).json({
+        message: "Product name is required.",
+      });
+    }
+
+    if (price === "" || price === undefined || price === null) {
+      return res.status(400).json({
+        message: "Price is required.",
+      });
+    }
+
+    if (weight === "" || weight === undefined || weight === null) {
+      return res.status(400).json({
+        message: "Weight is required.",
+      });
+    }
+
+    if (!variants?.length) {
+      return res.status(400).json({
+        message: "At least one product variant is required.",
+      });
+    }
+
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found.",
+      });
+    }
+
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found.",
+      });
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
+
+    res.json({
+      message: "Product deleted successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
 export const updateInventory = async (req, res) => {
   try {
     const { sku, quantity, reason, notes } = req.body;

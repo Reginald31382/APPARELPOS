@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import ProductModal from "../../components/product/ProductModal";
-import { fetchProducts } from "../../services/productService";
-
+import { fetchProducts, deleteProduct } from "../../services/productService";
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,6 +34,26 @@ const Products = () => {
   const handleEditProduct = (product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
+  };
+
+  const handleDeleteProduct = async (product) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${product.name}"?\n\nThis action cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteProduct(product._id);
+
+      await loadProducts();
+
+      alert("Product deleted successfully.");
+    } catch (error) {
+      console.error(error);
+
+      alert(error.response?.data?.message || "Failed to delete product.");
+    }
   };
 
   const handleCloseModal = () => {
@@ -105,12 +124,21 @@ const Products = () => {
                     {product.variants.length} Variant(s)
                   </p>
 
-                  <button
-                    onClick={() => handleEditProduct(product)}
-                    className="mt-4 w-full rounded-xl border border-gray-300 px-4 py-2 font-medium transition hover:bg-gray-100"
-                  >
-                    Edit Product
-                  </button>
+                  <div className="mt-4 flex gap-3">
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="flex-1 rounded-xl border border-gray-300 px-4 py-2 font-medium transition hover:bg-gray-100"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteProduct(product)}
+                      className="flex-1 rounded-xl bg-red-600 px-4 py-2 font-medium text-white transition hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -122,6 +150,7 @@ const Products = () => {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         product={selectedProduct}
+        onProductCreated={loadProducts}
       />
     </>
   );

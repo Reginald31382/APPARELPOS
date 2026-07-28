@@ -5,7 +5,7 @@ import { notifyError } from "../../utils/notifications";
 
 const TAX_RATE = 0.06;
 
-const useCartStore = create(
+const useCustomerCartStore = create(
   persist(
     (set, get) => ({
       items: [],
@@ -166,9 +166,9 @@ const useCartStore = create(
       total: () => get().subtotal() - get().discountAmount() + get().tax(),
     }),
     {
-      name: "jrome-pos-cart",
+      name: "jrome-customer-cart",
     },
   ),
 );
 
-export default useCartStore;
+export default useCustomerCartStore;

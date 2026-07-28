@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 
+import { GiMoneyStack } from "react-icons/gi";
 import {
   FaHome,
   FaBoxOpen,
@@ -27,6 +28,11 @@ const Sidebar = () => {
         <NavLink to="/admin" end className={linkClasses}>
           <FaHome />
           Dashboard
+        </NavLink>
+
+        <NavLink to="/pos" className={linkClasses}>
+          <GiMoneyStack className="text-2xl" />
+          POS
         </NavLink>
 
         <NavLink to="/admin/products" className={linkClasses}>
