@@ -15,6 +15,8 @@ const router = express.Router();
 
 router.get("/", getOrders);
 
+router.get("/success/:sessionId", getSuccessOrder);
+
 router.get("/:id", getOrder);
 
 router.post("/", createOrder);
@@ -22,7 +24,5 @@ router.post("/", createOrder);
 router.put("/:id", updateOrder);
 
 router.delete("/:id", deleteOrder);
-
-router.get("/success/:sessionId", getSuccessOrder);
 
 export default router;

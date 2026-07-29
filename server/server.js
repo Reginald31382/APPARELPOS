@@ -19,6 +19,7 @@ import userRoutes from "./routes/user.js";
 import refundRoutes from "./routes/refund.js";
 import shippingRoutes from "./routes/shipping.js";
 import paymentRoutes from "./routes/payment.js";
+import notificationRoutes from "./routes/notifications.js";
 
 import stripeRoutes from "./routes/stripe.js";
 
@@ -60,6 +61,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/shipping", shippingRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/dashboard", dashboardRoutes);

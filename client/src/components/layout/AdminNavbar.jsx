@@ -1,4 +1,6 @@
 // import TextCarousel from "../TextCarousel";
+import { GiRingingBell } from "react-icons/gi";
+import useNotificationStore from "../../store/notifications/useNotificationStore";
 import useAuthStore from "../../modules/auth/store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -13,6 +15,8 @@ const Navbar = () => {
   const isAdmin = useAuthStore((state) => state.isAdmin);
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
 
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -48,6 +52,20 @@ const Navbar = () => {
                   Admin
                 </Link>
               )}
+              <div className="relative">
+                <button
+                  className="relative rounded-full p-2 transition hover:bg-gray-100"
+                  aria-label="Notifications"
+                >
+                  <GiRingingBell size={22} />
+
+                  {unreadCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1 text-xs font-bold text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+              </div>
 
               <button
                 onClick={handleLogout}
