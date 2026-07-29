@@ -1,4 +1,5 @@
 import Notification from "../models/Notification.js";
+import { getSocket } from "./socketService.js";
 
 export async function createNotification({
   type,
@@ -7,11 +8,20 @@ export async function createNotification({
   orderId = null,
   productId = null,
 }) {
-  return Notification.create({
+  const notification = await Notification.create({
     type,
     title,
     message,
     orderId,
     productId,
   });
+
+  try {
+    getSocket().emit("new-notification", notification);
+    console.log("🔔 Notification broadcast:", notification.title);
+  } catch (error) {
+    console.warn("Socket broadcast skipped:", error.message);
+  }
+
+  return notification;
 }

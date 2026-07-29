@@ -1,3 +1,6 @@
+import http from "http";
+import { Server } from "socket.io";
+import { initializeSocket } from "./services/socketService.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 import express from "express";
 import cors from "cors";
@@ -22,6 +25,24 @@ import stripeRoutes from "./routes/stripe.js";
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+});
+
+initializeSocket(io);
+
+io.on("connection", (socket) => {
+  console.log(`🟢 Admin Connected: ${socket.id}`);
+
+  socket.on("disconnect", () => {
+    console.log(`🔴 Admin Disconnected: ${socket.id}`);
+  });
+});
 
 app.use(cors());
 
@@ -67,6 +88,6 @@ app.use(notFound);
 app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
