@@ -1,15 +1,20 @@
 // import TextCarousel from "../TextCarousel";
+import NotificationDropdown from "../notifications/NotificationDropdown";
 import { GiRingingBell } from "react-icons/gi";
 import useNotificationStore from "../../store/notifications/useNotificationStore";
 import useAuthStore from "../../modules/auth/store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import api from "../../api/axios";
+import { useState } from "react";
 
 // import { FaBell, FaRegUserCircle, FaSearch } from "react-icons/fa";
 // import { GiShoppingCart } from "react-icons/gi";
 // import { MdOutlineSettings } from "react-icons/md";
 
 const Navbar = () => {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const markAllRead = useNotificationStore((state) => state.markAllRead);
   const logout = useAuthStore((state) => state.logout);
 
   const isAdmin = useAuthStore((state) => state.isAdmin);
@@ -17,6 +22,16 @@ const Navbar = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const unreadCount = useNotificationStore((state) => state.unreadCount);
+
+  const handleMarkAllRead = async () => {
+    try {
+      await api.put("/notifications/read-all");
+
+      markAllRead();
+    } catch (error) {
+      console.error("Failed to mark notifications as read.", error);
+    }
+  };
 
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -52,8 +67,10 @@ const Navbar = () => {
                   Admin
                 </Link>
               )}
+
               <div className="relative">
                 <button
+                  onClick={() => setShowNotifications((prev) => !prev)}
                   className="relative rounded-full p-2 transition hover:bg-gray-100"
                   aria-label="Notifications"
                 >
@@ -65,8 +82,21 @@ const Navbar = () => {
                     </span>
                   )}
                 </button>
-              </div>
 
+                {showNotifications && (
+                  <NotificationDropdown
+                    onClose={() => setShowNotifications(false)}
+                  />
+                )}
+              </div>
+              <div className="border-t bg-gray-50 p-3">
+                <button
+                  onClick={handleMarkAllRead}
+                  className="w-full rounded-lg py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
+                >
+                  Mark All Read
+                </button>
+              </div>
               <button
                 onClick={handleLogout}
                 className="rounded-md border px-3 py-2 hover:bg-gray-100"

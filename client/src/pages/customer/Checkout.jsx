@@ -74,6 +74,9 @@ const Checkout = () => {
           size: item.size,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
+
+          // Preserve product images with the order
+          images: item.images || [],
         })),
 
         subtotal: subtotal(),
@@ -103,6 +106,15 @@ const Checkout = () => {
 
         paymentMethod: "Stripe",
       };
+      console.log("Checkout Items:", items);
+      console.log(
+        "Payload Items:",
+        items.map((item) => ({
+          productId: item._id,
+          name: item.name,
+          images: item.images,
+        })),
+      );
 
       const { data } = await api.post(
         "/payments/create-checkout-session",

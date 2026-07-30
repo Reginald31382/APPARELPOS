@@ -21,6 +21,7 @@ import Setup from "../pages/auth/Setup";
 import Login from "../pages/auth/Login";
 import Settings from "../pages/admin/Settings";
 import Employees from "../pages/admin/Employees";
+import OrderDetails from "../pages/admin/OrderDetails";
 import ProtectedRoute from "../modules/auth/components/ProtectedRoute";
 
 import NotFound from "../pages/NotFound";
@@ -63,6 +64,7 @@ const AppRoutes = () => {
         <Route index element={<DashboardPage />} />
         <Route path="products" element={<Products />} />
         <Route path="orders" element={<Orders />} />
+        <Route path="orders/:id" element={<OrderDetails />} />
         {/* <Route path="customers" element={<Customers />} /> */}
         <Route path="employees" element={<Employees />} />
         <Route path="inventory" element={<Inventory />} />

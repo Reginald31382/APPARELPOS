@@ -11,12 +11,10 @@ const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
 
-  const [order, setOrder] = useState(null);
+  const [order, setOrder] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    clearCart();
-
     const fetchOrder = async () => {
       if (!sessionId) {
         setLoading(false);
@@ -25,9 +23,13 @@ const CheckoutSuccess = () => {
 
       try {
         const { data } = await api.get(`/orders/success/${sessionId}`);
+
         setOrder(data);
+
+        clearCart();
       } catch (error) {
-        console.error(error);
+        console.error("Order fetch failed:", error.response?.status);
+        console.error(error.response?.data);
       } finally {
         setLoading(false);
       }

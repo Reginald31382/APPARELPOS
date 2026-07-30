@@ -85,7 +85,11 @@ const Product = () => {
       _id: product._id,
       sku: selectedVariant.sku,
       name: product.name,
+
+      // Keep both for now until we update the UI
       image: selectedImage,
+      images: product.images || [],
+
       brand: product.brand,
       color: selectedColor,
       size: selectedSize,

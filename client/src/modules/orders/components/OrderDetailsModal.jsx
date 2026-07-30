@@ -122,7 +122,7 @@ const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
                       <td className="p-3">
                         <div className="flex items-center gap-3">
                           <img
-                            src={item.image}
+                            src={item.images?.[0] || "/placeholder-product.png"}
                             alt={item.name}
                             className="h-12 w-12 rounded object-cover"
                           />

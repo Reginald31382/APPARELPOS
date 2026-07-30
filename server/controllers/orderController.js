@@ -113,11 +113,11 @@ export const deleteOrder = async (req, res) => {
 export const getSuccessOrder = async (req, res) => {
   try {
     const { sessionId } = req.params;
-
+    console.log("Looking for session:", sessionId);
     const order = await Order.findOne({
       stripeCheckoutSessionId: sessionId,
     });
-
+    console.log("Order found:", order);
     if (!order) {
       return res.status(404).json({
         message: "Order not found.",
