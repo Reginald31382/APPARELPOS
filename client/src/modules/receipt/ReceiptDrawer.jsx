@@ -1,5 +1,5 @@
 import useReceiptStore from "../../store/receipt/useReceiptStore";
-
+import useSettingsStore from "../../store/settings/useSettingsStore";
 import { useEffect, useRef } from "react";
 import PrintableReceipt from "./PrintableReceipt";
 import useReceiptPrint from "./hooks/useReceiptPrint";
@@ -49,7 +49,7 @@ const ReceiptDrawer = () => {
             <p className="font-semibold">Sale Completed Successfully</p>
 
             <p className="text-sm text-gray-600">
-              Thank you for shopping with J.Rome Apparel.
+              Thank you for shopping with {businessName || "our store"}.
             </p>
           </div>
         </div>
