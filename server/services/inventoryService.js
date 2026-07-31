@@ -5,9 +5,9 @@ import Product from "../models/Products.js";
 | Reduce Inventory
 |--------------------------------------------------------------------------
 */
-export const reduceInventory = async (items) => {
+export const reduceInventory = async (items, session = null) => {
   for (const item of items) {
-    const product = await Product.findById(item.productId);
+    const product = await Product.findById(item.productId).session(session);
 
     if (!product) {
       throw new Error(`Product not found: ${item.productId}`);
@@ -25,7 +25,7 @@ export const reduceInventory = async (items) => {
 
     variant.quantity -= item.quantity;
 
-    await product.save();
+    await product.save({ session });
   }
 };
 
@@ -34,9 +34,9 @@ export const reduceInventory = async (items) => {
 | Restore Inventory
 |--------------------------------------------------------------------------
 */
-export const restoreInventory = async (items) => {
+export const restoreInventory = async (items, session = null) => {
   for (const item of items) {
-    const product = await Product.findById(item.productId);
+    const product = await Product.findById(item.productId).session(session);
 
     if (!product) continue;
 
@@ -46,7 +46,7 @@ export const restoreInventory = async (items) => {
 
     variant.quantity += item.quantity;
 
-    await product.save();
+    await product.save({ session });
   }
 };
 

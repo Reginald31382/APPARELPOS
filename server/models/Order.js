@@ -43,7 +43,8 @@ const orderSchema = new mongoose.Schema(
     },
     customerEmail: {
       type: String,
-      required: true,
+      trim: true,
+      default: "",
       index: true,
     },
 

@@ -1,47 +1,94 @@
+import mongoose from "mongoose";
+
 import Order from "../models/Order.js";
-import Counter from "../models/Counter.js";
-import Product from "../models/Products.js";
+
+import generateOrderNumber from "../utils/generateOrderNummber.js";
+
+import { reduceInventory } from "./inventoryService.js";
 import { createNotification } from "./notificationService.js";
+import { emitOrderCreated } from "./socketService.js";
+import { sendReceiptEmail } from "./email/sendReceiptEmail.js";
 
-async function generateOrderNumber() {
-  let counter = await Counter.findOne({ name: "order" });
+/*
+|--------------------------------------------------------------------------
+| Complete Order
+|--------------------------------------------------------------------------
+*/
 
-  if (!counter) {
-    counter = await Counter.create({
-      name: "order",
-      sequence: 100000,
+export async function completeOrder({
+  customerEmail,
+  items,
+  subtotal,
+  shipping = {},
+  shippingAddress = {},
+  total,
+  paymentMethod,
+  paymentStatus,
+  status,
+  stripeCheckoutSessionId = "",
+  stripePaymentIntentId = "",
+}) {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const orderNumber = await generateOrderNumber();
+
+    const [order] = await Order.create(
+      [
+        {
+          orderNumber,
+          customerEmail: customerEmail || shippingAddress?.email || "",
+          items,
+          subtotal,
+          shipping,
+          shippingAddress,
+          total,
+          paymentMethod,
+          paymentStatus,
+          status,
+          stripeCheckoutSessionId,
+          stripePaymentIntentId,
+        },
+      ],
+      {
+        session,
+      },
+    );
+
+    await reduceInventory(order.items, session);
+
+    await session.commitTransaction();
+
+    session.endSession();
+
+    await createNotification({
+      type: "NEW_ORDER",
+      title: "New Order Received",
+      message: `${order.orderNumber} has been placed by ${order.customerEmail}.`,
+      orderId: order._id,
     });
-  }
 
-  counter.sequence += 1;
-  await counter.save();
+    emitOrderCreated(order);
 
-  return `JR-${counter.sequence}`;
-}
+    await sendReceiptEmail(order);
 
-async function deductInventory(items) {
-  for (const item of items) {
-    const product = await Product.findById(item.productId);
+    return order;
+  } catch (error) {
+    await session.abortTransaction();
 
-    if (!product) {
-      throw new Error(`Product not found: ${item.productId}`);
-    }
+    session.endSession();
 
-    const variant = product.variants.find((v) => v.sku === item.sku);
-
-    if (!variant) {
-      throw new Error(`Variant not found: ${item.sku}`);
-    }
-
-    if (variant.quantity < item.quantity) {
-      throw new Error(`Insufficient inventory for SKU ${item.sku}`);
-    }
-
-    variant.quantity -= item.quantity;
-
-    await product.save();
+    throw error;
   }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Stripe Checkout
+|--------------------------------------------------------------------------
+*/
 
 export async function createStripeOrder(session) {
   const { subtotal, total, shipping, shippingAddress, items } =
@@ -53,35 +100,19 @@ export async function createStripeOrder(session) {
     );
   }
 
-  const parsedShipping = JSON.parse(shipping);
-  const parsedShippingAddress = JSON.parse(shippingAddress);
-  const parsedItems = JSON.parse(items);
-
-  const orderNumber = await generateOrderNumber();
-
-  const order = await Order.create({
-    orderNumber,
-    customerEmail: parsedShippingAddress.email,
-    items: parsedItems,
+  return completeOrder({
+    customerEmail: JSON.parse(shippingAddress).email,
+    items: JSON.parse(items),
     subtotal: Number(subtotal),
-    shipping: parsedShipping,
-    shippingAddress: parsedShippingAddress,
+    shipping: JSON.parse(shipping),
+    shippingAddress: JSON.parse(shippingAddress),
     total: Number(total),
+
     paymentMethod: "Stripe",
     paymentStatus: "Paid",
     status: "Processing",
+
     stripeCheckoutSessionId: session.id,
     stripePaymentIntentId: session.payment_intent,
   });
-
-  await deductInventory(parsedItems);
-
-  await createNotification({
-    type: "NEW_ORDER",
-    title: "New Order Received",
-    message: `${order.orderNumber} has been placed by ${order.customerEmail}.`,
-    orderId: order._id,
-  });
-
-  return order;
 }

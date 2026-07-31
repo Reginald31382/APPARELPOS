@@ -3,7 +3,6 @@ import useSettingsStore from "../../store/settings/useSettingsStore";
 import { useEffect, useRef } from "react";
 import PrintableReceipt from "./PrintableReceipt";
 import useReceiptPrint from "./hooks/useReceiptPrint";
-import EmailReceiptButton from "./EmailReceiptButton";
 
 const ReceiptDrawer = () => {
   const receipt = useReceiptStore((state) => state.receipt);
@@ -11,6 +10,8 @@ const ReceiptDrawer = () => {
   const isOpen = useReceiptStore((state) => state.isOpen);
 
   const closeReceipt = useReceiptStore((state) => state.closeReceipt);
+
+  const businessName = useSettingsStore((state) => state.businessName);
 
   const receiptRef = useRef(null);
 
@@ -62,8 +63,6 @@ const ReceiptDrawer = () => {
           >
             Reprint Receipt
           </button>
-
-          <EmailReceiptButton />
 
           <button
             onClick={closeReceipt}

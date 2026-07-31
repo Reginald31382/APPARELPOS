@@ -1,11 +1,6 @@
 import Order from "../models/Order.js";
-import { sendReceiptEmail } from "../services/email/sendReceiptEmail.js";
-import { reduceInventory } from "../services/inventoryService.js";
+import { completeOrder } from "../services/orderService.js";
 import { emitOrderUpdated } from "../services/socketService.js";
-
-const generateOrderNumber = () => {
-  return `JR-${Date.now()}`;
-};
 
 /*
 GET /api/orders
@@ -48,10 +43,8 @@ export const getOrder = async (req, res) => {
 POST /api/orders
 */
 export const createOrder = async (req, res) => {
+  console.log(req.body);
   try {
-    console.log("Incoming Order:");
-    console.dir(req.body, { depth: null });
-    // Only Admins may apply discounts
     const discount = Number(req.body.discount || 0);
 
     if (discount > 0 && req.user?.role !== "Admin") {
@@ -59,20 +52,19 @@ export const createOrder = async (req, res) => {
         message: "Only administrators can apply discounts.",
       });
     }
-    const order = await Order.create({
+
+    const order = await completeOrder({
       ...req.body,
-      orderNumber: generateOrderNumber(),
+
+      paymentMethod: req.body.paymentMethod || "Cash",
+
+      paymentStatus: "Paid",
+
+      status: "Processing",
     });
-
-    // Update inventory
-    await reduceInventory(order.items);
-
-    // Send receipt email
-    await sendReceiptEmail(order);
 
     res.status(201).json(order);
   } catch (error) {
-    console.error("Create Order Error:");
     console.error(error);
 
     res.status(500).json({

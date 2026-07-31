@@ -2,9 +2,8 @@ import axios from "axios";
 import { receiptTemplate } from "./receiptTemplate.js";
 
 export const sendReceiptEmail = async (order) => {
-  if (!order.shippingAddress?.email) {
-    console.warn("No customer email found. Receipt email skipped.");
-
+  if (!order.customerEmail) {
+    console.log("Receipt email skipped (no customer email).");
     return;
   }
 
@@ -21,8 +20,8 @@ export const sendReceiptEmail = async (order) => {
 
         to: [
           {
-            email: order.shippingAddress.email,
-            name: `${order.shippingAddress.firstName || ""} ${order.shippingAddress.lastName || ""}`.trim(),
+            email: order.customerEmail,
+            name: `${order.shippingAddress?.firstName || ""} ${order.shippingAddress?.lastName || ""}`.trim(),
           },
         ],
 
