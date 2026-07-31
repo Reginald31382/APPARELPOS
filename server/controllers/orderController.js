@@ -1,5 +1,5 @@
 import Order from "../models/Order.js";
-
+import { sendReceiptEmail } from "../services/email/sendReceiptEmail.js";
 import { reduceInventory } from "../services/inventoryService.js";
 import { emitOrderUpdated } from "../services/socketService.js";
 
@@ -64,7 +64,11 @@ export const createOrder = async (req, res) => {
       orderNumber: generateOrderNumber(),
     });
 
-    // await reduceInventory(order.items);
+    // Update inventory
+    await reduceInventory(order.items);
+
+    // Send receipt email
+    await sendReceiptEmail(order);
 
     res.status(201).json(order);
   } catch (error) {

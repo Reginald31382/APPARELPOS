@@ -1,11 +1,13 @@
+import { STORE_CONFIG } from "../../config/storeConfig";
 import { useEffect, useState } from "react";
 
 const messages = [
-  "FREE SHIPPING ON ORDERS OVER $100",
+  `FREE SHIPPING ON ORDERS OVER $${STORE_CONFIG.FREE_SHIPPING_THRESHOLD}`,
   "NEW SUMMER COLLECTION AVAILABLE NOW",
   "MADE FOR DETROIT. WORN EVERYWHERE.",
   "PREMIUM QUALITY • EVERYDAY ESSENTIALS",
   "BUY NOW • PAY LATER AVAILABLE",
+  "100% COTTON • BECAUSE IT MATTERS",
 ];
 
 const AnnouncementBar = () => {
@@ -14,7 +16,7 @@ const AnnouncementBar = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % messages.length);
-    }, 3500);
+    }, STORE_CONFIG.ANNOUNCEMENT_ROTATION_SPEED);
 
     return () => clearInterval(timer);
   }, []);
