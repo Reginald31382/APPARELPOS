@@ -3,17 +3,17 @@ import { Link } from "react-router-dom";
 const collections = [
   {
     title: "Men",
-    image: "/images/collections/men.jpg",
+    image: "https://i.postimg.cc/VkqkPfGh/jrome-mens-collection-II.png",
     link: "/shop?category=Men",
   },
   {
     title: "Women",
-    image: "/images/collections/women.jpg",
+    image: "https://i.postimg.cc/T36WDHZf/jrome-womens-collection.png",
     link: "/shop?category=Women",
   },
   {
     title: "Kids",
-    image: "/images/collections/kids.jpg",
+    image: "https://i.postimg.cc/3JwqHnL7/jrome-kids-collection.png",
     link: "/shop?category=Kids",
   },
 ];
