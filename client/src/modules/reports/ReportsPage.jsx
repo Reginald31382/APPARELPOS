@@ -11,10 +11,12 @@ import RecentOrdersTable from "./components/RecentOrdersTable";
 import LowInventoryTable from "./components/LowInventoryTable";
 import ReportFilters from "./components/ReportFilters";
 import ExportButtons from "./components/ExportButtons";
+import OrderStatusCard from "../../pages/reports/components/OrderStatusCard";
 
 const ReportsPage = () => {
-  const [filters, setFilters] = useState({});
-
+  const [filters, setFilters] = useState({
+    range: "today",
+  });
   const summary = useReportSummary(filters);
   const sales = useSalesReport(filters);
   const orders = useOrdersReport(filters);
@@ -41,20 +43,28 @@ const ReportsPage = () => {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <h1 className="text-3xl font-bold">Reports</h1>
 
-        <ExportButtons orders={orders.data?.recentOrders ?? []} />
+        <ExportButtons
+          filters={filters}
+          summary={summary.data}
+          sales={sales.data}
+          orders={orders.data}
+          // products={products.data}
+          inventory={inventory.data}
+        />
       </div>
 
       <ReportFilters filters={filters} onChange={setFilters} />
 
       <SummaryCards data={summary.data} />
 
-      <SalesChart data={sales.data ?? []} />
-
+      <SalesChart data={sales.data ?? []} range={filters.range} />
       <div className="grid gap-6 xl:grid-cols-2">
-        <RecentOrdersTable orders={orders.data?.recentOrders ?? []} />
+        <OrderStatusCard statuses={orders.data?.statuses ?? []} />
 
         <LowInventoryTable products={inventory.data?.lowInventory ?? []} />
       </div>
+
+      <RecentOrdersTable orders={orders.data?.recentOrders ?? []} />
     </div>
   );
 };

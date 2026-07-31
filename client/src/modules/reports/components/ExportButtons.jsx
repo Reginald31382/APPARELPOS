@@ -4,25 +4,33 @@ import {
   exportPDF,
 } from "../services/reportExportService";
 
-const ExportButtons = ({ orders }) => {
+const ExportButtons = ({ filters, summary, sales, orders, inventory }) => {
+  const report = {
+    filters,
+    summary,
+    sales,
+    orders,
+    inventory,
+  };
+
   return (
     <div className="flex flex-wrap gap-4">
       <button
-        onClick={() => exportCSV(orders)}
+        onClick={() => exportCSV(report)}
         className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
       >
         Export CSV
       </button>
 
       <button
-        onClick={() => exportExcel(orders)}
+        onClick={() => exportExcel(report)}
         className="rounded-lg bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-700"
       >
         Export Excel
       </button>
 
       <button
-        onClick={() => exportPDF(orders)}
+        onClick={() => exportPDF(report)}
         className="rounded-lg bg-gray-900 px-5 py-3 font-medium text-white hover:bg-black"
       >
         Export PDF

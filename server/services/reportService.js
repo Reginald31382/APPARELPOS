@@ -1,22 +1,109 @@
 import Order from "../models/Order.js";
 import Product from "../models/Products.js";
 
-const buildDateQuery = (start, end) => {
+const buildDateQuery = (start, end, range) => {
   const query = {};
 
-  if (start && end) {
-    query.createdAt = {
-      $gte: new Date(start),
-      $lte: new Date(`${end}T23:59:59.999Z`),
-    };
+  const today = new Date();
+
+  switch (range) {
+    case "today": {
+      const startDate = new Date(today);
+      startDate.setHours(0, 0, 0, 0);
+
+      query.createdAt = {
+        $gte: startDate,
+      };
+
+      break;
+    }
+
+    case "last7": {
+      const startDate = new Date(today);
+      startDate.setDate(startDate.getDate() - 6);
+      startDate.setHours(0, 0, 0, 0);
+
+      query.createdAt = {
+        $gte: startDate,
+      };
+
+      break;
+    }
+
+    case "last30": {
+      const startDate = new Date(today);
+      startDate.setDate(startDate.getDate() - 29);
+      startDate.setHours(0, 0, 0, 0);
+
+      query.createdAt = {
+        $gte: startDate,
+      };
+
+      break;
+    }
+
+    case "month": {
+      const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      query.createdAt = {
+        $gte: startDate,
+      };
+
+      break;
+    }
+
+    case "lastMonth": {
+      const startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+
+      const endDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        0,
+        23,
+        59,
+        59,
+        999,
+      );
+
+      query.createdAt = {
+        $gte: startDate,
+        $lte: endDate,
+      };
+
+      break;
+    }
+
+    case "custom": {
+      if (start && end) {
+        query.createdAt = {
+          $gte: new Date(start),
+          $lte: new Date(`${end}T23:59:59.999Z`),
+        };
+      }
+
+      break;
+    }
+
+    default:
+      {
+        const startDate = new Date(today);
+
+        startDate.setHours(0, 0, 0, 0);
+
+        query.createdAt = {
+          $gte: startDate,
+        };
+
+        break;
+      }
+      break;
   }
 
   return query;
 };
 
-export const getSummary = async ({ start, end }) => {
-  const query = buildDateQuery(start, end);
-
+export const getSummary = async ({ start, end, range }) => {
+  const query = buildDateQuery(start, end, range);
   const orders = await Order.find(query);
 
   const revenue = orders.reduce((sum, order) => sum + order.total, 0);
@@ -33,8 +120,25 @@ export const getSummary = async ({ start, end }) => {
   };
 };
 
-export const getSales = async ({ start, end }) => {
-  const query = buildDateQuery(start, end);
+export const getSales = async ({ start, end, range }) => {
+  const query = buildDateQuery(start, end, range);
+
+  let groupFormat = "%Y-%m-%d";
+
+  switch (range) {
+    case "today":
+      groupFormat = "%H:00";
+      break;
+
+    case "month":
+    case "lastMonth":
+      groupFormat = "%Y-%U";
+      break;
+
+    default:
+      groupFormat = "%Y-%m-%d";
+      break;
+  }
 
   const sales = await Order.aggregate([
     {
@@ -44,7 +148,7 @@ export const getSales = async ({ start, end }) => {
       $group: {
         _id: {
           $dateToString: {
-            format: "%Y-%m-%d",
+            format: groupFormat,
             date: "$createdAt",
           },
         },
@@ -63,15 +167,14 @@ export const getSales = async ({ start, end }) => {
     },
   ]);
 
-  return sales.map((day) => ({
-    ...day,
-    revenue: Number(day.revenue.toFixed(2)),
+  return sales.map((item) => ({
+    ...item,
+    revenue: Number(item.revenue.toFixed(2)),
   }));
 };
 
-export const getOrders = async ({ start, end }) => {
-  const query = buildDateQuery(start, end);
-
+export const getOrders = async ({ start, end, range }) => {
+  const query = buildDateQuery(start, end, range);
   const orders = await Order.find(query).sort({ createdAt: -1 }).limit(10);
 
   const statuses = await Order.aggregate([
@@ -124,9 +227,8 @@ export const getOrders = async ({ start, end }) => {
   };
 };
 
-export const getProducts = async ({ start, end }) => {
-  const query = buildDateQuery(start, end);
-
+export const getProducts = async ({ start, end, range }) => {
+  const query = buildDateQuery(start, end, range);
   const products = await Order.aggregate([
     {
       $match: query,
