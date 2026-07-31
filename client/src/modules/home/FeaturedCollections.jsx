@@ -8,7 +8,7 @@ const collections = [
   },
   {
     title: "Women",
-    image: "https://i.postimg.cc/T36WDHZf/jrome-womens-collection.png",
+    image: "https://i.postimg.cc/MGkJ2vvx/jrome-womens-collection-IV.png",
     link: "/shop?category=Women",
   },
   {
