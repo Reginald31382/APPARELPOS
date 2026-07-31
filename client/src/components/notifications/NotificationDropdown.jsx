@@ -44,7 +44,7 @@ const NotificationDropdown = ({ onClose }) => {
               key={notification._id}
               onClick={() => {
                 if (notification.orderId) {
-                  navigate(`/admin/orders/${notification.orderId}`);
+                  navigate(`/admin/orders?order=${notification.orderId}`);
                   onClose();
                 }
               }}

@@ -1,5 +1,4 @@
-import useDashboard from "./hooks/useDashboard";
-
+import useReportSummary from "./hooks/useReportSummary";
 import SummaryCards from "./components/SummaryCards";
 import SalesChart from "./components/SalesChart";
 import RecentOrdersTable from "./components/RecentOrdersTable";
@@ -8,7 +7,7 @@ import ReportFilters from "./components/ReportFilters";
 import ExportButtons from "./components/ExportButtons";
 
 const ReportsPage = () => {
-  const { data, isLoading, error } = useDashboard();
+  const { data, isLoading, error } = useReportSummary();
 
   if (isLoading) {
     return <div className="p-8">Loading...</div>;

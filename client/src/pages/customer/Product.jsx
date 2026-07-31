@@ -86,7 +86,6 @@ const Product = () => {
       sku: selectedVariant.sku,
       name: product.name,
 
-      // Keep both for now until we update the UI
       image: selectedImage,
       images: product.images || [],
 

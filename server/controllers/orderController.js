@@ -1,6 +1,7 @@
 import Order from "../models/Order.js";
 
 import { reduceInventory } from "../services/inventoryService.js";
+import { emitOrderUpdated } from "../services/socketService.js";
 
 const generateOrderNumber = () => {
   return `JR-${Date.now()}`;
@@ -84,6 +85,48 @@ export const updateOrder = async (req, res) => {
     const order = await Order.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+/*
+PATCH /api/orders/:id/status
+*/
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const allowedStatuses = [
+      "Pending",
+      "Processing",
+      "Shipped",
+      "Delivered",
+      "Refunded",
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid order status.",
+      });
+    }
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found.",
+      });
+    }
+
+    order.status = status;
+
+    await order.save();
+    emitOrderUpdated(order);
 
     res.json(order);
   } catch (error) {

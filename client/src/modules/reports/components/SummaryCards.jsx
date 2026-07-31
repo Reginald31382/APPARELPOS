@@ -3,20 +3,20 @@ import { formatCurrency } from "../../../utils/currency";
 const SummaryCards = ({ data }) => {
   const cards = [
     {
-      title: "Today's Sales",
-      value: formatCurrency(data.todaySales),
+      title: "Revenue",
+      value: formatCurrency(data.revenue ?? 0),
     },
     {
-      title: "Orders Today",
-      value: data.ordersToday,
+      title: "Orders",
+      value: data.orders ?? 0,
     },
     {
-      title: "Items Sold",
-      value: data.itemsSold,
+      title: "Tax Collected",
+      value: formatCurrency(data.tax ?? 0),
     },
     {
-      title: "Low Inventory",
-      value: data.lowInventory,
+      title: "Average Order",
+      value: formatCurrency(data.averageOrder ?? 0),
     },
   ];
 

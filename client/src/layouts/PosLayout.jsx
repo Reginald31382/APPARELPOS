@@ -17,12 +17,12 @@ const PosLayout = () => {
   );
   return (
     <div className="flex h-screen flex-col lg:flex-row">
-      <Link to="/" className="p-3 text-3xl font-bold fixed right-0">
-        <AiTwotoneHome />
-      </Link>
       {/* Product Area */}
       <div className="flex flex-1 flex-col">
         <h1 className="p-3 text-3xl font-bold ">POS J.Rome Checkout Systems</h1>
+        <Link to="/admin" className="p-3 text-3xl font-bold fixed right-0">
+          <AiTwotoneHome />
+        </Link>
         <CheckoutToolbar />
 
         <div className="flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-5 lg:p-6">

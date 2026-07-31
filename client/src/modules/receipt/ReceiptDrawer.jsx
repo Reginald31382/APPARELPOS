@@ -1,6 +1,6 @@
 import useReceiptStore from "../../store/receipt/useReceiptStore";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import PrintableReceipt from "./PrintableReceipt";
 import useReceiptPrint from "./hooks/useReceiptPrint";
 import EmailReceiptButton from "./EmailReceiptButton";
@@ -13,7 +13,19 @@ const ReceiptDrawer = () => {
   const closeReceipt = useReceiptStore((state) => state.closeReceipt);
 
   const receiptRef = useRef(null);
+
   const { printReceipt } = useReceiptPrint(receiptRef);
+
+  useEffect(() => {
+    if (!isOpen || !receipt) return;
+
+    // Wait for the receipt to render before printing
+    const timer = setTimeout(() => {
+      printReceipt();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, receipt, printReceipt]);
 
   if (!isOpen || !receipt) return null;
 
@@ -48,7 +60,7 @@ const ReceiptDrawer = () => {
             onClick={printReceipt}
             className="mb-3 w-full rounded-lg bg-blue-600 py-3 text-white hover:bg-blue-700"
           >
-            Print Receipt
+            Reprint Receipt
           </button>
 
           <EmailReceiptButton />

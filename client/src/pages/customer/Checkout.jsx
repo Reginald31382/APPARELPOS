@@ -64,7 +64,7 @@ const Checkout = () => {
 
   const handleContinueToPayment = async () => {
     try {
-      console.log("Customer Cart:", items);
+      // console.log("Customer Cart:", items);
       const payload = {
         items: items.map((item) => ({
           productId: item._id,
@@ -106,15 +106,15 @@ const Checkout = () => {
 
         paymentMethod: "Stripe",
       };
-      console.log("Checkout Items:", items);
-      console.log(
-        "Payload Items:",
-        items.map((item) => ({
-          productId: item._id,
-          name: item.name,
-          images: item.images,
-        })),
-      );
+      // console.log("Checkout Items:", items);
+      // console.log(
+      //   "Payload Items:",
+      //   items.map((item) => ({
+      //     productId: item._id,
+      //     name: item.name,
+      //     images: item.images,
+      //   })),
+      // );
 
       const { data } = await api.post(
         "/payments/create-checkout-session",
