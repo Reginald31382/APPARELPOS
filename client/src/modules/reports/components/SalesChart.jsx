@@ -15,13 +15,13 @@ const SalesChart = ({ data }) => {
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
 
-          <XAxis dataKey="day" />
-
-          <Tooltip />
-
+          <XAxis dataKey="_id" />
+          <Tooltip
+            formatter={(value) => [`$${Number(value).toFixed(2)}`, "Revenue"]}
+          />
           <Line
             type="monotone"
-            dataKey="sales"
+            dataKey="revenue"
             stroke="#2563eb"
             strokeWidth={3}
           />

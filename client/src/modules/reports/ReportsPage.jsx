@@ -1,4 +1,10 @@
+import { useState } from "react";
+
 import useReportSummary from "./hooks/useReportSummary";
+import useSalesReport from "./hooks/useSalesReport";
+import useOrdersReport from "./hooks/useOrdersReport";
+import useInventoryReport from "./hooks/useInventoryReport";
+
 import SummaryCards from "./components/SummaryCards";
 import SalesChart from "./components/SalesChart";
 import RecentOrdersTable from "./components/RecentOrdersTable";
@@ -7,7 +13,20 @@ import ReportFilters from "./components/ReportFilters";
 import ExportButtons from "./components/ExportButtons";
 
 const ReportsPage = () => {
-  const { data, isLoading, error } = useReportSummary();
+  const [filters, setFilters] = useState({});
+
+  const summary = useReportSummary(filters);
+  const sales = useSalesReport(filters);
+  const orders = useOrdersReport(filters);
+  const inventory = useInventoryReport(filters);
+
+  const isLoading =
+    summary.isLoading ||
+    sales.isLoading ||
+    orders.isLoading ||
+    inventory.isLoading;
+
+  const error = summary.error || sales.error || orders.error || inventory.error;
 
   if (isLoading) {
     return <div className="p-8">Loading...</div>;
@@ -22,19 +41,19 @@ const ReportsPage = () => {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <h1 className="text-3xl font-bold">Reports</h1>
 
-        <ExportButtons orders={data.recentOrders} />
+        <ExportButtons orders={orders.data?.recentOrders ?? []} />
       </div>
 
-      <ReportFilters />
+      <ReportFilters filters={filters} onChange={setFilters} />
 
-      <SummaryCards data={data} />
+      <SummaryCards data={summary.data} />
 
-      <SalesChart data={data.last7Days} />
+      <SalesChart data={sales.data ?? []} />
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <RecentOrdersTable orders={data.recentOrders} />
+        <RecentOrdersTable orders={orders.data?.recentOrders ?? []} />
 
-        <LowInventoryTable products={data.lowInventoryProducts} />
+        <LowInventoryTable products={inventory.data?.lowInventory ?? []} />
       </div>
     </div>
   );
