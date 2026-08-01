@@ -49,11 +49,13 @@ io.on("connection", (socket) => {
 app.use(cors());
 
 // Stripe webhook MUST receive the raw request body
-// app.use(
-//   "/api/stripe/webhook",
-//   express.raw({ type: "application/json" }),
-//   stripeRoutes,
-// );
+app.use(
+  "/api/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  stripeRoutes,
+);
+
+// Shipping webhook logging
 app.use((req, res, next) => {
   if (req.path.includes("/shipping/webhook")) {
     console.log("Webhook hit:", req.method, req.path);

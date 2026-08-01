@@ -2,6 +2,7 @@ import Order from "../../models/Order.js";
 import { sendShipmentEmail } from "../email/sendShipmentEmail.js";
 import { createShipment } from "./createShipment.js";
 import { purchaseLabel } from "./purchaseLabel.js";
+import { emitOrderUpdated } from "../socketService.js";
 
 export async function purchaseShippingLabel(orderId) {
   // console.log("Order ID:", orderId);
@@ -129,6 +130,8 @@ export async function purchaseShippingLabel(orderId) {
 
   order.shipping.status = "Label Created";
 
+  order.status = "Shipped";
+
   order.shipping.shippoShipmentId = shipment.objectId;
 
   order.shipping.shippoTransactionId = transaction.objectId;
@@ -140,6 +143,8 @@ export async function purchaseShippingLabel(orderId) {
   order.status = "Shipped";
 
   await order.save();
+
+  emitOrderUpdated(order);
 
   try {
     await sendShipmentEmail(order);

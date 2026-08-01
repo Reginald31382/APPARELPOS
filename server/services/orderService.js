@@ -94,7 +94,7 @@ export async function completeOrder({
 
     await createNotification({
       type: "NEW_ORDER",
-      title: "New Order Received",
+      title: "New J.Rome Apparel Order",
       message: `${order.orderNumber} has been placed by ${order.customerEmail}.`,
       orderId: order._id,
     });

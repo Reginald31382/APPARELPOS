@@ -22,7 +22,7 @@ const StoreNavbar = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur-md">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-12">
+      <div className="mx-auto flex h-25 max-w-7xl items-center justify-between px-6 lg:px-12">
         {/* Logo */}
         <Link
           to="/"
@@ -32,7 +32,7 @@ const StoreNavbar = () => {
           <img
             src="https://i.postimg.cc/9QCLhrdv/jrome-leo-szn.png"
             alt="logo"
-            className="h-50 w-auto"
+            className="h-50 w-auto mt-10"
           />
         </Link>
 

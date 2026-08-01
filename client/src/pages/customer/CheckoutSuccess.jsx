@@ -1,3 +1,4 @@
+import socket from "../../services/socketService";
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
@@ -16,7 +17,7 @@ const CheckoutSuccess = () => {
 
   const [attempts, setAttempts] = useState(0);
 
-  const MAX_ATTEMPTS = 10;
+  const MAX_ATTEMPTS = 20;
 
   useEffect(() => {
     if (!sessionId) {
@@ -25,6 +26,18 @@ const CheckoutSuccess = () => {
     }
 
     let cancelled = false;
+
+    socket.connect();
+
+    const handleOrderCreated = (newOrder) => {
+      if (newOrder.stripeCheckoutSessionId !== sessionId) return;
+
+      setOrder(newOrder);
+      clearCart();
+      setLoading(false);
+    };
+
+    socket.on("order:new", handleOrderCreated);
 
     const fetchOrder = async (attempt = 1) => {
       try {
@@ -43,13 +56,12 @@ const CheckoutSuccess = () => {
 
           setTimeout(() => {
             fetchOrder(attempt + 1);
-          }, 1000);
+          }, 1500);
 
           return;
         }
 
         console.error("Order fetch failed:", error);
-
         setLoading(false);
       }
     };
@@ -58,6 +70,7 @@ const CheckoutSuccess = () => {
 
     return () => {
       cancelled = true;
+      socket.off("order:new", handleOrderCreated);
     };
   }, [sessionId, clearCart]);
 

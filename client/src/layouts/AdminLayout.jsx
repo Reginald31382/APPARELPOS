@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom";
+import socket from "../services/socketService";
 import { useEffect } from "react";
 
 import Sidebar from "../components/layout/Sidebar";
@@ -8,6 +9,12 @@ import NotificationProvider from "../providers/NotificationProvider";
 import ReceiptDrawer from "../modules/receipt/ReceiptDrawer";
 
 const AdminLayout = () => {
+  useEffect(() => {
+    socket.connect();
+
+    return () => socket.disconnect();
+  }, []);
+
   return (
     <NotificationProvider>
       <div className="flex h-screen overflow-hidden bg-gray-100">

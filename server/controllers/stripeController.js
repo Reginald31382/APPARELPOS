@@ -1,3 +1,4 @@
+import { emitOrderCreated } from "../services/socketService.js";
 import { createStripeOrder } from "../services/orderService.js";
 import { getStripe } from "../services/stripeService.js";
 import Order from "../models/Order.js";
@@ -21,7 +22,9 @@ export const webhook = async (req, res) => {
     }
 
     const session = event.data.object;
-    console.log("Stripe Session:", session.id);
+    // console.log("Stripe Session:", session.id);
+    // console.log("Payment Status:", session.payment_status);
+    // console.log("Metadata:", session.metadata);
     const existingOrder = await Order.findOne({
       stripeCheckoutSessionId: session.id,
     });
@@ -33,15 +36,15 @@ export const webhook = async (req, res) => {
     // console.log("Raw metadata:", session.metadata.items);
 
     // console.log("Parsed metadata:", JSON.parse(session.metadata.items));
-
+    // console.log("Creating order...");
     const order = await createStripeOrder(session);
-
+    emitOrderCreated(order);
     console.log(`Order Created: ${order.orderNumber}`);
 
     return res.json({ received: true });
   } catch (error) {
     // console.error("Stripe webhook error:");
-    console.error(error.message);
+    console.error("Webhook Error:", error);
 
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }

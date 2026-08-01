@@ -1,3 +1,5 @@
+import api from "../../../api/axios";
+import { notifySuccess, notifyError } from "../../../utils/notifications";
 import RefundOrderModal from "../../refunds/RefundOrderModal";
 import UpdateStatusModal from "./UpdateStatusModal";
 import { useState } from "react";
@@ -14,6 +16,7 @@ const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
   const [refundOpen, setRefundOpen] = useState(false);
   const openReceipt = useReceiptStore((state) => state.openReceipt);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [purchasingLabel, setPurchasingLabel] = useState(false);
 
   if (!order) return null;
   const handlePrintReceipt = () => {
@@ -33,13 +36,33 @@ const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
       },
     });
   };
+
+  const handlePurchaseLabel = async () => {
+    try {
+      setPurchasingLabel(true);
+
+      const { data } = await api.post(`/shipping/purchase-label/${order._id}`);
+
+      Object.assign(order, data);
+
+      notifySuccess("Shipping label purchased!");
+    } catch (error) {
+      console.error(error);
+
+      notifyError(
+        error.response?.data?.message || "Unable to purchase shipping label.",
+      );
+    } finally {
+      setPurchasingLabel(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[95vh] max-w-3xl overflow-y-auto">
+      <DialogContent className="max-h-[95vh] w-[95vw] max-w-6xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Order {order.orderNumber}</DialogTitle>
         </DialogHeader>
-
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div>
@@ -134,7 +157,7 @@ const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
                           />
 
                           <div>
-                            <p className="font-medium">{item.name}</p>
+                            {/* <p className="font-medium">{item.name}</p> */}
 
                             <p className="text-xs text-gray-500">{item.sku}</p>
                           </div>
@@ -153,6 +176,80 @@ const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <div className="rounded-lg border bg-white p-5">
+            <h3 className="mb-4 text-lg font-semibold">Shipping</h3>
+
+            <div className="grid gap-6 md:grid-cols-4">
+              <div>
+                <p className="text-xs uppercase text-gray-500">Carrier</p>
+                <p className="font-medium">{order.shipping?.carrier}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase text-gray-500">Service</p>
+                <p className="font-medium">{order.shipping?.service}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase text-gray-500">Status</p>
+
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">
+                  {order.shipping?.status}
+                </span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs uppercase text-gray-500">
+                  Tracking Number
+                </p>
+
+                <p className="truncate font-mono text-sm">
+                  {order.shipping?.trackingNumber || "Not Purchased"}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              {!order.shipping?.trackingNumber ? (
+                <button
+                  onClick={handlePurchaseLabel}
+                  disabled={purchasingLabel}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:bg-gray-400"
+                >
+                  {purchasingLabel ? "Purchasing..." : "Purchase USPS Label"}
+                </button>
+              ) : (
+                <>
+                  <a
+                    href={order.shipping.labelUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                  >
+                    View Shipping Label
+                  </a>
+
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(
+                        order.shipping.trackingNumber,
+                      )
+                    }
+                    className="rounded-lg border px-4 py-2 hover:bg-gray-100"
+                  >
+                    Copy Tracking
+                  </button>
+
+                  <a
+                    href={`https://tools.usps.com/go/TrackConfirmAction?tLabels=${order.shipping.trackingNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-lg border px-4 py-2 hover:bg-gray-100"
+                  >
+                    Track USPS
+                  </a>
+                </>
+              )}
             </div>
           </div>
 

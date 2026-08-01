@@ -2,6 +2,8 @@ import Order from "../models/Order.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { purchaseShippingLabel } from "../services/shipping/purchaseShippingLabel.js";
 import { getShippingRates } from "../services/shippingService.js";
+import { formatShippingStatus } from "../utils/shippingStatus.js";
+import { emitOrderUpdated } from "../services/socketService.js";
 
 /*
 POST /api/shipping/rates
@@ -69,13 +71,30 @@ export const trackingWebhook = asyncHandler(async (req, res) => {
 
   const status =
     event.data?.tracking_status?.status ||
+    event.data?.tracking_status ||
     event.data?.object?.tracking_status?.status;
 
   if (status) {
-    order.shipping.status = status;
+    order.shipping.status = formatShippingStatus(status);
+
+    switch (order.shipping.status) {
+      case "In Transit":
+        order.status = "Shipped";
+        break;
+
+      case "Out For Delivery":
+        order.status = "Shipped";
+        break;
+
+      case "Delivered":
+        order.status = "Delivered";
+        order.shipping.deliveredAt = new Date();
+        break;
+    }
   }
 
   await order.save();
+  emitOrderUpdated(order);
 
   console.log(`✅ ${order.orderNumber} updated to ${order.shipping.status}`);
 

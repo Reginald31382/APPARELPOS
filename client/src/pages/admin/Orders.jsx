@@ -1,3 +1,5 @@
+import { useQueryClient } from "@tanstack/react-query";
+import socket from "../../services/socketService";
 import OrderDetailsModal from "../../modules/orders/components/OrderDetailsModal";
 import useOrders from "../../modules/orders/hooks/useOrders";
 import useRefundOrder from "../../modules/orders/hooks/useRefundOrder";
@@ -21,6 +23,7 @@ const Orders = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (orders.length === 0) return;
@@ -40,6 +43,26 @@ const Orders = () => {
     // doesn't keep reopening the modal.
     setSearchParams({});
   }, [orders, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    const refreshOrders = (order) => {
+      console.log("📦 Socket Update:", order);
+
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.ORDERS],
+      });
+    };
+
+    socket.on("order:new", refreshOrders);
+    socket.on("order:updated", refreshOrders);
+    socket.on("order:refunded", refreshOrders);
+
+    return () => {
+      socket.off("order:new", refreshOrders);
+      socket.off("order:updated", refreshOrders);
+      socket.off("order:refunded", refreshOrders);
+    };
+  }, [queryClient]);
 
   if (isLoading) {
     return <p>Loading orders...</p>;
