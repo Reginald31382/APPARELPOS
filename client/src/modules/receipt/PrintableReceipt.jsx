@@ -2,12 +2,19 @@ import { forwardRef } from "react";
 import ReceiptQRCode from "./ReceiptQRCode";
 import { formatCurrency } from "../../utils/currency";
 import formatReceiptNumber from "../../utils/formatReceiptNumber";
-import useSettingsStore from "../../store/settings/useSettingsStore";
+// import useSettingsStore from "../../store/settings/useSettingsStore";
+import useStore from "../../modules/settings/hooks/useStore";
 
 const PrintableReceipt = forwardRef(({ receipt }, ref) => {
   if (!receipt) return null;
-  const { businessName, phone, email, website, address, receiptFooter } =
-    useSettingsStore();
+  const { data: store } = useStore();
+
+  const businessName = store?.businessName;
+  const phone = store?.phone;
+  const email = store?.email;
+  const website = store?.website;
+  const address = store?.address;
+  const receiptFooter = store?.receiptFooter;
 
   return (
     <div
@@ -96,7 +103,7 @@ const PrintableReceipt = forwardRef(({ receipt }, ref) => {
           {receiptFooter || "Thank you for shopping!"}
         </p>
       </div>
-      <ReceiptQRCode value={website || window.location.origin} />
+      <ReceiptQRCode value={`${website}/orders/${receipt.orderNumber}`} />{" "}
     </div>
   );
 });

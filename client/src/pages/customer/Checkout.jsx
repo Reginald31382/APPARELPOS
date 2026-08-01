@@ -7,13 +7,10 @@ import { US_STATES } from "../../constants/usStates";
 
 const Checkout = () => {
   const items = useCustomerCartStore((state) => state.items);
-  const taxRate = store?.taxRate ?? 6;
-  const tax = () => subtotal() * (taxRate / 100);
-  const freeShippingThreshold = store?.freeShippingThreshold ?? 150;
-  const shippingCost =
-    subtotal() >= freeShippingThreshold ? 0 : (selectedShipping?.cost ?? 0);
-  const subtotal = useCustomerCartStore((state) => state.subtotal);
+
+  const subtotal = useCustomerCartStore((state) => state.subtotal());
   const { data: store } = useStore();
+
   const [checkout, setCheckout] = useState({
     email: "",
     phone: "",
@@ -26,9 +23,19 @@ const Checkout = () => {
     zip: "",
     shippingMethod: null,
   });
+
   const [shippingRates, setShippingRates] = useState([]);
   const [loadingRates, setLoadingRates] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState(null);
+
+  const taxRate = store?.taxRate ?? 6;
+
+  const tax = subtotal * (taxRate / 100);
+
+  const freeShippingThreshold = store?.freeShippingThreshold ?? 150;
+
+  const shippingCost =
+    subtotal >= freeShippingThreshold ? 0 : (selectedShipping?.cost ?? 0);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -86,9 +93,9 @@ const Checkout = () => {
           images: item.images || [],
         })),
 
-        subtotal: subtotal(),
+        subtotal: subtotal,
 
-        tax: 0,
+        tax,
 
         shippingAddress: {
           firstName: checkout.firstName,
@@ -106,11 +113,10 @@ const Checkout = () => {
         shipping: {
           carrier: selectedShipping.carrier,
           service: selectedShipping.service,
-          cost: selectedShipping.cost,
+          cost: shippingCost,
         },
 
-        total: subtotal() + selectedShipping.cost,
-
+        total: subtotal + tax + shippingCost,
         paymentMethod: "Stripe",
       };
       // console.log("Checkout Items:", items);
@@ -326,31 +332,31 @@ const Checkout = () => {
             <div className="flex justify-between">
               <span>Subtotal</span>
 
-              <span>{formatCurrency(subtotal())}</span>
+              <span>{formatCurrency(subtotal)}</span>
             </div>
 
             <div className="flex justify-between">
               <span>Tax</span>
 
-              <span>{formatCurrency(tax())}</span>
+              <span>{formatCurrency(tax)}</span>
             </div>
 
             <div className="flex justify-between">
               <span>Shipping</span>
 
               <span>
-                {selectedShipping
-                  ? formatCurrency(selectedShipping.cost)
-                  : "Not Selected"}
+                {!selectedShipping
+                  ? "Not Selected"
+                  : shippingCost === 0
+                    ? "FREE"
+                    : formatCurrency(shippingCost)}
               </span>
             </div>
 
             <div className="flex justify-between text-xl font-bold">
               <span>Total</span>
 
-              <span>
-                {formatCurrency(subtotal() + (selectedShipping?.cost ?? 0))}
-              </span>
+              <span>{formatCurrency(subtotal + tax + shippingCost)} </span>
             </div>
 
             <button
