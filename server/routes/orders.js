@@ -7,6 +7,7 @@ import {
   updateOrder,
   updateOrderStatus,
   deleteOrder,
+  getOrderByNumber,
   getSuccessOrder,
 } from "../controllers/orderController.js";
 
@@ -17,6 +18,8 @@ const router = express.Router();
 router.get("/", getOrders);
 
 router.get("/success/:sessionId", getSuccessOrder);
+
+router.get("/number/:orderNumber", getOrderByNumber);
 
 router.get("/:id", getOrder);
 

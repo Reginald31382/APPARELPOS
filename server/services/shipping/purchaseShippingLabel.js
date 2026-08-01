@@ -1,10 +1,14 @@
 import Order from "../../models/Order.js";
-
+import { sendShipmentEmail } from "../email/sendShipmentEmail.js";
 import { createShipment } from "./createShipment.js";
 import { purchaseLabel } from "./purchaseLabel.js";
 
 export async function purchaseShippingLabel(orderId) {
+  // console.log("Order ID:", orderId);
+
   const order = await Order.findById(orderId);
+
+  // console.log("Order:", order);
 
   if (!order) {
     throw new Error("Order not found.");
@@ -29,7 +33,7 @@ export async function purchaseShippingLabel(orderId) {
     state: "MI",
     zip: "48160",
     country: "US",
-    phone: "3134601948",
+    phone: "3134741286",
     email: "shipping@jrome-studios.com",
   };
 
@@ -129,7 +133,19 @@ export async function purchaseShippingLabel(orderId) {
 
   order.shipping.shippoTransactionId = transaction.objectId;
 
+  order.shipping.trackingUrl = `https://tools.usps.com/go/TrackConfirmAction?tLabels=${transaction.trackingNumber}`;
+
+  order.shipping.shippedAt = new Date();
+
+  order.status = "Shipped";
+
   await order.save();
+
+  try {
+    await sendShipmentEmail(order);
+  } catch (err) {
+    console.error("Shipment email failed:", err.message);
+  }
 
   return order;
 }

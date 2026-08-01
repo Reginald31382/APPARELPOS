@@ -49,11 +49,18 @@ io.on("connection", (socket) => {
 app.use(cors());
 
 // Stripe webhook MUST receive the raw request body
-app.use(
-  "/api/stripe/webhook",
-  express.raw({ type: "application/json" }),
-  stripeRoutes,
-);
+// app.use(
+//   "/api/stripe/webhook",
+//   express.raw({ type: "application/json" }),
+//   stripeRoutes,
+// );
+app.use((req, res, next) => {
+  if (req.path.includes("/shipping/webhook")) {
+    console.log("Webhook hit:", req.method, req.path);
+  }
+
+  next();
+});
 
 // Everything else uses JSON
 app.use(express.json());
@@ -72,14 +79,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/refunds", refundRoutes);
 app.use("/api/store", storeRoutes);
-
-// app.post("/test", (req, res) => {
-//   console.log("TEST BODY:", req.body);
-
-//   res.json({
-//     body: req.body,
-//   });
-// });
 
 app.get("/", (req, res) => {
   res.json({

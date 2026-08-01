@@ -1,4 +1,5 @@
 import Order from "../models/Order.js";
+import asyncHandler from "../utils/asyncHandler.js";
 import { completeOrder } from "../services/orderService.js";
 import { emitOrderUpdated } from "../services/socketService.js";
 
@@ -172,3 +173,17 @@ export const getSuccessOrder = async (req, res) => {
     });
   }
 };
+
+export const getOrderByNumber = asyncHandler(async (req, res) => {
+  const order = await Order.findOne({
+    orderNumber: req.params.orderNumber,
+  });
+
+  if (!order) {
+    return res.status(404).json({
+      message: "Order not found",
+    });
+  }
+
+  res.json(order);
+});

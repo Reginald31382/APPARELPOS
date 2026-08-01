@@ -94,29 +94,74 @@ const orderSchema = new mongoose.Schema(
     },
 
     shipping: {
-      carrier: "USPS",
+      carrier: {
+        type: String,
+        default: "USPS",
+      },
 
-      service: "Ground Advantage",
+      service: {
+        type: String,
+        default: "Ground Advantage",
+      },
 
-      cost: 0,
+      cost: {
+        type: Number,
+        default: 0,
+      },
 
-      trackingNumber: "",
+      trackingNumber: {
+        type: String,
+        default: "",
+      },
 
-      trackingUrl: "",
+      trackingUrl: {
+        type: String,
+        default: "",
+      },
 
-      labelUrl: "",
+      labelUrl: {
+        type: String,
+        default: "",
+      },
 
-      shippoShipmentId: "",
+      shippoShipmentId: {
+        type: String,
+        default: "",
+      },
 
-      shippoTransactionId: "",
+      shippoTransactionId: {
+        type: String,
+        default: "",
+      },
 
-      estimatedDelivery: null,
+      estimatedDelivery: {
+        type: Date,
+        default: null,
+      },
 
-      status: "Pending",
+      status: {
+        type: String,
+        enum: [
+          "Pending",
+          "Label Created",
+          "In Transit",
+          "Out for Delivery",
+          "Delivered",
+          "Exception",
+          "Returned",
+        ],
+        default: "Pending",
+      },
 
-      shippedAt: null,
+      shippedAt: {
+        type: Date,
+        default: null,
+      },
 
-      deliveredAt: null,
+      deliveredAt: {
+        type: Date,
+        default: null,
+      },
     },
 
     total: {

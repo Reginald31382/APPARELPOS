@@ -103,7 +103,9 @@ const PrintableReceipt = forwardRef(({ receipt }, ref) => {
           {receiptFooter || "Thank you for shopping!"}
         </p>
       </div>
-      <ReceiptQRCode value={`${website}/orders/${receipt.orderNumber}`} />{" "}
+      <ReceiptQRCode
+        value={`${window.location.origin}/order/${receipt.orderNumber}`}
+      />
     </div>
   );
 });

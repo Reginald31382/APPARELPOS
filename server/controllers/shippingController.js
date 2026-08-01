@@ -1,3 +1,5 @@
+import Order from "../models/Order.js";
+import asyncHandler from "../utils/asyncHandler.js";
 import { purchaseShippingLabel } from "../services/shipping/purchaseShippingLabel.js";
 import { getShippingRates } from "../services/shippingService.js";
 
@@ -41,4 +43,41 @@ export const purchaseLabel = asyncHandler(async (req, res) => {
   const order = await purchaseShippingLabel(orderId);
 
   res.json(order);
+});
+
+export const trackingWebhook = asyncHandler(async (req, res) => {
+  console.log("📦 Shippo Webhook Received");
+  console.dir(req.body, { depth: null });
+
+  const event = req.body;
+
+  const trackingNumber =
+    event.data?.tracking_number || event.data?.object?.tracking_number;
+
+  if (!trackingNumber) {
+    return res.sendStatus(200);
+  }
+
+  const order = await Order.findOne({
+    "shipping.trackingNumber": trackingNumber,
+  });
+
+  if (!order) {
+    console.log("❌ No order found:", trackingNumber);
+    return res.sendStatus(200);
+  }
+
+  const status =
+    event.data?.tracking_status?.status ||
+    event.data?.object?.tracking_status?.status;
+
+  if (status) {
+    order.shipping.status = status;
+  }
+
+  await order.save();
+
+  console.log(`✅ ${order.orderNumber} updated to ${order.shipping.status}`);
+
+  res.sendStatus(200);
 });

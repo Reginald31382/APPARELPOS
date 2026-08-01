@@ -14,6 +14,7 @@ import CheckoutSuccess from "../pages/customer/CheckoutSuccess";
 import DashboardPage from "../modules/dashboard/DashboardPage";
 import Products from "../pages/admin/Products";
 import Orders from "../pages/admin/Orders";
+import OrderTracking from "../modules/customer/OrderTracking";
 // import Customers from "../pages/admin/Customers";
 import Inventory from "../pages/admin/Inventory";
 import ReportsPage from "../modules/reports/ReportsPage";
@@ -36,6 +37,7 @@ const AppRoutes = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/checkout/success" element={<CheckoutSuccess />} />
+        <Route path="/order/:orderNumber" element={<OrderTracking />} />
       </Route>
 
       {/* Authentication */}
