@@ -1,3 +1,4 @@
+import { purchaseShippingLabel } from "../services/shipping/purchaseShippingLabel.js";
 import { getShippingRates } from "../services/shippingService.js";
 
 /*
@@ -33,3 +34,11 @@ export const calculateShippingRates = async (req, res) => {
     });
   }
 };
+
+export const purchaseLabel = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  const order = await purchaseShippingLabel(orderId);
+
+  res.json(order);
+});

@@ -11,36 +11,71 @@ const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
 
-  const [order, setOrder] = useState({});
+  const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      if (!sessionId) {
-        setLoading(false);
-        return;
-      }
+  const [attempts, setAttempts] = useState(0);
 
+  const MAX_ATTEMPTS = 10;
+
+  useEffect(() => {
+    if (!sessionId) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchOrder = async (attempt = 1) => {
       try {
         const { data } = await api.get(`/orders/success/${sessionId}`);
 
-        setOrder(data);
+        if (cancelled) return;
 
+        setOrder(data);
         clearCart();
+        setLoading(false);
       } catch (error) {
-        console.error("Order fetch failed:", error.response?.status);
-        console.error(error.response?.data);
-      } finally {
+        if (cancelled) return;
+
+        if (error.response?.status === 404 && attempt < MAX_ATTEMPTS) {
+          setAttempts(attempt);
+
+          setTimeout(() => {
+            fetchOrder(attempt + 1);
+          }, 1000);
+
+          return;
+        }
+
+        console.error("Order fetch failed:", error);
+
         setLoading(false);
       }
     };
 
     fetchOrder();
+
+    return () => {
+      cancelled = true;
+    };
   }, [sessionId, clearCart]);
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl px-6 py-20">Loading your order...</div>
+      <div className="mx-auto max-w-4xl px-6 py-24 text-center">
+        <div className="mx-auto mb-6 h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
+
+        <h2 className="text-2xl font-bold">Finalizing Your Order...</h2>
+
+        <p className="mt-4 text-gray-600">
+          We're confirming your payment and preparing your receipt.
+        </p>
+
+        <p className="mt-2 text-sm text-gray-500">
+          Attempt {attempts + 1} of {MAX_ATTEMPTS}
+        </p>
+      </div>
     );
   }
 
@@ -59,7 +94,7 @@ const CheckoutSuccess = () => {
           </p>
         </div>
 
-        {order ? (
+        {order !== null ? (
           <>
             <div className="mb-8 grid gap-6 rounded-xl bg-gray-50 p-6 md:grid-cols-2">
               <div>
@@ -88,22 +123,22 @@ const CheckoutSuccess = () => {
 
               <div className="rounded-xl border p-5">
                 <p className="font-semibold">
-                  {order.shippingAddress.firstName}{" "}
-                  {order.shippingAddress.lastName}
+                  {order.shippingAddress?.firstName}
+                  {order.shippingAddress?.lastName}
                 </p>
 
-                <p>{order.shippingAddress.address1}</p>
+                <p>{order.shippingAddress?.address1}</p>
 
-                {order.shippingAddress.address2 && (
-                  <p>{order.shippingAddress.address2}</p>
+                {order.shippingAddress?.address2 && (
+                  <p>{order.shippingAddress?.address2}</p>
                 )}
 
                 <p>
-                  {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-                  {order.shippingAddress.zipCode}
+                  {order.shippingAddress?.city}, {order.shippingAddress?.state}
+                  {order.shippingAddress?.zipCode}
                 </p>
 
-                <p>{order.shippingAddress.country}</p>
+                <p>{order.shippingAddress?.country}</p>
               </div>
             </div>
 
@@ -111,7 +146,7 @@ const CheckoutSuccess = () => {
               <h2 className="mb-4 text-2xl font-semibold">Items Purchased</h2>
 
               <div className="space-y-4">
-                {order.items.map((item) => (
+                {order.items?.map((item) => (
                   <div
                     key={item.sku}
                     className="flex items-center justify-between rounded-xl border p-4"

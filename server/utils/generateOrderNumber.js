@@ -14,7 +14,10 @@ const generateOrderNumber = async () => {
   }
 
   counter.sequence += 1;
+
   await counter.save();
+
+  console.log("Counter sequence:", counter.sequence);
 
   return `${PREFIX}${counter.sequence}`;
 };
