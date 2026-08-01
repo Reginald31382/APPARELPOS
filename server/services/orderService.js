@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 import Order from "../models/Order.js";
 
-import generateOrderNumber from "../utils/generateOrderNummber.js";
+import generateOrderNumber from "../utils/generateOrderNumber.js";
 
 import { reduceInventory } from "./inventoryService.js";
 import { createNotification } from "./notificationService.js";
@@ -19,6 +19,7 @@ export async function completeOrder({
   customerEmail,
   items,
   subtotal,
+  tax = 0,
   shipping = {},
   shippingAddress = {},
   total,
@@ -39,28 +40,56 @@ export async function completeOrder({
       [
         {
           orderNumber,
+
           customerEmail: customerEmail || shippingAddress?.email || "",
+
           items,
+
           subtotal,
-          shipping,
+
+          tax,
+
+          shipping: {
+            carrier: shipping.carrier || "USPS",
+
+            service: shipping.service || "Ground Advantage",
+
+            cost: shipping.cost || 0,
+
+            trackingNumber: shipping.trackingNumber || "",
+
+            labelUrl: shipping.labelUrl || "",
+
+            status: shipping.status || "Pending",
+
+            estimatedDelivery: shipping.estimatedDelivery || null,
+
+            shippedAt: shipping.shippedAt || null,
+
+            deliveredAt: shipping.deliveredAt || null,
+          },
+
           shippingAddress,
+
           total,
+
           paymentMethod,
+
           paymentStatus,
+
           status,
+
           stripeCheckoutSessionId,
+
           stripePaymentIntentId,
         },
       ],
-      {
-        session,
-      },
+      { session },
     );
 
-    await reduceInventory(order.items, session);
+    await reduceInventory(order.items);
 
     await session.commitTransaction();
-
     session.endSession();
 
     await createNotification({
@@ -77,9 +106,7 @@ export async function completeOrder({
     return order;
   } catch (error) {
     await session.abortTransaction();
-
     session.endSession();
-
     throw error;
   }
 }
@@ -91,7 +118,7 @@ export async function completeOrder({
 */
 
 export async function createStripeOrder(session) {
-  const { subtotal, total, shipping, shippingAddress, items } =
+  const { subtotal, tax, total, shipping, shippingAddress, items } =
     session.metadata;
 
   if (!shipping || !shippingAddress || !items) {
@@ -104,6 +131,7 @@ export async function createStripeOrder(session) {
     customerEmail: JSON.parse(shippingAddress).email,
     items: JSON.parse(items),
     subtotal: Number(subtotal),
+    tax: Number(tax),
     shipping: JSON.parse(shipping),
     shippingAddress: JSON.parse(shippingAddress),
     total: Number(total),

@@ -19,6 +19,7 @@ import userRoutes from "./routes/user.js";
 import refundRoutes from "./routes/refund.js";
 import shippingRoutes from "./routes/shipping.js";
 import paymentRoutes from "./routes/payment.js";
+import storeRoutes from "./routes/store.js";
 import notificationRoutes from "./routes/notifications.js";
 
 import stripeRoutes from "./routes/stripe.js";
@@ -70,6 +71,7 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/refunds", refundRoutes);
+app.use("/api/store", storeRoutes);
 
 // app.post("/test", (req, res) => {
 //   console.log("TEST BODY:", req.body);

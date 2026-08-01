@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import useSettingsStore from "../../store/settings/useSettingsStore";
+import useStore from "../../modules/settings/hooks/useStore";
+import useUpdateStore from "../../modules/settings/hooks/useUpdateStore";
 
 const fieldDescriptions = {
   businessName: "Displayed on receipts, reports, invoices, and exports.",
@@ -18,18 +19,9 @@ const fieldDescriptions = {
 };
 
 const Settings = () => {
-  const {
-    businessName: storeBusinessName,
-    phone: storePhone,
-    email: storeEmail,
-    website: storeWebsite,
-    address: storeAddress,
-    taxRate: storeTaxRate,
-    receiptFooter: storeReceiptFooter,
-    autoPrintReceipts: storeAutoPrintReceipts,
-    defaultPaymentMethod: storeDefaultPaymentMethod,
-    updateSettings,
-  } = useSettingsStore();
+  const { data: store, isLoading } = useStore();
+
+  const updateStore = useUpdateStore();
 
   const [form, setForm] = useState({
     businessName: "",
@@ -44,28 +36,21 @@ const Settings = () => {
   });
 
   useEffect(() => {
+    if (!store) return;
+
     setForm({
-      businessName: storeBusinessName,
-      phone: storePhone,
-      email: storeEmail,
-      website: storeWebsite,
-      address: storeAddress,
-      taxRate: storeTaxRate,
-      receiptFooter: storeReceiptFooter,
-      autoPrintReceipts: storeAutoPrintReceipts,
-      defaultPaymentMethod: storeDefaultPaymentMethod,
+      businessName: store.businessName,
+      phone: store.phone,
+      email: store.email,
+      website: store.website,
+      address: store.address,
+      taxRate: store.taxRate,
+      receiptFooter: store.receiptFooter,
+      autoPrintReceipts: store.autoPrintReceipts,
+      defaultPaymentMethod: store.defaultPaymentMethod,
+      freeShippingThreshold: store.freeShippingThreshold ?? 150,
     });
-  }, [
-    storeBusinessName,
-    storePhone,
-    storeEmail,
-    storeWebsite,
-    storeAddress,
-    storeTaxRate,
-    storeReceiptFooter,
-    storeAutoPrintReceipts,
-    storeDefaultPaymentMethod,
-  ]);
+  }, [store]);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({
@@ -75,36 +60,45 @@ const Settings = () => {
   };
 
   const handleSave = () => {
-    updateSettings(form);
+    updateStore.mutate(form);
   };
 
   const handleReset = () => {
+    if (!store) return;
+
     setForm({
-      businessName: storeBusinessName,
-      phone: storePhone,
-      email: storeEmail,
-      website: storeWebsite,
-      address: storeAddress,
-      taxRate: storeTaxRate,
-      receiptFooter: storeReceiptFooter,
-      autoPrintReceipts: storeAutoPrintReceipts,
-      defaultPaymentMethod: storeDefaultPaymentMethod,
+      businessName: store.businessName,
+      phone: store.phone,
+      email: store.email,
+      website: store.website,
+      address: store.address,
+      taxRate: store.taxRate,
+      receiptFooter: store.receiptFooter,
+      autoPrintReceipts: store.autoPrintReceipts,
+      defaultPaymentMethod: store.defaultPaymentMethod,
+      freeShippingThreshold: store.freeShippingThreshold ?? 150,
     });
   };
 
   const hasChanges =
+    store &&
     JSON.stringify(form) !==
-    JSON.stringify({
-      businessName: storeBusinessName,
-      phone: storePhone,
-      email: storeEmail,
-      website: storeWebsite,
-      address: storeAddress,
-      taxRate: storeTaxRate,
-      receiptFooter: storeReceiptFooter,
-      autoPrintReceipts: storeAutoPrintReceipts,
-      defaultPaymentMethod: storeDefaultPaymentMethod,
-    });
+      JSON.stringify({
+        businessName: store.businessName,
+        phone: store.phone,
+        email: store.email,
+        website: store.website,
+        address: store.address,
+        taxRate: store.taxRate,
+        receiptFooter: store.receiptFooter,
+        autoPrintReceipts: store.autoPrintReceipts,
+        defaultPaymentMethod: store.defaultPaymentMethod,
+        freeShippingThreshold: store.freeShippingThreshold ?? 150,
+      });
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading store settings...</div>;
+  }
 
   return (
     <div className="space-y-8">
@@ -207,8 +201,25 @@ const Settings = () => {
         <div className="border-b px-6 py-4">
           <h2 className="text-lg font-semibold">POS Settings</h2>
         </div>
-
         <div className="grid gap-6 p-6 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Free Shipping Threshold ($)
+            </label>
+
+            <input
+              type="number"
+              className="w-full rounded-lg border p-3 focus:border-blue-500 focus:outline-none"
+              value={form.freeShippingThreshold}
+              onChange={(e) =>
+                handleChange("freeShippingThreshold", Number(e.target.value))
+              }
+            />
+
+            <p className="mt-2 text-sm text-gray-500">
+              Orders at or above this amount receive free shipping.
+            </p>
+          </div>
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700">
               Tax Rate (%)
@@ -302,10 +313,10 @@ const Settings = () => {
         <button
           type="button"
           onClick={handleSave}
-          disabled={!hasChanges}
+          disabled={!hasChanges || updateStore.isPending}
           className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
         >
-          Save Changes
+          {updateStore.isPending ? "Saving..." : "Save Changes"}
         </button>
       </div>
 

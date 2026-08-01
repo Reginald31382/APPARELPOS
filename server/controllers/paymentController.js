@@ -49,6 +49,7 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     metadata: {
       paymentSource: "stripe_checkout",
       subtotal: String(subtotal),
+      tax: String(req.body.tax),
       total: String(total),
       shipping: JSON.stringify(shipping),
       shippingAddress: JSON.stringify(shippingAddress),

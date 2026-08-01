@@ -1,12 +1,19 @@
+import useStore from "../../modules/settings/hooks/useStore";
 import api from "../../api/axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import { formatCurrency } from "../../utils/currency";
 import { US_STATES } from "../../constants/usStates";
 
 const Checkout = () => {
   const items = useCustomerCartStore((state) => state.items);
+  const taxRate = store?.taxRate ?? 6;
+  const tax = () => subtotal() * (taxRate / 100);
+  const freeShippingThreshold = store?.freeShippingThreshold ?? 150;
+  const shippingCost =
+    subtotal() >= freeShippingThreshold ? 0 : (selectedShipping?.cost ?? 0);
   const subtotal = useCustomerCartStore((state) => state.subtotal);
+  const { data: store } = useStore();
   const [checkout, setCheckout] = useState({
     email: "",
     phone: "",
@@ -320,6 +327,12 @@ const Checkout = () => {
               <span>Subtotal</span>
 
               <span>{formatCurrency(subtotal())}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Tax</span>
+
+              <span>{formatCurrency(tax())}</span>
             </div>
 
             <div className="flex justify-between">
