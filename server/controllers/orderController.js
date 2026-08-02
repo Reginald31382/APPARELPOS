@@ -1,7 +1,9 @@
 import Order from "../models/Order.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import { completeOrder } from "../services/orderService.js";
+// import { completeOrder } from "../services/orderService.js";
 import { emitOrderUpdated } from "../services/socketService.js";
+import { getStripe } from "../services/stripeService.js";
+import { createStripeOrder } from "../services/orderService.js";
 
 /*
 GET /api/orders
@@ -153,15 +155,42 @@ export const deleteOrder = async (req, res) => {
 export const getSuccessOrder = async (req, res) => {
   try {
     const { sessionId } = req.params;
+
     console.log("Looking for session:", sessionId);
-    const order = await Order.findOne({
+
+    // First look in MongoDB
+    let order = await Order.findOne({
       stripeCheckoutSessionId: sessionId,
     });
-    console.log("Order found:", order);
-    if (!order) {
+
+    if (order) {
+      console.log("✅ Order found in MongoDB:", order.orderNumber);
+      return res.json(order);
+    }
+
+    console.log("⚠️ Order not found. Checking Stripe...");
+
+    const stripe = getStripe();
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (session.payment_status !== "paid") {
       return res.status(404).json({
-        message: "Order not found.",
+        message: "Payment has not completed.",
       });
+    }
+
+    // Double-check in case another request/webhook created it
+    order = await Order.findOne({
+      stripeCheckoutSessionId: session.id,
+    });
+
+    if (!order) {
+      console.log("🛠 Creating missing order from Stripe session...");
+
+      order = await createStripeOrder(session);
+
+      console.log("✅ Recovery successful:", order.orderNumber);
     }
 
     res.json(order);

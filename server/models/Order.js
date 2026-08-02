@@ -196,7 +196,8 @@ const orderSchema = new mongoose.Schema(
 
     stripeCheckoutSessionId: {
       type: String,
-      default: "",
+      unique: true,
+      sparse: true,
     },
 
     stripePaymentIntentId: {

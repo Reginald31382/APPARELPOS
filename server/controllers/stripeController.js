@@ -22,28 +22,24 @@ export const webhook = async (req, res) => {
     }
 
     const session = event.data.object;
-    // console.log("Stripe Session:", session.id);
-    // console.log("Payment Status:", session.payment_status);
-    // console.log("Metadata:", session.metadata);
+
+    console.log("Webhook creating order:", session.id);
+
     const existingOrder = await Order.findOne({
       stripeCheckoutSessionId: session.id,
     });
 
     if (existingOrder) {
+      console.log("Webhook skipped. Order already exists.");
       return res.json({ received: true });
     }
 
-    // console.log("Raw metadata:", session.metadata.items);
-
-    // console.log("Parsed metadata:", JSON.parse(session.metadata.items));
-    // console.log("Creating order...");
     const order = await createStripeOrder(session);
-    emitOrderCreated(order);
-    console.log(`Order Created: ${order.orderNumber}`);
+
+    console.log("Webhook created:", order.orderNumber);
 
     return res.json({ received: true });
   } catch (error) {
-    // console.error("Stripe webhook error:");
     console.error("Webhook Error:", error);
 
     return res.status(400).send(`Webhook Error: ${error.message}`);

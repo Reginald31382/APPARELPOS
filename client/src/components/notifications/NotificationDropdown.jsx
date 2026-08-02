@@ -59,7 +59,7 @@ const NotificationDropdown = ({ onClose }) => {
                   <h4 className="font-semibold">{notification.title}</h4>
 
                   <div className="flex items-start justify-between">
-                    <h4 className="font-semibold">{notification.title}</h4>
+                    {/* <h4 className="font-semibold">{notification.title}</h4> */}
 
                     <span className="text-xs text-gray-400">
                       {formatDistanceToNow(new Date(notification.createdAt), {

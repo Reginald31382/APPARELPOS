@@ -30,6 +30,15 @@ export async function completeOrder({
   stripePaymentIntentId = "",
 }) {
   const session = await mongoose.startSession();
+  if (stripeCheckoutSessionId) {
+    const existingOrder = await Order.findOne({
+      stripeCheckoutSessionId,
+    });
+
+    if (existingOrder) {
+      return existingOrder;
+    }
+  }
 
   try {
     session.startTransaction();
@@ -94,8 +103,8 @@ export async function completeOrder({
 
     await createNotification({
       type: "NEW_ORDER",
-      title: "New J.Rome Apparel Order",
-      message: `${order.orderNumber} has been placed by ${order.customerEmail}.`,
+      title: "New Order",
+      message: `${order.orderNumber} has been placed by ${order.customerEmail}`,
       orderId: order._id,
     });
 
@@ -127,6 +136,16 @@ export async function createStripeOrder(session) {
     );
   }
 
+  console.log("About to create order with:");
+
+  console.log({
+    stripeCheckoutSessionId: session.id,
+    stripePaymentIntentId:
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent.id,
+  });
+
   return completeOrder({
     customerEmail: JSON.parse(shippingAddress).email,
     items: JSON.parse(items),
@@ -141,6 +160,9 @@ export async function createStripeOrder(session) {
     status: "Processing",
 
     stripeCheckoutSessionId: session.id,
-    stripePaymentIntentId: session.payment_intent,
+    stripePaymentIntentId:
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : session.payment_intent.id,
   });
 }

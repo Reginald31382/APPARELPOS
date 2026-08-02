@@ -64,7 +64,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Everything else uses JSON
 app.use(express.json());
 
 app.use("/api/products", productRoutes);
