@@ -23,3 +23,8 @@ export const updateOrderStatus = async (orderId, status) => {
 
   return data;
 };
+
+export const fetchOrderStats = async () => {
+  const { data } = await api.get("/orders/stats");
+  return data;
+};

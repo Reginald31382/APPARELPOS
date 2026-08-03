@@ -18,15 +18,26 @@ export const getSettings = async (req, res) => {
 
 export const updateSettings = async (req, res) => {
   try {
+    console.log("Incoming settings:");
+    console.dir(req.body, { depth: null });
     let settings = await Settings.findOne();
 
     if (!settings) {
-      settings = await Settings.create(req.body);
-    } else {
-      Object.assign(settings, req.body);
-
-      await settings.save();
+      settings = new Settings();
     }
+
+    // Merge all top-level fields
+    Object.assign(settings, req.body);
+
+    // Merge nested shipping settings safely
+    if (req.body.shipping) {
+      settings.shipping = {
+        ...settings.shipping.toObject(),
+        ...req.body.shipping,
+      };
+    }
+
+    await settings.save();
 
     res.json(settings);
   } catch (error) {

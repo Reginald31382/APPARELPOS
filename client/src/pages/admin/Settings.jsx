@@ -33,6 +33,26 @@ const Settings = () => {
     receiptFooter: "",
     autoPrintReceipts: false,
     defaultPaymentMethod: "Cash",
+    freeShippingThreshold: 150,
+
+    shipping: {
+      businessName: "",
+      company: "",
+      street1: "",
+      street2: "",
+      city: "",
+      state: "",
+      zip: "",
+      country: "US",
+      phone: "",
+      email: "",
+      defaultCarrier: "USPS",
+      defaultService: "Ground Advantage",
+      packageLength: 12,
+      packageWidth: 10,
+      packageHeight: 2,
+      packageWeight: 16,
+    },
   });
 
   useEffect(() => {
@@ -49,6 +69,25 @@ const Settings = () => {
       autoPrintReceipts: store.autoPrintReceipts,
       defaultPaymentMethod: store.defaultPaymentMethod,
       freeShippingThreshold: store.freeShippingThreshold ?? 150,
+
+      shipping: {
+        businessName: store.shipping?.businessName ?? "",
+        company: store.shipping?.company ?? "",
+        street1: store.shipping?.street1 ?? "",
+        street2: store.shipping?.street2 ?? "",
+        city: store.shipping?.city ?? "",
+        state: store.shipping?.state ?? "",
+        zip: store.shipping?.zip ?? "",
+        country: store.shipping?.country ?? "US",
+        phone: store.shipping?.phone ?? "",
+        email: store.shipping?.email ?? "",
+        defaultCarrier: store.shipping?.defaultCarrier ?? "USPS",
+        defaultService: store.shipping?.defaultService ?? "Ground Advantage",
+        packageLength: store.shipping?.packageLength ?? 12,
+        packageWidth: store.shipping?.packageWidth ?? 10,
+        packageHeight: store.shipping?.packageHeight ?? 2,
+        packageWeight: store.shipping?.packageWeight ?? 16,
+      },
     });
   }, [store]);
 
@@ -59,7 +98,20 @@ const Settings = () => {
     }));
   };
 
+  const handleShippingChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      shipping: {
+        ...prev.shipping,
+        [field]: value,
+      },
+    }));
+  };
+
   const handleSave = () => {
+    console.log("Saving settings:");
+    console.dir(form, { depth: null });
+
     updateStore.mutate(form);
   };
 
@@ -77,6 +129,25 @@ const Settings = () => {
       autoPrintReceipts: store.autoPrintReceipts,
       defaultPaymentMethod: store.defaultPaymentMethod,
       freeShippingThreshold: store.freeShippingThreshold ?? 150,
+
+      shipping: {
+        businessName: store.shipping?.businessName ?? "",
+        company: store.shipping?.company ?? "",
+        street1: store.shipping?.street1 ?? "",
+        street2: store.shipping?.street2 ?? "",
+        city: store.shipping?.city ?? "",
+        state: store.shipping?.state ?? "",
+        zip: store.shipping?.zip ?? "",
+        country: store.shipping?.country ?? "US",
+        phone: store.shipping?.phone ?? "",
+        email: store.shipping?.email ?? "",
+        defaultCarrier: store.shipping?.defaultCarrier ?? "USPS",
+        defaultService: store.shipping?.defaultService ?? "Ground Advantage",
+        packageLength: store.shipping?.packageLength ?? 12,
+        packageWidth: store.shipping?.packageWidth ?? 10,
+        packageHeight: store.shipping?.packageHeight ?? 2,
+        packageWeight: store.shipping?.packageWeight ?? 16,
+      },
     });
   };
 
@@ -274,6 +345,91 @@ const Settings = () => {
                 Automatically print receipts after every completed sale.
               </p>
             </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Shipping Settings */}
+      <div className="rounded-xl border bg-white shadow-sm">
+        <div className="border-b px-6 py-4">
+          <h2 className="text-lg font-semibold">Shipping Settings</h2>
+        </div>
+
+        <div className="grid gap-6 p-6 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block text-sm font-medium">Company</label>
+
+            <input
+              className="w-full rounded-lg border p-3"
+              value={form.shipping.company}
+              onChange={(e) => handleShippingChange("company", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">
+              Shipping Email
+            </label>
+
+            <input
+              className="w-full rounded-lg border p-3"
+              value={form.shipping.email}
+              onChange={(e) => handleShippingChange("email", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">
+              Shipping Phone
+            </label>
+
+            <input
+              className="w-full rounded-lg border p-3"
+              value={form.shipping.phone}
+              onChange={(e) => handleShippingChange("phone", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">
+              Street Address
+            </label>
+
+            <input
+              className="w-full rounded-lg border p-3"
+              value={form.shipping.street1}
+              onChange={(e) => handleShippingChange("street1", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">City</label>
+
+            <input
+              className="w-full rounded-lg border p-3"
+              value={form.shipping.city}
+              onChange={(e) => handleShippingChange("city", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">State</label>
+
+            <input
+              className="w-full rounded-lg border p-3"
+              value={form.shipping.state}
+              onChange={(e) => handleShippingChange("state", e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">ZIP Code</label>
+
+            <input
+              className="w-full rounded-lg border p-3"
+              value={form.shipping.zip}
+              onChange={(e) => handleShippingChange("zip", e.target.value)}
+            />
           </div>
         </div>
       </div>

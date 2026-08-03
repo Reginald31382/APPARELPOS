@@ -17,7 +17,7 @@ const CheckoutSuccess = () => {
 
   const [attempts, setAttempts] = useState(0);
 
-  const MAX_ATTEMPTS = 20;
+  const MAX_ATTEMPTS = 10;
 
   useEffect(() => {
     if (!sessionId) {
@@ -56,7 +56,7 @@ const CheckoutSuccess = () => {
 
           setTimeout(() => {
             fetchOrder(attempt + 1);
-          }, 1500);
+          }, 1000);
 
           return;
         }

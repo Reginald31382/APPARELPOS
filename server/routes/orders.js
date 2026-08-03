@@ -9,6 +9,7 @@ import {
   deleteOrder,
   getOrderByNumber,
   getSuccessOrder,
+  getOrderStats,
 } from "../controllers/orderController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -20,6 +21,8 @@ router.get("/", getOrders);
 router.get("/success/:sessionId", getSuccessOrder);
 
 router.get("/number/:orderNumber", getOrderByNumber);
+
+router.get("/stats", getOrderStats);
 
 router.get("/:id", getOrder);
 

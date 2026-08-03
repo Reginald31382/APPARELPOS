@@ -216,3 +216,31 @@ export const getOrderByNumber = asyncHandler(async (req, res) => {
 
   res.json(order);
 });
+
+export const getOrderStats = async (req, res) => {
+  try {
+    const totalOrders = await Order.countDocuments();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const todaysOrders = await Order.find({
+      createdAt: { $gte: today },
+    });
+
+    const revenueToday = todaysOrders.reduce(
+      (sum, order) => sum + order.total,
+      0,
+    );
+
+    res.json({
+      totalOrders,
+      todaysOrders: todaysOrders.length,
+      revenueToday,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};

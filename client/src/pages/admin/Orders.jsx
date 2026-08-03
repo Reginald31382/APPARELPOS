@@ -2,14 +2,19 @@ import { useQueryClient } from "@tanstack/react-query";
 import socket from "../../services/socketService";
 import OrderDetailsModal from "../../modules/orders/components/OrderDetailsModal";
 import useOrders from "../../modules/orders/hooks/useOrders";
+import useOrderStats from "../../modules/orders/hooks/useOrderStats";
 import useRefundOrder from "../../modules/orders/hooks/useRefundOrder";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QUERY_KEYS } from "../../constants/queryKeys";
 import { formatCurrency } from "../../utils/currency";
 
+import { ShoppingCart, DollarSign, Package } from "lucide-react";
+
 const Orders = () => {
   const { data: orders = [], isLoading } = useOrders();
+
+  const { data: stats } = useOrderStats();
 
   const { mutate: refundOrder } = useRefundOrder();
 
@@ -112,8 +117,53 @@ const Orders = () => {
     <div className="space-y-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Orders</h1>
+          <div>
+            <h1 className="text-3xl font-bold">Orders</h1>
 
+            <div className="mt-6 grid gap-5 md:grid-cols-3">
+              <div className="rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Total Orders</p>
+
+                    <h2 className="mt-2 text-4xl font-bold">
+                      {stats?.totalOrders ?? 0}
+                    </h2>
+                  </div>
+
+                  <ShoppingCart className="h-10 w-10 text-blue-600" />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-green-100 bg-gradient-to-br from-green-50 to-white p-6 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Today's Revenue</p>
+
+                    <h2 className="mt-2 text-4xl font-bold">
+                      {formatCurrency(stats?.revenueToday ?? 0)}
+                    </h2>
+                  </div>
+
+                  <DollarSign className="h-10 w-10 text-green-600" />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-purple-100 bg-gradient-to-br from-purple-50 to-white p-6 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Today's Orders</p>
+
+                    <h2 className="mt-2 text-4xl font-bold">
+                      {stats?.todaysOrders ?? 0}
+                    </h2>
+                  </div>
+
+                  <Package className="h-10 w-10 text-purple-600" />
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {[
               "All",

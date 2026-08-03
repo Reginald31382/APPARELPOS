@@ -13,3 +13,8 @@ export const createOrder = async (order) => {
 
   return data;
 };
+
+export const fetchOrderStats = async () => {
+  const { data } = await api.get("/orders/stats");
+  return data;
+};
