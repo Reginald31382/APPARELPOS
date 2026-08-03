@@ -122,7 +122,7 @@ const CartDrawer = () => {
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="mb-3 h-24 w-full rounded object-cover sm:h-28"
+                  className="mb-3 w-full rounded object-cover"
                 />
 
                 <h3 className="font-semibold">{item.name}</h3>

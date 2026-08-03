@@ -1,12 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import AnnouncementBar from "../components/layout/AnnouncementBar";
 import StoreNavbar from "../components/layout/StoreNavbar";
-import CartDrawer from "../modules/cart/CartDrawer";
 import ProductQuickView from "../modules/product/ProductQuickView";
 import StoreCartModal from "../modules/cart/StoreCartModal";
-// import Footer from "../components/layout/Footer";
+import Footer from "../components/layout/Footer";
 
 const MainLayout = () => {
+  const location = useLocation();
+
+  const isHomePage = location.pathname === "/";
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
       <AnnouncementBar />
@@ -18,7 +20,7 @@ const MainLayout = () => {
       </div>
       <StoreCartModal />
       <ProductQuickView />
-      {/* <Footer /> */}
+      {isHomePage && <Footer />}
     </div>
   );
 };

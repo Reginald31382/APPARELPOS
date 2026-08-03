@@ -5,35 +5,46 @@ import useReceiptStore from "../../../store/receipt/useReceiptStore";
 import useCheckout from "../../../hooks/useCheckout";
 import useMobileCartStore from "../../../store/ui/useMobileCartStore";
 
-import { notifySuccess } from "../../../utils/notifications";
+import { notifySuccess, notifyError } from "../../../utils/notifications";
 import { buildCheckoutOrder } from "../../../services/checkoutWorkflow";
 import { completeCashSale } from "../services/completeSale";
-
-import { notifyError } from "../../../utils/notifications";
 
 const CompleteSaleButton = () => {
   const paymentMethod = useCheckoutStore((state) => state.paymentMethod);
 
   const closeCheckout = useCheckoutStore((state) => state.closeCheckout);
 
+  const clearClientSecret = useCheckoutStore(
+    (state) => state.clearClientSecret,
+  );
+
+  const cashReceived = useCheckoutStore((state) => state.cashReceived);
+
+  const clearCashReceived = useCheckoutStore(
+    (state) => state.clearCashReceived,
+  );
+
   const items = useCartStore((state) => state.items);
+
   const subtotal = useCartStore((state) => state.subtotal());
+
   const tax = useCartStore((state) => state.tax());
+
   const total = useCartStore((state) => state.total());
+
   const discountInfo = useCartStore((state) => state.discount);
 
   const discountAmount = useCartStore((state) => state.discountAmount);
 
   const clearDiscount = useCartStore((state) => state.clearDiscount);
+
   const clearCart = useCartStore((state) => state.clearCart);
+
   const closeCart = useMobileCartStore((state) => state.closeCart);
+
   const customer = useCustomerStore((state) => state.selectedCustomer);
 
   const clearCustomer = useCustomerStore((state) => state.clearCustomer);
-
-  const clearClientSecret = useCheckoutStore(
-    (state) => state.clearClientSecret,
-  );
 
   const checkout = useCheckout();
 
@@ -41,6 +52,11 @@ const CompleteSaleButton = () => {
 
   const handleCompleteSale = async () => {
     if (items.length === 0) return;
+
+    if (paymentMethod === "Cash" && Number(cashReceived || 0) < total) {
+      notifyError("Cash received is less than the order total.");
+      return;
+    }
 
     const order = buildCheckoutOrder({
       items,
@@ -52,6 +68,7 @@ const CompleteSaleButton = () => {
       tax,
       total,
       paymentMethod,
+      orderType: "POS",
     });
 
     if (paymentMethod === "Cash") {
@@ -63,6 +80,7 @@ const CompleteSaleButton = () => {
         clearDiscount,
         clearCustomer,
         clearClientSecret,
+        clearCashReceived,
         closeCheckout,
         closeCart,
         notifySuccess,

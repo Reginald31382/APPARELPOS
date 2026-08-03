@@ -28,6 +28,18 @@ const useCheckoutStore = create((set) => ({
       paymentMethod,
     }),
 
+  cashReceived: "",
+
+  setCashReceived: (amount) =>
+    set({
+      cashReceived: amount,
+    }),
+
+  clearCashReceived: () =>
+    set({
+      cashReceived: "",
+    }),
+
   startSubmitting: () =>
     set({
       isSubmitting: true,

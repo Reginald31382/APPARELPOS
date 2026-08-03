@@ -34,7 +34,9 @@ const StripeCheckout = ({ total }) => {
   const discountInfo = useCartStore((state) => state.discount);
 
   const discountAmount = useCartStore((state) => state.discountAmount);
-
+  const clearCashReceived = useCheckoutStore(
+    (state) => state.clearCashReceived,
+  );
   const clearDiscount = useCartStore((state) => state.clearDiscount);
   const tax = useCartStore((state) => state.tax());
   const clearCart = useCartStore((state) => state.clearCart);
@@ -78,6 +80,7 @@ const StripeCheckout = ({ total }) => {
       tax,
       total,
       paymentMethod: "Stripe",
+      orderType: "POS",
     });
 
     await completeStripeSale({
@@ -88,6 +91,7 @@ const StripeCheckout = ({ total }) => {
       clearDiscount,
       clearCustomer,
       clearClientSecret,
+      clearCashReceived,
       closeCheckout,
       closeCart,
       notifySuccess,

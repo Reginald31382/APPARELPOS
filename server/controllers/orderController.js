@@ -1,9 +1,8 @@
 import Order from "../models/Order.js";
 import asyncHandler from "../utils/asyncHandler.js";
-// import { completeOrder } from "../services/orderService.js";
 import { emitOrderUpdated } from "../services/socketService.js";
 import { getStripe } from "../services/stripeService.js";
-import { createStripeOrder } from "../services/orderService.js";
+import { completeOrder, createStripeOrder } from "../services/orderService.js";
 
 /*
 GET /api/orders

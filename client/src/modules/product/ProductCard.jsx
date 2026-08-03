@@ -13,10 +13,7 @@ const ProductCard = ({ product }) => {
       onClick={() => openProduct(product)}
       className="border rounded-lg p-3 cursor-pointer hover:shadow-md transition"
     >
-      <img
-        src={product.images?.[0]}
-        className="h-40 w-full object-cover rounded"
-      />
+      <img src={product.images?.[0]} className=" w-full object-cover rounded" />
       <h2 className="mt-2 font-semibold">{product.name}</h2>
       <RatingBadge productId={product._id} />
       <p className="text-sm text-gray-500">{formatCurrency(product.price)}</p>

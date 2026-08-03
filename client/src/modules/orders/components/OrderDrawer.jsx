@@ -31,7 +31,11 @@ const OrderDrawer = () => {
           <div>
             <h3 className="font-semibold">Order Number</h3>
 
-            <p>{order.orderNumber}</p>
+            <div className="mt-1 flex items-center gap-3">
+              <p className="text-lg font-bold">{order.orderNumber}</p>
+
+              <OrderTypeBadge type={order.orderType} />
+            </div>
           </div>
 
           <div>
@@ -55,7 +59,23 @@ const OrderDrawer = () => {
 
             <p>{order.status}</p>
           </div>
+          {order.orderType === "Online" && (
+            <>
+              <div>
+                <h3 className="font-semibold">Shipping Method</h3>
 
+                <p>
+                  {order.shipping.carrier} • {order.shipping.service}
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold">Tracking</h3>
+
+                <p>{order.shipping.trackingNumber || "Pending"}</p>
+              </div>
+            </>
+          )}
           <div>
             <h3 className="mb-3 font-semibold">Items</h3>
 

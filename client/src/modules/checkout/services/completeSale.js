@@ -6,6 +6,7 @@ export const completeCashSale = async ({
   clearDiscount,
   clearCustomer,
   clearClientSecret,
+  clearCashReceived,
   closeCheckout,
   closeCart,
   notifySuccess,
@@ -16,14 +17,11 @@ export const completeCashSale = async ({
         openReceipt(savedOrder);
 
         clearClientSecret();
+        clearCashReceived();
 
         clearCart();
-
         clearDiscount();
-
         clearCustomer();
-
-        clearClientSecret();
 
         closeCheckout();
         closeCart();
@@ -46,7 +44,9 @@ export const completeStripeSale = async ({
   clearDiscount,
   clearCustomer,
   clearClientSecret,
+  clearCashReceived,
   closeCheckout,
+  closeCart,
   notifySuccess,
 }) => {
   return new Promise((resolve, reject) => {
@@ -55,11 +55,14 @@ export const completeStripeSale = async ({
         openReceipt(savedOrder);
 
         clearClientSecret();
+        clearCashReceived();
 
         clearCart();
         clearDiscount();
         clearCustomer();
+
         closeCheckout();
+        closeCart();
 
         notifySuccess("Payment successful");
 

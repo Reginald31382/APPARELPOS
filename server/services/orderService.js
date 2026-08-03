@@ -19,6 +19,7 @@ import { sendOrderSMS } from "./sms/sendOrderSMS.js";
 
 export async function completeOrder({
   customerEmail,
+  orderType = "Online",
   items,
   subtotal,
   tax = 0,
@@ -28,8 +29,8 @@ export async function completeOrder({
   paymentMethod,
   paymentStatus,
   status,
-  stripeCheckoutSessionId = "",
-  stripePaymentIntentId = "",
+  stripeCheckoutSessionId,
+  stripePaymentIntentId,
 }) {
   const session = await mongoose.startSession();
   if (stripeCheckoutSessionId) {
@@ -53,6 +54,8 @@ export async function completeOrder({
           orderNumber,
 
           customerEmail: customerEmail || shippingAddress?.email || "",
+
+          orderType: orderType || "Online",
 
           items: items.map((item) => ({
             ...item,
@@ -93,9 +96,13 @@ export async function completeOrder({
 
           status,
 
-          stripeCheckoutSessionId,
+          ...(stripeCheckoutSessionId && {
+            stripeCheckoutSessionId,
+          }),
 
-          stripePaymentIntentId,
+          ...(stripePaymentIntentId && {
+            stripePaymentIntentId,
+          }),
         },
       ],
       { session },

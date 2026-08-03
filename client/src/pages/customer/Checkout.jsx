@@ -101,6 +101,8 @@ const Checkout = () => {
 
         tax,
 
+        orderType: "Online",
+
         shippingAddress: {
           firstName: checkout.firstName,
           lastName: checkout.lastName,

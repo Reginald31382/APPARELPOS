@@ -64,3 +64,19 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     url: session.url,
   });
 });
+
+export const createPaymentIntent = asyncHandler(async (req, res) => {
+  const stripe = getStripe();
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: req.body.amount,
+    currency: "usd",
+    automatic_payment_methods: {
+      enabled: true,
+    },
+  });
+
+  res.json({
+    clientSecret: paymentIntent.client_secret,
+  });
+});

@@ -8,6 +8,7 @@ const buildOrder = ({
   tax,
   total,
   paymentMethod,
+  orderType = "POS",
 }) => {
   return {
     customer: customer?._id || null,
@@ -27,6 +28,8 @@ const buildOrder = ({
     total,
 
     paymentMethod,
+
+    orderType,
 
     status: "Pending",
   };

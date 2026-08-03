@@ -48,6 +48,12 @@ const orderSchema = new mongoose.Schema(
       index: true,
     },
 
+    orderType: {
+      type: String,
+      enum: ["Online", "POS"],
+      default: "Online",
+    },
+
     items: [orderItemSchema],
 
     subtotal: {

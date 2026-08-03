@@ -1,7 +1,7 @@
 import api from "../../../api/axios";
 
 export const createPaymentIntent = async (amount) => {
-  const { data } = await api.post("/stripe/create-payment-intent", {
+  const { data } = await api.post("/payments/create-payment-intent", {
     amount,
   });
 

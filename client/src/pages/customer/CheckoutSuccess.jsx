@@ -13,6 +13,16 @@ const CheckoutSuccess = () => {
   const sessionId = searchParams.get("session_id");
 
   const [order, setOrder] = useState(null);
+
+  const loadingMessages = [
+    "Confirming your payment...",
+    "Creating your order...",
+    "Preparing your receipt...",
+    "Almost done...",
+  ];
+
+  const [messageIndex, setMessageIndex] = useState(0);
+
   const [loading, setLoading] = useState(true);
 
   const [attempts, setAttempts] = useState(0);
@@ -74,6 +84,16 @@ const CheckoutSuccess = () => {
     };
   }, [sessionId, clearCart]);
 
+  useEffect(() => {
+    if (!loading) return;
+
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, [loading]);
+
   if (loading) {
     return (
       <div className="mx-auto max-w-4xl px-6 py-24 text-center">
@@ -81,13 +101,13 @@ const CheckoutSuccess = () => {
 
         <h2 className="text-2xl font-bold">Finalizing Your Order...</h2>
 
-        <p className="mt-4 text-gray-600">
-          We're confirming your payment and preparing your receipt.
+        <p className="mt-4 text-gray-600 transition-all">
+          {loadingMessages[messageIndex]}
         </p>
 
-        <p className="mt-2 text-sm text-gray-500">
-          Attempt {attempts + 1} of {MAX_ATTEMPTS}
-        </p>
+        <div className="mx-auto mt-8 h-2 w-72 overflow-hidden rounded-full bg-gray-200">
+          <div className="h-full w-1/3 animate-pulse rounded-full bg-black"></div>
+        </div>
       </div>
     );
   }
@@ -112,7 +132,13 @@ const CheckoutSuccess = () => {
             <div className="mb-8 grid gap-6 rounded-xl bg-gray-50 p-6 md:grid-cols-2">
               <div>
                 <p className="text-sm text-gray-500">Order Number</p>
-                <p className="font-bold text-xl">{order.orderNumber}</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-xl font-bold">{order.orderNumber}</p>
+
+                  <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                    Confirmed
+                  </span>
+                </div>
               </div>
 
               <div>
