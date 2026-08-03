@@ -8,6 +8,7 @@ import { reduceInventory } from "./inventoryService.js";
 import { createNotification } from "./notificationService.js";
 import { emitOrderCreated } from "./socketService.js";
 import { sendReceiptEmail } from "./email/sendReceiptEmail.js";
+import { addTimelineEvent } from "./orders/timelineService.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +96,14 @@ export async function completeOrder({
       ],
       { session },
     );
+
+    addTimelineEvent(
+      order,
+      "Order Created",
+      "Payment received and order created.",
+    );
+
+    await order.save({ session });
 
     await reduceInventory(order.items);
 

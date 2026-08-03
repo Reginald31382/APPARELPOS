@@ -3,7 +3,7 @@ import Store from "../../models/Store.js";
 
 import { createShipment } from "./createShipment.js";
 import { purchaseLabel } from "./purchaseLabel.js";
-
+import { addTimelineEvent } from "../orders/timelineService.js";
 import { sendShipmentEmail } from "../email/sendShipmentEmail.js";
 import { emitOrderUpdated } from "../socketService.js";
 
@@ -30,14 +30,14 @@ export async function purchaseShippingLabel(orderId) {
     throw new Error("Shipping settings have not been configured.");
   }
 
-  console.log("ORDER");
-  console.dir(order, { depth: null });
+  // console.log("ORDER");
+  // console.dir(order, { depth: null });
 
-  console.log("STORE");
-  console.dir(store, { depth: null });
+  // console.log("STORE");
+  // console.dir(store, { depth: null });
 
-  console.log("SHIPPING SETTINGS");
-  console.dir(shippingSettings, { depth: null });
+  // console.log("SHIPPING SETTINGS");
+  // console.dir(shippingSettings, { depth: null });
 
   /*
   |--------------------------------------------------------------------------
@@ -116,14 +116,14 @@ export async function purchaseShippingLabel(orderId) {
     massUnit: "oz",
   };
 
-  console.log("FROM ADDRESS");
-  console.dir(fromAddress, { depth: null });
+  // console.log("FROM ADDRESS");
+  // console.dir(fromAddress, { depth: null });
 
-  console.log("TO ADDRESS");
-  console.dir(toAddress, { depth: null });
+  // console.log("TO ADDRESS");
+  // console.dir(toAddress, { depth: null });
 
-  console.log("PARCEL");
-  console.dir(parcel, { depth: null });
+  // console.log("PARCEL");
+  // console.dir(parcel, { depth: null });
 
   /*
   |--------------------------------------------------------------------------
@@ -137,8 +137,8 @@ export async function purchaseShippingLabel(orderId) {
     parcel,
   });
 
-  console.log("SHIPMENT");
-  console.dir(shipment, { depth: null });
+  // console.log("SHIPMENT");
+  // console.dir(shipment, { depth: null });
 
   if (!shipment.rates?.length) {
     throw new Error("No shipping rates returned.");
@@ -157,8 +157,8 @@ export async function purchaseShippingLabel(orderId) {
         r.servicelevel?.name === shippingSettings.defaultService,
     ) || shipment.rates[0];
 
-  console.log("RATE");
-  console.dir(rate, { depth: null });
+  // console.log("RATE");
+  // console.dir(rate, { depth: null });
 
   /*
   |--------------------------------------------------------------------------
@@ -168,8 +168,8 @@ export async function purchaseShippingLabel(orderId) {
 
   const transaction = await purchaseLabel(rate.objectId);
 
-  console.log("TRANSACTION");
-  console.dir(transaction, { depth: null });
+  // console.log("TRANSACTION");
+  // console.dir(transaction, { depth: null });
 
   if (transaction.status !== "SUCCESS") {
     throw new Error("Unable to purchase shipping label.");
@@ -192,6 +192,8 @@ export async function purchaseShippingLabel(orderId) {
   order.shipping.labelUrl = transaction.labelUrl;
 
   order.shipping.status = "Label Created";
+
+  addTimelineEvent(order, "USPS Accepted", "Shipping label created.");
 
   order.shipping.shippoShipmentId = shipment.objectId;
 

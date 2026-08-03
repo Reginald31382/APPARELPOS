@@ -205,6 +205,25 @@ const orderSchema = new mongoose.Schema(
       default: "",
     },
 
+    timeline: [
+      {
+        title: {
+          type: String,
+          required: true,
+        },
+
+        description: {
+          type: String,
+          default: "",
+        },
+
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+
     refund: {
       amount: {
         type: Number,
