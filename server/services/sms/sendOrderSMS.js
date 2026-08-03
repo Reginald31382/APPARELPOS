@@ -7,14 +7,24 @@ const client = twilio(
 );
 
 export async function sendOrderSMS(order) {
+  console.log("📱 sendOrderSMS() called");
+
   const store = await Store.findOne();
 
-  if (!store?.smsNotifications?.enabled || !store.smsNotifications.phone) {
+  console.log("SMS Settings:");
+  console.dir(store.smsNotifications, { depth: null });
+
+  if (!store?.smsNotifications?.enabled) {
+    console.log("❌ SMS notifications are disabled.");
     return;
   }
 
-  const body = `
-🛍 New Order!
+  if (!store.smsNotifications.phone) {
+    console.log("❌ No destination phone number configured.");
+    return;
+  }
+
+  const body = `🛍 New Order!
 
 ${order.orderNumber}
 
@@ -25,11 +35,19 @@ Total:
 $${order.total.toFixed(2)}
 `;
 
-  await client.messages.create({
+  console.log("Sending SMS to:", store.smsNotifications.phone);
+
+  const message = await client.messages.create({
     from: process.env.TWILIO_PHONE_NUMBER,
     to: store.smsNotifications.phone,
     body,
   });
 
-  console.log("📱 SMS Sent");
+  console.log("✅ Twilio accepted message");
+  console.log("SID:", message.sid);
+  console.log("Status:", message.status);
+  console.log("Error Code:", message.errorCode);
+  console.log("Error Message:", message.errorMessage);
+
+  return message;
 }

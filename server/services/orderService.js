@@ -123,7 +123,24 @@ export async function completeOrder({
 
     emitOrderCreated(order);
 
-    await sendReceiptEmail(order);
+    console.log("📱 About to send SMS...");
+
+    try {
+      await sendOrderSMS(order);
+      console.log("✅ SMS function completed");
+    } catch (err) {
+      console.error("❌ SMS Notification Failed");
+      console.error(err);
+    }
+
+    console.log("📧 About to send receipt email...");
+
+    try {
+      await sendReceiptEmail(order);
+    } catch (err) {
+      console.error("❌ Receipt email failed");
+      console.error(err);
+    }
 
     return order;
   } catch (error) {

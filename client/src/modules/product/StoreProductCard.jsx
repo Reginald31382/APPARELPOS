@@ -1,9 +1,9 @@
-import useProductStore from "../../store/product/useProductStore";
+// import useProductStore from "../../store/product/useProductStore";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "../../utils/currency";
 
 const StoreProductCard = ({ product }) => {
-  const openProduct = useProductStore((state) => state.openProduct);
+  // const openProduct = useProductStore((state) => state.openProduct);
   return (
     <Link to={`/product/${product._id}`} className="group block">
       <div className="relative overflow-hidden bg-[#f7f5f2]">
@@ -33,7 +33,7 @@ const StoreProductCard = ({ product }) => {
         <div className="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/10" />
 
         {/* Quick View */}
-        <div className="absolute bottom-5 left-1/2 w-[85%] -translate-x-1/2 translate-y-8 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+        {/* <div className="absolute bottom-5 left-1/2 w-[85%] -translate-x-1/2 translate-y-8 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -44,7 +44,7 @@ const StoreProductCard = ({ product }) => {
           >
             Quick View
           </button>
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-5 flex items-start justify-between">

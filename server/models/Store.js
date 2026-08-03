@@ -58,18 +58,6 @@ const storeSchema = new mongoose.Schema(
         default: 150,
       },
 
-      smsNotifications: {
-        enabled: {
-          type: Boolean,
-          default: false,
-        },
-
-        phone: {
-          type: String,
-          default: "",
-        },
-      },
-
       lightweightMaxOz: {
         type: Number,
         default: 16,
@@ -98,6 +86,18 @@ const storeSchema = new mongoose.Schema(
       alwaysUseUSPS: {
         type: Boolean,
         default: true,
+      },
+    },
+
+    smsNotifications: {
+      enabled: {
+        type: Boolean,
+        default: false,
+      },
+
+      phone: {
+        type: String,
+        default: "",
       },
     },
 
