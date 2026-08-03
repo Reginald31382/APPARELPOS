@@ -126,20 +126,20 @@ export async function completeOrder({
     console.log("📱 About to send SMS...");
 
     try {
-      await sendOrderSMS(order);
-      console.log("✅ SMS function completed");
+      // await sendOrderSMS(order);
+      // console.log("✅ SMS function completed");
     } catch (err) {
-      console.error("❌ SMS Notification Failed");
-      console.error(err);
+      // console.error("❌ SMS Notification Failed");
+      // console.error(err);
     }
 
-    console.log("📧 About to send receipt email...");
+    // console.log("📧 About to send receipt email...");
 
     try {
       await sendReceiptEmail(order);
     } catch (err) {
-      console.error("❌ Receipt email failed");
-      console.error(err);
+      // console.error("❌ Receipt email failed");
+      // console.error(err);
     }
 
     return order;
@@ -166,15 +166,15 @@ export async function createStripeOrder(session) {
     );
   }
 
-  console.log("About to create order with:");
+  // console.log("About to create order with:");
 
-  console.log({
-    stripeCheckoutSessionId: session.id,
-    stripePaymentIntentId:
-      typeof session.payment_intent === "string"
-        ? session.payment_intent
-        : session.payment_intent.id,
-  });
+  // console.log({
+  //   stripeCheckoutSessionId: session.id,
+  //   stripePaymentIntentId:
+  //     typeof session.payment_intent === "string"
+  //       ? session.payment_intent
+  //       : session.payment_intent.id,
+  // });
 
   return completeOrder({
     customerEmail: JSON.parse(shippingAddress).email,
