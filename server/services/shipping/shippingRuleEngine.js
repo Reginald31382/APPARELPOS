@@ -7,9 +7,9 @@ export function determineShippingService(items, store) {
 
   const totalWeightOz = totalWeightLbs * 16;
 
-  console.log(
-    `Package Weight: ${totalWeightLbs.toFixed(2)} lb (${totalWeightOz.toFixed(2)} oz)`,
-  );
+  // console.log(
+  //   `Package Weight: ${totalWeightLbs.toFixed(2)} lb (${totalWeightOz.toFixed(2)} oz)`,
+  // );
 
   if (totalWeightOz <= rules.lightweightMaxOz) {
     return {

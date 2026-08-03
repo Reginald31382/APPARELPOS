@@ -18,7 +18,7 @@ export const getSettings = async (req, res) => {
 
 export const updateSettings = async (req, res) => {
   try {
-    console.log("Incoming settings:");
+    // console.log("Incoming settings:");
     console.dir(req.body, { depth: null });
     let settings = await Settings.findOne();
 

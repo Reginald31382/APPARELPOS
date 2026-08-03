@@ -129,7 +129,7 @@ const Settings = () => {
   };
 
   const handleSave = () => {
-    console.log("Saving settings:");
+    message("Saving...");
     console.dir(form, { depth: null });
 
     updateStore.mutate(form);

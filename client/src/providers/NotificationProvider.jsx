@@ -30,8 +30,6 @@ const NotificationProvider = ({ children }) => {
 
     socket.connect();
 
-    console.log("🟢 Connected to notification server");
-
     const handleNotification = (notification) => {
       addNotification(notification);
 
@@ -46,8 +44,6 @@ const NotificationProvider = ({ children }) => {
       socket.off("new-notification", handleNotification);
 
       socket.disconnect();
-
-      console.log("🔴 Disconnected from notification server");
     };
   }, [addNotification, setNotifications]);
 

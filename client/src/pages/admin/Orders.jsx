@@ -51,8 +51,6 @@ const Orders = () => {
 
   useEffect(() => {
     const refreshOrders = (order) => {
-      console.log("📦 Socket Update:", order);
-
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.ORDERS],
       });

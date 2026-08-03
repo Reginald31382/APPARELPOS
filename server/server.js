@@ -40,10 +40,10 @@ const io = new Server(server, {
 initializeSocket(io);
 
 io.on("connection", (socket) => {
-  console.log(`🟢 Admin Connected: ${socket.id}`);
+  // console.log(`🟢 Admin Connected: ${socket.id}`);
 
   socket.on("disconnect", () => {
-    console.log(`🔴 Admin Disconnected: ${socket.id}`);
+    // console.log(`🔴 Admin Disconnected: ${socket.id}`);
   });
 });
 
@@ -59,7 +59,6 @@ app.use(
 // Shipping webhook logging
 app.use((req, res, next) => {
   if (req.path.includes("/shipping/webhook")) {
-    console.log("Webhook hit:", req.method, req.path);
   }
 
   next();
@@ -95,5 +94,5 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
+  // console.log(`Server running on ${PORT}`);
 });

@@ -38,13 +38,12 @@ export const sendReceiptEmail = async (order) => {
       },
     );
 
-    console.log(`📧 Receipt sent to ${order.shippingAddress.email}`);
+    // console.log(`📧 Receipt sent to ${order.shippingAddress.email}`);
   } catch (error) {
     console.error("Brevo Receipt Error:");
 
     console.error(error.response?.data || error.message);
 
-    // Don't throw.
-    // We don't want a failed email to cancel a completed sale.
+    // Prevent a failed email into cancelling a completed sale.
   }
 };

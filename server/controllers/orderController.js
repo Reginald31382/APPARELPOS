@@ -46,7 +46,7 @@ export const getOrder = async (req, res) => {
 POST /api/orders
 */
 export const createOrder = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const discount = Number(req.body.discount || 0);
 
@@ -156,7 +156,7 @@ export const getSuccessOrder = async (req, res) => {
   try {
     const { sessionId } = req.params;
 
-    console.log("Looking for session:", sessionId);
+    // console.log("Looking for session:", sessionId);
 
     // First look in MongoDB
     let order = await Order.findOne({
@@ -164,11 +164,11 @@ export const getSuccessOrder = async (req, res) => {
     });
 
     if (order) {
-      console.log("✅ Order found in MongoDB:", order.orderNumber);
+      // console.log("✅ Order found in MongoDB:", order.orderNumber);
       return res.json(order);
     }
 
-    console.log("⚠️ Order not found. Checking Stripe...");
+    // console.log("⚠️ Order not found. Checking Stripe...");
 
     const stripe = getStripe();
 
@@ -186,11 +186,11 @@ export const getSuccessOrder = async (req, res) => {
     });
 
     if (!order) {
-      console.log("🛠 Creating missing order from Stripe session...");
+      // console.log("🛠 Creating missing order from Stripe session...");
 
       order = await createStripeOrder(session);
 
-      console.log("✅ Recovery successful:", order.orderNumber);
+      // console.log("✅ Recovery successful:", order.orderNumber);
     }
 
     res.json(order);

@@ -247,7 +247,7 @@ const CartDrawer = () => {
         open={managerApprovalOpen}
         onClose={() => setManagerApprovalOpen(false)}
         onApprove={(result) => {
-          console.log("Manager Approved:", result);
+          // console.log("Manager Approved:", result);
 
           setManagerApprovalOpen(false);
 

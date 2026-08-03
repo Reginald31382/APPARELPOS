@@ -18,7 +18,6 @@ export async function createNotification({
 
   try {
     getSocket().emit("new-notification", notification);
-    console.log("🔔 Notification broadcast:", notification.title);
   } catch (error) {
     console.warn("Socket broadcast skipped:", error.message);
   }

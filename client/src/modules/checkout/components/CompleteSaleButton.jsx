@@ -72,7 +72,6 @@ const CompleteSaleButton = () => {
       return;
     }
   };
-  // console.log("Checkout pending:", checkout.isPending);
 
   return (
     <button

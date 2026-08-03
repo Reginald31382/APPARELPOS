@@ -19,7 +19,6 @@ export function emitOrderCreated(order) {
 }
 
 export function emitOrderUpdated(order) {
-  console.log(`📡 Broadcasting update for ${order.orderNumber}`);
   getSocket().emit("order:updated", order);
 }
 

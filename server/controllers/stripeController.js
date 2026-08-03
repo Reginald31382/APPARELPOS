@@ -3,7 +3,7 @@ import { createStripeOrder } from "../services/orderService.js";
 import { getStripe } from "../services/stripeService.js";
 import Order from "../models/Order.js";
 export const webhook = async (req, res) => {
-  console.log("🔥 Webhook route hit");
+  // console.log("🔥 Webhook route hit");
   const stripe = getStripe();
   const signature = req.headers["stripe-signature"];
 
@@ -14,7 +14,7 @@ export const webhook = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET,
     );
 
-    console.log("✅ Webhook verified:", event.type);
+    // console.log("✅ Webhook verified:", event.type);
     if (event.type !== "checkout.session.completed") {
       return res.status(200).json({
         received: true,
@@ -23,20 +23,15 @@ export const webhook = async (req, res) => {
 
     const session = event.data.object;
 
-    console.log("Webhook creating order:", session.id);
-
     const existingOrder = await Order.findOne({
       stripeCheckoutSessionId: session.id,
     });
 
     if (existingOrder) {
-      console.log("Webhook skipped. Order already exists.");
       return res.json({ received: true });
     }
 
     const order = await createStripeOrder(session);
-
-    console.log("Webhook created:", order.orderNumber);
 
     return res.json({ received: true });
   } catch (error) {

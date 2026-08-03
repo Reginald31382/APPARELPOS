@@ -123,7 +123,7 @@ export async function completeOrder({
 
     emitOrderCreated(order);
 
-    console.log("📱 About to send SMS...");
+    // console.log("📱 About to send SMS...");
 
     try {
       // await sendOrderSMS(order);

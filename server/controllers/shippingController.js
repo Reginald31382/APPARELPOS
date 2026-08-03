@@ -48,7 +48,7 @@ export const purchaseLabel = asyncHandler(async (req, res) => {
 });
 
 export const trackingWebhook = asyncHandler(async (req, res) => {
-  console.log("📦 Shippo Webhook Received");
+  // console.log("📦 Shippo Webhook Received");
   console.dir(req.body, { depth: null });
 
   const event = req.body;
@@ -65,7 +65,7 @@ export const trackingWebhook = asyncHandler(async (req, res) => {
   });
 
   if (!order) {
-    console.log("❌ No order found:", trackingNumber);
+    // console.log("❌ No order found:", trackingNumber);
     return res.sendStatus(200);
   }
 

@@ -15,7 +15,7 @@ try {
 
   await Product.insertMany(products);
 
-  console.log("✅ Products Seeded");
+  // console.log("✅ Products Seeded");
 
   mongoose.connection.close();
 } catch (err) {
