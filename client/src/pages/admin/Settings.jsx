@@ -46,12 +46,23 @@ const Settings = () => {
       country: "US",
       phone: "",
       email: "",
+
       defaultCarrier: "USPS",
       defaultService: "Ground Advantage",
+
       packageLength: 12,
       packageWidth: 10,
       packageHeight: 2,
       packageWeight: 16,
+    },
+
+    shippingRules: {
+      freeShippingThreshold: 150,
+      lightweightMaxOz: 16,
+      defaultCarrier: "USPS",
+      lightweightService: "Ground Advantage",
+      heavyweightService: "Priority Mail",
+      expressService: "Priority Mail Express",
     },
   });
 
@@ -87,6 +98,15 @@ const Settings = () => {
         packageWidth: store.shipping?.packageWidth ?? 10,
         packageHeight: store.shipping?.packageHeight ?? 2,
         packageWeight: store.shipping?.packageWeight ?? 16,
+      },
+
+      shippingRules: store.shippingRules ?? {
+        freeShippingThreshold: 150,
+        lightweightMaxOz: 16,
+        defaultCarrier: "USPS",
+        lightweightService: "Ground Advantage",
+        heavyweightService: "Priority Mail",
+        expressService: "Priority Mail Express",
       },
     });
   }, [store]);
@@ -147,6 +167,15 @@ const Settings = () => {
         packageWidth: store.shipping?.packageWidth ?? 10,
         packageHeight: store.shipping?.packageHeight ?? 2,
         packageWeight: store.shipping?.packageWeight ?? 16,
+      },
+
+      shippingRules: store.shippingRules ?? {
+        freeShippingThreshold: 150,
+        lightweightMaxOz: 16,
+        defaultCarrier: "USPS",
+        lightweightService: "Ground Advantage",
+        heavyweightService: "Priority Mail",
+        expressService: "Priority Mail Express",
       },
     });
   };
@@ -433,7 +462,103 @@ const Settings = () => {
           </div>
         </div>
       </div>
+      <div className="rounded-xl border bg-white p-6 mt-8">
+        <h2 className="text-xl font-semibold mb-6">Shipping Rules</h2>
 
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label>Free Shipping Threshold</label>
+
+            <input
+              type="number"
+              className="w-full border rounded-lg p-3"
+              value={form.shippingRules.freeShippingThreshold}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  shippingRules: {
+                    ...form.shippingRules,
+                    freeShippingThreshold: Number(e.target.value),
+                  },
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label>Lightweight Maximum (oz)</label>
+
+            <input
+              type="number"
+              className="w-full border rounded-lg p-3"
+              value={form.shippingRules.lightweightMaxOz}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  shippingRules: {
+                    ...form.shippingRules,
+                    lightweightMaxOz: Number(e.target.value),
+                  },
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label>Ground Service</label>
+
+            <input
+              className="w-full border rounded-lg p-3"
+              value={form.shippingRules.lightweightService}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  shippingRules: {
+                    ...form.shippingRules,
+                    lightweightService: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label>Heavy Package Service</label>
+
+            <input
+              className="w-full border rounded-lg p-3"
+              value={form.shippingRules.heavyweightService}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  shippingRules: {
+                    ...form.shippingRules,
+                    heavyweightService: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <label>Express Service</label>
+
+            <input
+              className="w-full border rounded-lg p-3"
+              value={form.shippingRules.expressService}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  shippingRules: {
+                    ...form.shippingRules,
+                    expressService: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+        </div>
+      </div>
       {/* Receipt */}
       <div className="rounded-xl border bg-white shadow-sm">
         <div className="border-b px-6 py-4">

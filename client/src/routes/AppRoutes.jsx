@@ -15,13 +15,13 @@ import DashboardPage from "../modules/dashboard/DashboardPage";
 import Products from "../pages/admin/Products";
 import Orders from "../pages/admin/Orders";
 import OrderTracking from "../modules/customer/OrderTracking";
-// import Customers from "../pages/admin/Customers";
 import Inventory from "../pages/admin/Inventory";
 import ReportsPage from "../modules/reports/ReportsPage";
 import Setup from "../pages/auth/Setup";
 import Login from "../pages/auth/Login";
 import Settings from "../pages/admin/Settings";
 import Employees from "../pages/admin/Employees";
+import ReviewPage from "../pages/ReviewPage";
 import ProtectedRoute from "../modules/auth/components/ProtectedRoute";
 
 import NotFound from "../pages/NotFound";
@@ -38,6 +38,7 @@ const AppRoutes = () => {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/checkout/success" element={<CheckoutSuccess />} />
         <Route path="/order/:orderNumber" element={<OrderTracking />} />
+        <Route path="/review/:orderId/:productId" element={<ReviewPage />} />
       </Route>
 
       {/* Authentication */}
@@ -65,7 +66,6 @@ const AppRoutes = () => {
         <Route index element={<DashboardPage />} />
         <Route path="products" element={<Products />} />
         <Route path="orders" element={<Orders />} />
-        {/* <Route path="customers" element={<Customers />} /> */}
         <Route path="employees" element={<Employees />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="reports" element={<ReportsPage />} />

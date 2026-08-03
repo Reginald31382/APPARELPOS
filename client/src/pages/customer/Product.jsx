@@ -90,6 +90,7 @@ const Product = () => {
       images: product.images || [],
 
       brand: product.brand,
+      weight: product.weight,
       color: selectedColor,
       size: selectedSize,
       stock: selectedVariant.quantity,

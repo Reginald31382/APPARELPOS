@@ -5,6 +5,7 @@ import { createShipment } from "./createShipment.js";
 import { purchaseLabel } from "./purchaseLabel.js";
 import { addTimelineEvent } from "../orders/timelineService.js";
 import { sendShipmentEmail } from "../email/sendShipmentEmail.js";
+import { determineShippingService } from "../../services/shipping/shippingRuleEngine.js";
 import { emitOrderUpdated } from "../socketService.js";
 
 export async function purchaseShippingLabel(orderId) {
@@ -150,11 +151,15 @@ export async function purchaseShippingLabel(orderId) {
   |--------------------------------------------------------------------------
   */
 
+  const selectedService = determineShippingService(order.items, store);
+  console.log("Selected Shipping Rule:");
+  console.dir(selectedService);
+
   const rate =
     shipment.rates.find(
       (r) =>
-        r.provider === shippingSettings.defaultCarrier &&
-        r.servicelevel?.name === shippingSettings.defaultService,
+        r.provider === selectedService.carrier &&
+        r.servicelevel?.name === selectedService.service,
     ) || shipment.rates[0];
 
   // console.log("RATE");
@@ -181,7 +186,7 @@ export async function purchaseShippingLabel(orderId) {
   |--------------------------------------------------------------------------
   */
 
-  order.shipping.carrier = shippingSettings.defaultCarrier;
+  order.shipping.carrier = selectedService.carrier;
 
   order.shipping.service = rate.servicelevel?.name;
 
@@ -204,6 +209,12 @@ export async function purchaseShippingLabel(orderId) {
   order.shipping.shippedAt = new Date();
 
   order.status = "Shipped";
+
+  addTimelineEvent(
+    order,
+    "USPS Accepted",
+    "USPS accepted the shipment and the shipping label was created.",
+  );
 
   await order.save();
 

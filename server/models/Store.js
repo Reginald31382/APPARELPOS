@@ -52,6 +52,55 @@ const storeSchema = new mongoose.Schema(
       default: "Cash",
     },
 
+    shippingRules: {
+      freeShippingThreshold: {
+        type: Number,
+        default: 150,
+      },
+
+      smsNotifications: {
+        enabled: {
+          type: Boolean,
+          default: false,
+        },
+
+        phone: {
+          type: String,
+          default: "",
+        },
+      },
+
+      lightweightMaxOz: {
+        type: Number,
+        default: 16,
+      },
+
+      defaultCarrier: {
+        type: String,
+        default: "USPS",
+      },
+
+      lightweightService: {
+        type: String,
+        default: "Ground Advantage",
+      },
+
+      heavyweightService: {
+        type: String,
+        default: "Priority Mail",
+      },
+
+      expressService: {
+        type: String,
+        default: "Priority Mail Express",
+      },
+
+      alwaysUseUSPS: {
+        type: Boolean,
+        default: true,
+      },
+    },
+
     // -------------------------------
     // Shipping Settings
     // -------------------------------

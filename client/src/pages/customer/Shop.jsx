@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchProducts } from "../../services/productService";
 import { formatCurrency } from "../../utils/currency";
+import RatingBadge from "@/modules/reviews/components/RatingBadge";
 
 const Shop = () => {
   const [products, setProducts] = useState([]);
@@ -53,7 +54,7 @@ const Shop = () => {
               </h2>
 
               <p className="text-sm text-gray-500">{product.brand}</p>
-
+              <RatingBadge productId={product._id} />
               <p className="text-xl font-bold">
                 {formatCurrency(product.price)}
               </p>

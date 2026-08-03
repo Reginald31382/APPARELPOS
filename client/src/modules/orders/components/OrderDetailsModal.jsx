@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import useReceiptStore from "../../../store/receipt/useReceiptStore";
 import { formatCurrency } from "../../../utils/currency";
+import OrderTimeline from "./OrderTimeline";
 
 const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
   const [refundOpen, setRefundOpen] = useState(false);
@@ -252,7 +253,29 @@ const OrderDetailsModal = ({ order, open, onOpenChange, onRefund }) => {
               )}
             </div>
           </div>
+          {/* <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              onClick={() => updateTimeline("USPS Accepted")}
+            >
+              USPS Accepted
+            </button>
 
+            <button
+              className="rounded-lg bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
+              onClick={() => updateTimeline("Out for Delivery")}
+            >
+              Out for Delivery
+            </button>
+
+            <button
+              className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+              onClick={() => updateTimeline("Delivered")}
+            >
+              Delivered
+            </button>
+          </div> */}
+          <OrderTimeline timeline={order.timeline} />
           <div className="rounded-lg bg-gray-100 p-5">
             <h3 className="text-lg font-semibold">Order Summary</h3>
             <div className="flex justify-between">

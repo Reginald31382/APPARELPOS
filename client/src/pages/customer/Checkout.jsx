@@ -84,10 +84,15 @@ const Checkout = () => {
           productId: item._id,
           name: item.name,
           sku: item.sku,
+
           color: item.color,
           size: item.size,
+
           quantity: item.quantity,
+
           unitPrice: item.unitPrice,
+
+          weight: item.weight,
 
           // Preserve product images with the order
           images: item.images || [],

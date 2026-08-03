@@ -9,6 +9,7 @@ import { createNotification } from "./notificationService.js";
 import { emitOrderCreated } from "./socketService.js";
 import { sendReceiptEmail } from "./email/sendReceiptEmail.js";
 import { addTimelineEvent } from "./orders/timelineService.js";
+import { sendOrderSMS } from "./sms/sendOrderSMS.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -53,7 +54,10 @@ export async function completeOrder({
 
           customerEmail: customerEmail || shippingAddress?.email || "",
 
-          items,
+          items: items.map((item) => ({
+            ...item,
+            weight: item.weight || 0,
+          })),
 
           subtotal,
 
