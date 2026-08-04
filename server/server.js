@@ -82,7 +82,6 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use("/api", apiLimiter);
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/shipping", shippingRoutes);
@@ -99,6 +98,7 @@ app.use("/api/refunds", refundRoutes);
 app.use("/api/store", storeRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/receipts", receiptRoutes);
+app.use("/api", apiLimiter);
 
 app.get("/", (req, res) => {
   res.json({

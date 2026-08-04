@@ -86,7 +86,7 @@ export const sendShipmentEmail = async (order) => {
       },
     );
 
-    console.log(`📦 Shipment email sent to ${order.customerEmail}`);
+    // console.log(`📦 Shipment email sent to ${order.customerEmail}`);
   } catch (error) {
     console.error("Brevo Shipment Email Error:");
     console.error(error.response?.data || error.message);

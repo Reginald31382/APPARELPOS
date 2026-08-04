@@ -39,12 +39,37 @@ export const calculateShippingRates = async (req, res) => {
   }
 };
 
+// export const purchaseLabel = asyncHandler(async (req, res) => {
+//   const { orderId } = req.params;
+
+//   const order = await purchaseShippingLabel(orderId);
+
+//   res.json(order);
+// });
+
 export const purchaseLabel = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
 
-  const order = await purchaseShippingLabel(orderId);
+  try {
+    // console.log("📦 Purchasing label for order:", orderId);
 
-  res.json(order);
+    const order = await purchaseShippingLabel(orderId);
+
+    // console.log("✅ Label purchased successfully");
+
+    res.json(order);
+  } catch (error) {
+    console.error("❌ Purchase Label Error");
+    console.error(error);
+
+    if (error.response?.data) {
+      console.error("API Response:", error.response.data);
+    }
+
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 });
 
 export const trackingWebhook = asyncHandler(async (req, res) => {

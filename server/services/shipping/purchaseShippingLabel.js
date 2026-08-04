@@ -173,11 +173,15 @@ export async function purchaseShippingLabel(orderId) {
 
   const transaction = await purchaseLabel(rate.objectId);
 
-  // console.log("TRANSACTION");
-  // console.dir(transaction, { depth: null });
-
   if (transaction.status !== "SUCCESS") {
-    throw new Error("Unable to purchase shipping label.");
+    // console.error("❌ Shippo Transaction Failed");
+    // console.dir(transaction, { depth: null });
+
+    throw new Error(
+      transaction.messages?.map((m) => m.text).join(", ") ||
+        transaction.objectState ||
+        "Unable to purchase shipping label.",
+    );
   }
 
   /*
