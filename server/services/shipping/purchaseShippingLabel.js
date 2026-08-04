@@ -152,8 +152,8 @@ export async function purchaseShippingLabel(orderId) {
   */
 
   const selectedService = determineShippingService(order.items, store);
-  console.log("Selected Shipping Rule:");
-  console.dir(selectedService);
+  // console.log("Selected Shipping Rule:");
+  // console.dir(selectedService);
 
   const rate =
     shipment.rates.find(

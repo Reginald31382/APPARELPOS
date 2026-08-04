@@ -14,6 +14,7 @@ import CheckoutSuccess from "../pages/customer/CheckoutSuccess";
 import DashboardPage from "../modules/dashboard/DashboardPage";
 import Products from "../pages/admin/Products";
 import Orders from "../pages/admin/Orders";
+import Receipts from "../modules/receipts/pages/Receipts";
 import OrderTracking from "../modules/customer/OrderTracking";
 import Inventory from "../pages/admin/Inventory";
 import ReportsPage from "../modules/reports/ReportsPage";
@@ -66,6 +67,7 @@ const AppRoutes = () => {
         <Route index element={<DashboardPage />} />
         <Route path="products" element={<Products />} />
         <Route path="orders" element={<Orders />} />
+        <Route path="receipts" element={<Receipts />} />
         <Route path="employees" element={<Employees />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="reports" element={<ReportsPage />} />

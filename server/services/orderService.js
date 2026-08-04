@@ -10,6 +10,7 @@ import { emitOrderCreated } from "./socketService.js";
 import { sendReceiptEmail } from "./email/sendReceiptEmail.js";
 import { addTimelineEvent } from "./orders/timelineService.js";
 import { sendOrderSMS } from "./sms/sendOrderSMS.js";
+import { createReceipt } from "./receiptService.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -115,9 +116,8 @@ export async function completeOrder({
     );
 
     await order.save({ session });
-
-    await reduceInventory(order.items);
-
+    await createReceipt(order);
+    await reduceInventory(order.items, session);
     await session.commitTransaction();
     session.endSession();
 

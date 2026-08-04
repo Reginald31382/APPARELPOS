@@ -5,11 +5,10 @@ import {
   FaHome,
   FaBoxOpen,
   FaClipboardList,
-  FaUsers,
   FaWarehouse,
   FaChartLine,
 } from "react-icons/fa";
-import { IoSettingsSharp } from "react-icons/io5";
+import { IoSettingsSharp, IoReceiptSharp } from "react-icons/io5";
 import { BsPeopleFill } from "react-icons/bs";
 
 const Sidebar = () => {
@@ -45,10 +44,9 @@ const Sidebar = () => {
           Orders
         </NavLink>
 
-        {/* <NavLink to="/admin/customers" className={linkClasses}>
-          <FaUsers />
-          Customers
-        </NavLink> */}
+        <NavLink to="/admin/receipts" className={linkClasses}>
+          <IoReceiptSharp /> Receipts
+        </NavLink>
 
         <NavLink to="/admin/employees" className={linkClasses}>
           <BsPeopleFill />
