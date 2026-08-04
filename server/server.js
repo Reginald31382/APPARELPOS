@@ -34,6 +34,7 @@ import stripeRoutes from "./routes/stripe.js";
 connectDB();
 
 const app = express();
+app.disable("x-powered-by");
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
@@ -43,7 +44,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", process.env.CLIENT_URL],
     credentials: true,
   },
 });
@@ -82,6 +83,12 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+app.use(mongoSanitize());
+app.use(xss());
+app.use(compression());
+
+app.use("/api", apiLimiter);
+
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/shipping", shippingRoutes);
@@ -98,7 +105,6 @@ app.use("/api/refunds", refundRoutes);
 app.use("/api/store", storeRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/receipts", receiptRoutes);
-app.use("/api", apiLimiter);
 
 app.get("/", (req, res) => {
   res.json({
@@ -109,10 +115,7 @@ app.get("/", (req, res) => {
 
 app.use(notFound);
 app.use(errorHandler);
-app.use(mongoSanitize());
-app.use(xss());
-app.use(compression());
-app.disable("x-powered-by");
+
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
