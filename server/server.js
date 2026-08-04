@@ -83,8 +83,8 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use(mongoSanitize());
-app.use(xss());
+// app.use(mongoSanitize());
+// app.use(xss());
 app.use(compression());
 
 app.use("/api", apiLimiter);
