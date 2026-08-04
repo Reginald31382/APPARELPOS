@@ -1,12 +1,17 @@
+import helmet from "helmet";
 import http from "http";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import compression from "compression";
 import { Server } from "socket.io";
 import { initializeSocket } from "./services/socketService.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
+import { apiLimiter } from "./middleware/rateLimiter.js";
 import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import connectDB from "./config/db.js";
-
+import "./config/validateEnv.js";
 import productRoutes from "./routes/products.js";
 import customerRoutes from "./routes/customers.js";
 import orderRoutes from "./routes/orders.js";
@@ -29,6 +34,11 @@ import stripeRoutes from "./routes/stripe.js";
 connectDB();
 
 const app = express();
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  }),
+);
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -48,8 +58,13 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", process.env.CLIENT_URL],
 
+    credentials: true,
+  }),
+);
 // Stripe webhook MUST receive the raw request body
 app.use(
   "/api/stripe/webhook",
@@ -67,6 +82,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+app.use("/api", apiLimiter);
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/shipping", shippingRoutes);
@@ -93,6 +109,10 @@ app.get("/", (req, res) => {
 
 app.use(notFound);
 app.use(errorHandler);
+app.use(mongoSanitize());
+app.use(xss());
+app.use(compression());
+app.disable("x-powered-by");
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {

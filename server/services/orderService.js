@@ -6,6 +6,7 @@ import generateOrderNumber from "../utils/generateOrderNumber.js";
 
 import { reduceInventory } from "./inventoryService.js";
 import { createNotification } from "./notificationService.js";
+import { sendNewOrderNotification } from "./email/sendNewOrderNotification.js";
 import { emitOrderCreated } from "./socketService.js";
 import { sendReceiptEmail } from "./email/sendReceiptEmail.js";
 import { addTimelineEvent } from "./orders/timelineService.js";
@@ -145,8 +146,13 @@ export async function completeOrder({
     try {
       await sendReceiptEmail(order);
     } catch (err) {
-      // console.error("❌ Receipt email failed");
-      // console.error(err);
+      console.error("Customer receipt failed:", err);
+    }
+
+    try {
+      await sendNewOrderNotification(order);
+    } catch (err) {
+      console.error("Admin notification failed:", err);
     }
 
     return order;
