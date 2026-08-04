@@ -8,6 +8,7 @@ const messages = [
   "PREMIUM QUALITY • EVERYDAY ESSENTIALS",
   "BUY NOW • PAY LATER AVAILABLE",
   "100% COTTON • BECAUSE IT MATTERS",
+  "THANK YOU FOR YOUR BUSINESS",
 ];
 
 const AnnouncementBar = () => {
