@@ -30,7 +30,8 @@
     "stripe": "^22.3.0",
     "twilio": "^6.0.2",
     "uuid": "^14.0.1",
-    "xss-clean": "^0.1.4"
+    "xss-clean": "^0.1.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "concurrently": "^10.0.4",
