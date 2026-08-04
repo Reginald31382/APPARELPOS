@@ -1,11 +1,14 @@
 import Product from "../models/Products.js";
 import InventoryHistory from "../models/InventoryHistory.js";
+import { logger } from "../utils/logger.js";
 
 export const getProducts = async (req, res) => {
   try {
     const { search = "", category, brand, featured, sort } = req.query;
 
     let query = {};
+
+    query.active = true;
 
     // ONLY apply search if meaningful
     if (search && search.trim() !== "") {
@@ -54,19 +57,18 @@ export const getProducts = async (req, res) => {
         sortQuery.createdAt = -1;
     }
 
-    const products = await Product.find(query).sort(sortQuery);
+    const products = await Product.find(query).sort(sortQuery).lean();
 
     res.json(products);
   } catch (error) {
-    console.log("PRODUCT API ERROR:", error);
+    logger.error("Product API Error", error);
     res.status(500).json({ message: error.message });
   }
 };
 
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-
+    const product = await Product.findById(req.params.id).lean();
     if (!product) {
       return res.status(404).json({
         message: "Product not found.",
@@ -148,7 +150,7 @@ export const updateProduct = async (req, res) => {
     }
 
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     });
 
@@ -168,8 +170,7 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-
+    const product = await Product.findById(req.params.id).lean();
     if (!product) {
       return res.status(404).json({
         message: "Product not found.",

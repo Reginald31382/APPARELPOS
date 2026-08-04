@@ -102,4 +102,10 @@ const productSchema = new mongoose.Schema(
   },
 );
 
+productSchema.index({ category: 1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ featured: 1 });
+productSchema.index({ active: 1 });
+productSchema.index({ "variants.sku": 1 });
+
 export default mongoose.model("Product", productSchema);
