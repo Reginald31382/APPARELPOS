@@ -152,3 +152,12 @@
   width: max-content;
   animation: text-scroll 20s linear infinite;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

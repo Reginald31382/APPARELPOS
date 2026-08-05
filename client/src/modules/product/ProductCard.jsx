@@ -1,9 +1,8 @@
 import useProductStore from "../../store/product/useProductStore";
 import InventoryBadge from "../inventory/components/InventoryBadge";
 import { getTotalInventory } from "../inventory/utils/inventoryHelpers";
-
-import { formatCurrency } from "../../utils/currency";
 import RatingBadge from "../reviews/components/RatingBadge";
+import { formatCurrency } from "../../utils/currency";
 
 const ProductCard = ({ product }) => {
   const openProduct = useProductStore((state) => state.openProduct);
@@ -11,14 +10,31 @@ const ProductCard = ({ product }) => {
   return (
     <div
       onClick={() => openProduct(product)}
-      className="border rounded-lg p-3 cursor-pointer hover:shadow-md transition"
+      className="group cursor-pointer overflow-hidden rounded-2xl border bg-white transition duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
-      <img src={product.images?.[0]} className=" w-full object-cover rounded" />
-      <h2 className="mt-2 font-semibold">{product.name}</h2>
-      <RatingBadge productId={product._id} />
-      <p className="text-sm text-gray-500">{formatCurrency(product.price)}</p>
+      <div className="aspect-[4/5] overflow-hidden bg-gray-100">
+        <img
+          src={product.images?.[0]}
+          alt={product.name}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
+      </div>
 
-      <InventoryBadge quantity={getTotalInventory(product.variants)} />
+      <div className="space-y-2 p-4">
+        <h2 className="line-clamp-2 min-h-[48px] text-base font-semibold">
+          {product.name}
+        </h2>
+
+        <RatingBadge productId={product._id} />
+
+        <div className="flex items-center justify-between">
+          <span className="text-lg font-bold">
+            {formatCurrency(product.price)}
+          </span>
+
+          <InventoryBadge quantity={getTotalInventory(product.variants)} />
+        </div>
+      </div>
     </div>
   );
 };

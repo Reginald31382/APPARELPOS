@@ -23,12 +23,12 @@ const AnnouncementBar = () => {
   }, []);
 
   return (
-    <div className="h-10 overflow-hidden bg-black text-white">
+    <div className="h-10 overflow-hidden bg-black px-3 text-white">
       <div
         className="flex h-full items-center justify-center transition-all duration-500"
         key={index}
       >
-        <p className="text-[11px] font-medium uppercase tracking-[0.35em]">
+        <p className="truncate text-center text-[10px] font-medium uppercase tracking-[0.18em] sm:text-[11px] sm:tracking-[0.35em]">
           {messages[index]}
         </p>
       </div>

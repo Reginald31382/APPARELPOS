@@ -1,12 +1,10 @@
-// import useProductStore from "../../store/product/useProductStore";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "../../utils/currency";
 
 const StoreProductCard = ({ product }) => {
-  // const openProduct = useProductStore((state) => state.openProduct);
   return (
-    <Link to={`/product/${product._id}`} className="group block">
-      <div className="relative overflow-hidden bg-[#f7f5f2]">
+    <Link to={`/product/${product._id}`} className="group flex h-full flex-col">
+      <div className="relative overflow-hidden rounded-xl bg-[#f7f5f2]">
         <div className="relative aspect-[4/5] overflow-hidden">
           {/* Primary Image */}
           <img
@@ -14,8 +12,8 @@ const StoreProductCard = ({ product }) => {
             alt={product.name}
             className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ${
               product.images?.length > 1
-                ? "group-hover:opacity-0 group-hover:scale-105"
-                : ""
+                ? "group-hover:scale-105 group-hover:opacity-0"
+                : "group-hover:scale-105"
             }`}
           />
 
@@ -24,43 +22,32 @@ const StoreProductCard = ({ product }) => {
             <img
               src={product.images[1]}
               alt={product.name}
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-105"
+              className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-all duration-700 group-hover:scale-100 group-hover:opacity-100"
             />
           )}
         </div>
 
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/10" />
-
-        {/* Quick View */}
-        {/* <div className="absolute bottom-5 left-1/2 w-[85%] -translate-x-1/2 translate-y-8 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              openProduct(product);
-            }}
-            className="w-full bg-white py-3 text-sm font-semibold uppercase tracking-widest text-black transition hover:bg-black hover:text-white"
-          >
-            Quick View
-          </button>
-        </div> */}
+        <div className="absolute inset-0 bg-black/0 transition group-hover:bg-black/5" />
       </div>
 
-      <div className="mt-5 flex items-start justify-between">
+      <div className="flex flex-1 flex-col justify-between py-3">
         <div>
-          <h3 className="text-lg font-medium tracking-wide text-black">
+          <h3 className="line-clamp-2 min-h-[48px] text-sm font-semibold text-black sm:text-base">
             {product.name}
           </h3>
 
           {product.brand && (
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-gray-400">
+            <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-gray-400 sm:text-xs">
               {product.brand}
             </p>
           )}
         </div>
 
-        <p className="text-base font-medium">{formatCurrency(product.price)}</p>
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-lg font-bold">
+            {formatCurrency(product.price)}
+          </span>
+        </div>
       </div>
     </Link>
   );

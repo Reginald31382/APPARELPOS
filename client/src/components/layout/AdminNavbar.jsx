@@ -8,10 +8,6 @@ import { Link } from "react-router-dom";
 import api from "../../api/axios";
 import { useState } from "react";
 
-// import { FaBell, FaRegUserCircle, FaSearch } from "react-icons/fa";
-// import { GiShoppingCart } from "react-icons/gi";
-// import { MdOutlineSettings } from "react-icons/md";
-
 const Navbar = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const markAllRead = useNotificationStore((state) => state.markAllRead);

@@ -5,19 +5,18 @@ import StoreProductCard from "../product/StoreProductCard";
 
 const NewArrivals = () => {
   return (
-    <section className="bg-white py-28">
+    <section className="bg-white py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
-        <div className="mb-16 flex items-end justify-between">
+        <div className="mb-10 flex items-end justify-between sm:mb-16">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.35em] text-gray-500">
               NEW ARRIVALS
             </p>
 
-            <h2 className="mt-4 text-5xl font-light tracking-tight">
+            <h2 className="mt-4 text-3xl font-light tracking-tight sm:text-5xl">
               The Latest Collection
             </h2>
           </div>
-
           <Link
             to="/shop"
             className="hidden border-b border-black pb-1 text-sm uppercase tracking-[0.25em] transition hover:opacity-60 md:block"

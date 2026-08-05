@@ -102,8 +102,8 @@ const Product = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-16">
-      <div className="grid lg:grid-cols-2 gap-12">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
         {/* Images */}
         <div className="grid grid-cols-[90px_1fr] gap-5">
           {/* Thumbnails */}
@@ -132,6 +132,8 @@ const Product = () => {
             <img
               src={selectedImage || product.images?.[0]}
               alt={product.name}
+              loading="eager"
+              draggable={false}
               onClick={() => setIsLightboxOpen(true)}
               className="w-full object-cover transition duration-500 hover:scale-110 cursor-zoom-in"
             />
@@ -145,9 +147,11 @@ const Product = () => {
               {product.brand}
             </p>
 
-            <h1 className="text-4xl font-bold mt-2">{product.name}</h1>
+            <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
+              {product.name}
+            </h1>
 
-            <p className="text-3xl font-semibold mt-4">
+            <p className="mt-3 text-2xl font-semibold sm:mt-4 sm:text-3xl">
               ${product.price.toFixed(2)}
             </p>
           </div>
@@ -161,7 +165,7 @@ const Product = () => {
                 <button
                   key={color}
                   onClick={() => setSelectedColor(color)}
-                  className={`px-4 py-2 border rounded-md transition ${
+                  className={`min-w-[70px] rounded-lg border px-4 py-3 transition ${
                     selectedColor === color
                       ? "bg-black text-white border-black"
                       : "border-gray-300 hover:border-black"
@@ -182,7 +186,7 @@ const Product = () => {
                 <button
                   key={variant.sku}
                   onClick={() => setSelectedSize(variant.size)}
-                  className={`px-4 py-2 border rounded-md transition ${
+                  className={`min-w-[56px] rounded-lg border px-4 py-3 transition ${
                     selectedSize === variant.size
                       ? "bg-black text-white border-black"
                       : "border-gray-300 hover:border-black"
@@ -206,10 +210,10 @@ const Product = () => {
           <div>
             <h3 className="font-semibold mb-3">Quantity</h3>
 
-            <div className="flex items-center border rounded-md w-fit">
+            <div className="flex w-fit items-center rounded-lg border">
               <button
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="p-3"
+                className="p-4 active:bg-gray-100"
               >
                 <Minus size={18} />
               </button>
@@ -224,7 +228,7 @@ const Product = () => {
                       : q,
                   )
                 }
-                className="p-3"
+                className="p-4 active:bg-gray-100"
               >
                 <Plus size={18} />
               </button>
@@ -236,7 +240,7 @@ const Product = () => {
             onClick={handleAddToCart}
             className="w-full bg-black text-white py-4 rounded-md font-semibold transition hover:bg-neutral-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            {selectedVariant?.quantity ? "Add to Cart" : "Out of Stock"}
+            {selectedVariant?.quantity ? "Add to Cart" : "Choose Color"}
           </button>
 
           {product.description && (
@@ -269,7 +273,7 @@ const Product = () => {
             <button
               disabled={selectedVariant.quantity === 0}
               onClick={handleAddToCart}
-              className="rounded-md bg-black px-6 py-3 font-semibold text-white disabled:bg-gray-300"
+              className="rounded-lg bg-black px-8 py-4 font-semibold text-white disabled:bg-gray-300"
             >
               Add to Cart
             </button>

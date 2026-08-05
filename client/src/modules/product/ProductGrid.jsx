@@ -5,9 +5,11 @@ import LoadingSpinner from "../../components/ui/LoadingSpinner";
 const ProductGrid = ({
   CardComponent = ProductCard,
   filters = {},
-  className = "grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+  className = "grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4",
 }) => {
   const { data: products = [], isLoading } = useProducts(filters);
+
+  const productList = Array.isArray(products) ? products : [];
 
   if (isLoading) {
     return <LoadingSpinner text="Loading products..." />;
@@ -15,7 +17,7 @@ const ProductGrid = ({
 
   return (
     <div className={className}>
-      {products.map((product) => (
+      {productList.map((product) => (
         <CardComponent key={product._id} product={product} />
       ))}
     </div>

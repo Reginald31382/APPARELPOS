@@ -20,7 +20,7 @@ const collections = [
 
 const FeaturedCollections = () => {
   return (
-    <section className="bg-white py-20">
+    <section className="bg-white py-14 sm:py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <div className="mb-12 flex items-end justify-between">
           <div>
@@ -28,7 +28,7 @@ const FeaturedCollections = () => {
               Shop by Collection
             </p>
 
-            <h2 className="mt-3 text-4xl font-semibold">
+            <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">
               Designed for every chapter.
             </h2>
           </div>
@@ -41,7 +41,7 @@ const FeaturedCollections = () => {
           </Link>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {collections.map((collection) => (
             <Link
               key={collection.title}
@@ -57,9 +57,10 @@ const FeaturedCollections = () => {
 
                 <div className="absolute inset-0 bg-black/20" />
 
-                <div className="absolute bottom-8 left-8 text-white">
-                  <h3 className="text-4xl font-semibold">{collection.title}</h3>
-
+                <div className="absolute bottom-5 left-5 text-white sm:bottom-8 sm:left-8">
+                  <h3 className="text-3xl font-semibold sm:text-4xl">
+                    {collection.title}
+                  </h3>
                   <p className="mt-2 uppercase tracking-widest">Explore →</p>
                 </div>
               </div>
