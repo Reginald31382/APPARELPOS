@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
+import useNewsletterStore from "../../store/ui/useNewsletterStore";
 
 const Footer = () => {
+  const openModal = useNewsletterStore((state) => state.openModal);
   return (
     <>
       {/* Desktop Footer */}
@@ -73,7 +75,9 @@ const Footer = () => {
                   Policies
                 </Link>
 
-                <button className="block hover:text-black">Newsletter</button>
+                <button onClick={openModal} className="block hover:text-black">
+                  Newsletter
+                </button>
               </div>
             </div>
 
@@ -93,11 +97,6 @@ const Footer = () => {
                   <RiInstagramFill size={18} />
                   Instagram
                 </a>
-
-                <button className="flex items-center gap-3 text-gray-600 hover:text-black">
-                  <Mail size={18} />
-                  Newsletter
-                </button>
               </div>
             </div>
           </div>
