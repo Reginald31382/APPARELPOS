@@ -174,10 +174,51 @@ const Inventory = () => {
           onOpenChange={setModalOpen}
         />
       </div>
-      <hr />
-      <h1 className="text-3xl font-bold">Inventory History</h1>
-      <hr />
-      <InventoryHistoryTable />
+      <div className="rounded-2xl border bg-white shadow-sm">
+        {/* Header */}
+        <div className="flex flex-col gap-4 border-b p-6 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-3xl font-bold">Inventory History</h2>
+
+            <p className="mt-1 text-gray-500">
+              Track every inventory movement across your store.
+            </p>
+          </div>
+
+          <button className="rounded-lg border px-5 py-3 transition hover:bg-gray-100">
+            Export CSV
+          </button>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex flex-col gap-4 border-b p-6 lg:flex-row">
+          <input
+            type="text"
+            placeholder="Search product or SKU..."
+            className="flex-1 rounded-lg border px-4 py-3"
+          />
+
+          <select className="rounded-lg border px-4 py-3">
+            <option>All Reasons</option>
+            <option>Receiving Shipment</option>
+            <option>Sale</option>
+            <option>Return</option>
+            <option>Manual Adjustment</option>
+            <option>Inventory Count</option>
+          </select>
+
+          <select className="rounded-lg border px-4 py-3">
+            <option>All Dates</option>
+            <option>Today</option>
+            <option>This Week</option>
+            <option>This Month</option>
+          </select>
+        </div>
+
+        <div className="p-6">
+          <InventoryHistoryTable />
+        </div>
+      </div>
     </div>
   );
 };
