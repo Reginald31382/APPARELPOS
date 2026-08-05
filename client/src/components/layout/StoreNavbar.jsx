@@ -3,7 +3,7 @@ import { ShoppingBag, Menu, X, Mail, User, ShieldCheck } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import { GrUserWorker } from "react-icons/gr";
 import { useState } from "react";
-
+import useNewsletterStore from "../../store/ui/useNewsletterStore";
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
 
@@ -34,7 +34,7 @@ const infoLinks = [
   {
     name: "Instagram",
     icon: RiInstagramFill,
-    path: "https://instagram.com/jrome",
+    path: "https://www.instagram.com/jrome_studios",
     external: true,
   },
 ];
@@ -43,6 +43,8 @@ const StoreNavbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const openCart = useMobileCartStore((state) => state.openCart);
+  const openNewsletterModal = useNewsletterStore((state) => state.openModal);
+
   const items = useCustomerCartStore((state) => state.items);
 
   const cartCount = (items ?? []).reduce(
@@ -167,7 +169,7 @@ const StoreNavbar = () => {
                   key={link.name}
                   onClick={() => {
                     setMenuOpen(false);
-                    // openNewsletterModal();
+                    openNewsletterModal();
                   }}
                   className="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition hover:bg-gray-100"
                 >

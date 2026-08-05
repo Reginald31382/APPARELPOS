@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Mail } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import useNewsletterStore from "../../store/ui/useNewsletterStore";
 
@@ -89,7 +88,7 @@ const Footer = () => {
 
               <div className="space-y-4">
                 <a
-                  href="https://instagram.com/jrome"
+                  href="https://www.instagram.com/jrome_studios"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-gray-600 hover:text-black"
