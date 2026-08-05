@@ -1,16 +1,42 @@
 import { Link, NavLink } from "react-router-dom";
-import { ShoppingBag, Menu, X } from "lucide-react";
+import { ShoppingBag, Menu, X, Mail, User, ShieldCheck } from "lucide-react";
+import { RiInstagramFill } from "react-icons/ri";
 import { GrUserWorker } from "react-icons/gr";
 import { useState } from "react";
 
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
 
-const links = [
+const shopLinks = [
   { name: "Shop", path: "/shop" },
   { name: "Men", path: "/shop?category=Men" },
   { name: "Women", path: "/shop?category=Women" },
   { name: "Kids", path: "/shop?category=Kids" },
+];
+
+const infoLinks = [
+  {
+    name: "Newsletter",
+    icon: Mail,
+    action: "newsletter",
+  },
+  {
+    name: "About",
+    icon: User,
+    path: "/about",
+  },
+
+  {
+    name: "Policies",
+    icon: ShieldCheck,
+    path: "/policies",
+  },
+  {
+    name: "Instagram",
+    icon: RiInstagramFill,
+    path: "https://instagram.com/jrome",
+    external: true,
+  },
 ];
 
 const StoreNavbar = () => {
@@ -48,7 +74,7 @@ const StoreNavbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-10 lg:flex">
-          {links.map((link) => (
+          {shopLinks.map((link) => (
             <NavLink
               key={link.name}
               to={link.path}
@@ -88,13 +114,15 @@ const StoreNavbar = () => {
       </div>
 
       {/* Mobile Horizontal Dropdown */}
+      {/* Mobile Dropdown */}
       <div
         className={`overflow-hidden border-t bg-white transition-all duration-300 lg:hidden ${
-          menuOpen ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+          menuOpen ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <nav className="scrollbar-hide flex gap-8 overflow-x-auto px-4 py-4">
-          {links.map((link) => (
+        {/* Shop Categories */}
+        <div className="scrollbar-hide flex gap-8 overflow-x-auto border-b px-4 py-4">
+          {shopLinks.map((link) => (
             <NavLink
               key={link.name}
               to={link.path}
@@ -110,7 +138,58 @@ const StoreNavbar = () => {
               {link.name}
             </NavLink>
           ))}
-        </nav>
+        </div>
+
+        {/* Secondary Links */}
+        <div className="grid grid-cols-2 gap-3 p-4">
+          {infoLinks.map((link) => {
+            const Icon = link.icon;
+
+            if (link.external) {
+              return (
+                <a
+                  key={link.name}
+                  href={link.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition hover:bg-gray-100"
+                >
+                  <Icon size={18} />
+                  {link.name}
+                </a>
+              );
+            }
+
+            if (link.action === "newsletter") {
+              return (
+                <button
+                  key={link.name}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    // openNewsletterModal();
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition hover:bg-gray-100"
+                >
+                  <Icon size={18} />
+                  {link.name}
+                </button>
+              );
+            }
+
+            return (
+              <NavLink
+                key={link.name}
+                to={link.path}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition hover:bg-gray-100"
+              >
+                <Icon size={18} />
+                {link.name}
+              </NavLink>
+            );
+          })}
+        </div>
       </div>
     </header>
   );

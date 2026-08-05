@@ -1,36 +1,29 @@
 import { STORE_CONFIG } from "../../config/storeConfig";
-import { useEffect, useState } from "react";
 
 const messages = [
   `FREE SHIPPING ON ORDERS OVER $${STORE_CONFIG.FREE_SHIPPING_THRESHOLD}`,
-  "NEW SUMMER COLLECTION AVAILABLE NOW",
-  "MADE FOR DETROIT. WORN EVERYWHERE.",
-  "PREMIUM QUALITY • EVERYDAY ESSENTIALS",
-  "BUY NOW • PAY LATER AVAILABLE",
-  "100% COTTON • BECAUSE IT MATTERS",
-  "THANK YOU FOR SHOPPING WITH US!",
+  "PREMIUM QUALITY",
+  "DETROIT INSPIRED",
+  "SECURE CHECKOUT",
+  "NEW ARRIVALS",
+  "SHOP THE COLLECTION",
 ];
 
 const AnnouncementBar = () => {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % messages.length);
-    }, STORE_CONFIG.ANNOUNCEMENT_ROTATION_SPEED);
-
-    return () => clearInterval(timer);
-  }, []);
+  const items = [...messages, ...messages];
 
   return (
-    <div className="h-10 overflow-hidden bg-black px-3 text-white">
-      <div
-        className="flex h-full items-center justify-center transition-all duration-500"
-        key={index}
-      >
-        <p className="truncate text-center text-[10px] font-medium uppercase tracking-[0.18em] sm:text-[11px] sm:tracking-[0.35em]">
-          {messages[index]}
-        </p>
+    <div className="overflow-hidden bg-black py-2.5 text-white">
+      <div className="announcement-track flex w-max">
+        {items.map((message, index) => (
+          <div
+            key={index}
+            className="mx-8 flex items-center whitespace-nowrap text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.3em]"
+          >
+            {message}
+            <span className="ml-8 text-white/40"> • </span>
+          </div>
+        ))}
       </div>
     </div>
   );
