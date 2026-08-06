@@ -28,6 +28,7 @@ import ReviewPage from "../pages/ReviewPage";
 import ProtectedRoute from "../modules/auth/components/ProtectedRoute";
 
 import NotFound from "../pages/NotFound";
+import ProductDetails from "@/modules/product/ProductDetails";
 
 const AppRoutes = () => {
   return (
@@ -71,6 +72,7 @@ const AppRoutes = () => {
       >
         <Route index element={<DashboardPage />} />
         <Route path="products" element={<Products />} />
+        <Route path="products/:id" element={<ProductDetails />} />
         <Route path="orders" element={<Orders />} />
         <Route path="receipts" element={<Receipts />} />
         <Route path="employees" element={<Employees />} />

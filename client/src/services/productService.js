@@ -9,8 +9,11 @@ export const fetchProducts = async (filters = {}) => {
   if (filters.featured) params.append("featured", true);
   if (filters.sort) params.append("sort", filters.sort);
 
-  const { data } = await api.get(`/products?${params.toString()}`);
+  console.log("API URL:", import.meta.env.VITE_API_URL);
+  console.log("Request:", `/products?${params.toString()}`);
 
+  const { data } = await api.get(`/products?${params.toString()}`);
+  console.log("Products Returned:", data.length);
   return data;
 };
 

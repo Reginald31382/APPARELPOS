@@ -1,6 +1,4 @@
 import useProductStore from "../../../store/product/useProductStore";
-// import CartSummary from "./CustomerSummary";
-// import CustomerAutocomplete from "../../customer/CustomerAutoComplete";
 import { Search } from "lucide-react";
 import { useRef, useEffect } from "react";
 
@@ -47,19 +45,6 @@ const POSHeader = () => {
 
   return (
     <div className="space-y-4 border-b bg-white p-4">
-      <div className="flex items-center justify-between">
-        {/* <h1 className="text-3xl font-bold">J.Rome POS</h1> */}
-
-        {/* <CartSummary /> */}
-      </div>
-
-      {/* Customer Section */}
-      {/* <div>
-        <h2 className="mb-2 font-semibold">Customer</h2>
-
-        <CustomerAutocomplete />
-      </div> */}
-
       <div className="relative">
         <Search
           size={18}
@@ -69,7 +54,7 @@ const POSHeader = () => {
         <input
           ref={searchRef}
           type="text"
-          placeholder="Search producsts..."
+          placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-lg border py-3 pl-10 pr-4"

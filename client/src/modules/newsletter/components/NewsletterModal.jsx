@@ -1,7 +1,34 @@
+import { useState } from "react";
 import { X } from "lucide-react";
+import { toast } from "react-hot-toast";
+import api from "../../../api/axios";
 
 const NewsletterModal = ({ open, onClose }) => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
   if (!open) return null;
+
+  const subscribe = async () => {
+    if (!email.trim()) return;
+
+    try {
+      setLoading(true);
+
+      await api.post("/newsletter", {
+        email,
+      });
+
+      toast.success("Welcome to the J.Rome newsletter!");
+      setEmail("");
+
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Unable to subscribe.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -28,11 +55,17 @@ const NewsletterModal = ({ open, onClose }) => {
           <input
             type="email"
             placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="mb-4 w-full rounded-xl border px-4 py-3 outline-none focus:border-black"
           />
 
-          <button className="w-full rounded-xl bg-black py-3 font-semibold text-white transition hover:bg-neutral-800">
-            Subscribe
+          <button
+            onClick={subscribe}
+            disabled={!email.trim() || loading}
+            className="w-full rounded-xl bg-black py-3 font-semibold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            {loading ? "Subscribing..." : "Subscribe"}
           </button>
 
           <p className="mt-5 text-center text-xs text-gray-500">

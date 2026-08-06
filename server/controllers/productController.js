@@ -8,7 +8,7 @@ export const getProducts = async (req, res) => {
 
     let query = {};
 
-    query.active = true;
+    query.active = { $ne: false };
 
     // ONLY apply search if meaningful
     if (search && search.trim() !== "") {

@@ -28,6 +28,7 @@ import storeRoutes from "./routes/store.js";
 import notificationRoutes from "./routes/notifications.js";
 import reviewRoutes from "./routes/review.js";
 import receiptRoutes from "./routes/receipts.js";
+import newsletterRoutes from "./routes/newsletter.js";
 
 import stripeRoutes from "./routes/stripe.js";
 
@@ -105,6 +106,7 @@ app.use("/api/refunds", refundRoutes);
 app.use("/api/store", storeRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/receipts", receiptRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 
 app.get("/", (req, res) => {
   res.json({

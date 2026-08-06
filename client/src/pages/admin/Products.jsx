@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import ProductModal from "../../components/product/ProductModal";
 import { fetchProducts, deleteProduct } from "../../services/productService";
 const Products = () => {
@@ -48,11 +50,11 @@ const Products = () => {
 
       await loadProducts();
 
-      alert("Product deleted successfully.");
+      toast.success("Product deleted.");
     } catch (error) {
       console.error(error);
 
-      alert(error.response?.data?.message || "Failed to delete product.");
+      toast.error(error.response?.data?.message || "Failed to delete product.");
     }
   };
 
@@ -60,6 +62,8 @@ const Products = () => {
     setSelectedProduct(null);
     setIsModalOpen(false);
   };
+
+  const navigate = useNavigate();
 
   return (
     <>
@@ -99,49 +103,112 @@ const Products = () => {
             </button>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {products.map((product) => (
-              <div
-                key={product._id}
-                className="overflow-hidden rounded-2xl border bg-white shadow-sm"
-              >
-                <div className="flex h-72 items-center justify-center bg-gray-100 p-6">
-                  <img
-                    src={product.images?.[0]}
-                    alt={product.name}
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </div>
+          <div className="space-y-4">
+            {products.map((product) => {
+              const totalStock = product.variants.reduce(
+                (sum, variant) => sum + variant.quantity,
+                0,
+              );
 
-                <div className="space-y-2 p-5">
-                  <h2 className="text-xl font-semibold">{product.name}</h2>
+              const profit = Number(product.price) - Number(product.cost || 0);
 
-                  <p className="text-gray-500">{product.brand}</p>
+              return (
+                <div
+                  key={product._id}
+                  onClick={() => navigate(`/admin/products/${product._id}`)}
+                  className="cursor-pointer rounded-xl border bg-white transition hover:border-black hover:shadow-md"
+                >
+                  <div className="flex items-center gap-5 p-5">
+                    {/* Image */}
+                    <img
+                      src={
+                        product.images?.[0] ||
+                        "https://placehold.co/100x100?text=No+Image"
+                      }
+                      alt={product.name}
+                      className="h-20 w-20 rounded-lg bg-[#f7f5f2] object-contain p-2"
+                    />
 
-                  <p className="font-bold">${product.price.toFixed(2)}</p>
+                    {/* Product */}
+                    <div className="min-w-0 flex-1">
+                      <h2 className="truncate text-lg font-semibold">
+                        {product.name}
+                      </h2>
 
-                  <p className="text-sm text-gray-500">
-                    {product.variants.length} Variant(s)
-                  </p>
+                      <p className="text-sm text-gray-500">
+                        {product.brand || "No Brand"} •{" "}
+                        {product.category || "Uncategorized"}
+                      </p>
+                    </div>
 
-                  <div className="mt-4 flex gap-3">
-                    <button
-                      onClick={() => handleEditProduct(product)}
-                      className="flex-1 rounded-xl border border-gray-300 px-4 py-2 font-medium transition hover:bg-gray-100"
+                    {/* Retail */}
+                    <div className="hidden w-24 text-center md:block">
+                      <p className="text-xs text-gray-500">Retail</p>
+
+                      <p className="font-semibold">
+                        ${Number(product.price).toFixed(2)}
+                      </p>
+                    </div>
+
+                    {/* Cost */}
+                    <div className="hidden w-24 text-center lg:block">
+                      <p className="text-xs text-gray-500">Cost</p>
+
+                      <p>${Number(product.cost || 0).toFixed(2)}</p>
+                    </div>
+
+                    {/* Profit */}
+                    <div className="hidden w-24 text-center lg:block">
+                      <p className="text-xs text-gray-500">Profit</p>
+
+                      <p className="font-semibold text-green-600">
+                        ${profit.toFixed(2)}
+                      </p>
+                    </div>
+
+                    {/* Stock */}
+                    <div className="w-24 text-center">
+                      <p className="text-xs text-gray-500">Stock</p>
+
+                      <p className="font-semibold">{totalStock}</p>
+                    </div>
+
+                    {/* Status */}
+                    <div className="w-24 text-center">
+                      {product.active ? (
+                        <span className="rounded-full bg-green-100 px-3 py-1 text-xs text-green-700">
+                          Active
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-red-100 px-3 py-1 text-xs text-red-700">
+                          Hidden
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div
+                      className="flex gap-2"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      Edit
-                    </button>
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100"
+                      >
+                        Edit
+                      </button>
 
-                    <button
-                      onClick={() => handleDeleteProduct(product)}
-                      className="flex-1 rounded-xl bg-red-600 px-4 py-2 font-medium text-white transition hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product)}
+                        className="rounded-lg bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

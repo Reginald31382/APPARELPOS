@@ -127,6 +127,16 @@ const ProductModal = ({
       return;
     }
 
+    if (!product.category) {
+      alert("Please select a category.");
+      return;
+    }
+
+    if (!product.brand.trim()) {
+      alert("Brand is required.");
+      return;
+    }
+
     if (product.price === "") {
       alert("Price is required.");
       return;
@@ -308,7 +318,7 @@ const ProductModal = ({
                 <div className="mt-4 space-y-4">
                   <div>
                     <label className="mb-2 block text-sm font-medium">
-                      Price
+                      Wholesale Cost
                     </label>
 
                     <input
@@ -324,7 +334,7 @@ const ProductModal = ({
 
                   <div>
                     <label className="mb-2 block text-sm font-medium">
-                      Sale Price
+                      Retail Price
                     </label>
 
                     <input
@@ -340,7 +350,7 @@ const ProductModal = ({
 
                   <div>
                     <label className="mb-2 block text-sm font-medium">
-                      Cost
+                      Sale Price
                     </label>
 
                     <input
@@ -352,6 +362,50 @@ const ProductModal = ({
                       placeholder="0.00"
                       className="w-full rounded-lg border p-3"
                     />
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 rounded-xl border bg-gray-50 p-4">
+                    <div>
+                      <p className="text-xs uppercase text-gray-500">Profit</p>
+
+                      <p className="mt-1 text-lg font-bold text-green-600">
+                        $
+                        {(
+                          Number(product.price || 0) - Number(product.cost || 0)
+                        ).toFixed(2)}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs uppercase text-gray-500">Margin</p>
+
+                      <p className="mt-1 text-lg font-bold">
+                        {product.price
+                          ? (
+                              ((Number(product.price) -
+                                Number(product.cost || 0)) /
+                                Number(product.price)) *
+                              100
+                            ).toFixed(1)
+                          : 0}
+                        %
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs uppercase text-gray-500">Markup</p>
+
+                      <p className="mt-1 text-lg font-bold">
+                        {product.cost
+                          ? (
+                              ((Number(product.price || 0) -
+                                Number(product.cost)) /
+                                Number(product.cost)) *
+                              100
+                            ).toFixed(1)
+                          : 0}
+                        %
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

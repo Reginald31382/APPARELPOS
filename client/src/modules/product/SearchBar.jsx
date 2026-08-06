@@ -1,8 +1,7 @@
-import useFilterStore from "../../store/useFilterStore";
-
+import useProductStore from "../../store/product/useProductStore";
 const SearchBar = () => {
-  const search = useFilterStore((s) => s.search);
-  const setSearch = useFilterStore((s) => s.setSearch);
+  const search = useProductStore((s) => s.search);
+  const setSearch = useProductStore((s) => s.setSearch);
 
   return (
     <input

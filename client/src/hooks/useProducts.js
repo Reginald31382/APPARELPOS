@@ -12,6 +12,14 @@ const useProducts = () => {
 
   const debouncedSearch = useDebounce(search, 300);
 
+  console.log({
+    search,
+    category,
+    brand,
+    featured,
+    sort,
+  });
+
   return useQuery({
     queryKey: [QUERY_KEYS.PRODUCTS, search, category, brand, featured, sort],
 
