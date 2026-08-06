@@ -5,12 +5,12 @@ import useNotificationStore from "../../store/notifications/useNotificationStore
 import useAuthStore from "../../modules/auth/store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import api from "../../api/axios";
+// import api from "../../api/axios";
 import { useState } from "react";
 
 const Navbar = () => {
   const [showNotifications, setShowNotifications] = useState(false);
-  const markAllRead = useNotificationStore((state) => state.markAllRead);
+  // const markAllRead = useNotificationStore((state) => state.markAllRead);
   const logout = useAuthStore((state) => state.logout);
 
   const isAdmin = useAuthStore((state) => state.isAdmin);
@@ -19,15 +19,15 @@ const Navbar = () => {
 
   const unreadCount = useNotificationStore((state) => state.unreadCount);
 
-  const handleMarkAllRead = async () => {
-    try {
-      await api.put("/notifications/read-all");
+  // const handleMarkAllRead = async () => {
+  //   try {
+  //     await api.put("/notifications/read-all");
 
-      markAllRead();
-    } catch (error) {
-      console.error("Failed to mark notifications as read.", error);
-    }
-  };
+  //     markAllRead();
+  //   } catch (error) {
+  //     console.error("Failed to mark notifications as read.", error);
+  //   }
+  // };
 
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -85,14 +85,14 @@ const Navbar = () => {
                   />
                 )}
               </div>
-              <div className="border-t bg-gray-50 p-3">
+              {/* <div className="border-t bg-gray-50 p-3">
                 <button
                   onClick={handleMarkAllRead}
                   className="w-full rounded-lg py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
                 >
                   Mark All Read
                 </button>
-              </div>
+              </div> */}
               <button
                 onClick={handleLogout}
                 className="rounded-md border px-3 py-2 hover:bg-gray-100"

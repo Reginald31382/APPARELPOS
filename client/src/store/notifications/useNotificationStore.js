@@ -1,8 +1,23 @@
+import {
+  getNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+  clearReadNotifications,
+} from "../../services/notificationService";
 import { create } from "zustand";
 
 const useNotificationStore = create((set) => ({
   notifications: [],
   unreadCount: 0,
+
+  fetchNotifications: async () => {
+    const notifications = await getNotifications();
+
+    set({
+      notifications,
+      unreadCount: notifications.filter((n) => !n.read).length,
+    });
+  },
 
   setNotifications: (notifications) =>
     set({
@@ -16,14 +31,50 @@ const useNotificationStore = create((set) => ({
       unreadCount: state.unreadCount + 1,
     })),
 
-  markAllRead: () =>
+  markAllRead: async () => {
+    await markAllNotificationsRead();
+
     set((state) => ({
       notifications: state.notifications.map((notification) => ({
         ...notification,
         read: true,
+        readAt: new Date(),
       })),
       unreadCount: 0,
-    })),
+    }));
+  },
+
+  markRead: async (id) => {
+    await markNotificationRead(id);
+
+    set((state) => ({
+      notifications: state.notifications.map((notification) =>
+        notification._id === id
+          ? {
+              ...notification,
+              read: true,
+              readAt: new Date(),
+            }
+          : notification,
+      ),
+      unreadCount: state.notifications.filter(
+        (notification) => !notification.read && notification._id !== id,
+      ).length,
+    }));
+  },
+
+  clearRead: async () => {
+    await clearReadNotifications();
+
+    set((state) => ({
+      notifications: state.notifications.filter(
+        (notification) => !notification.read,
+      ),
+      unreadCount: state.notifications.filter(
+        (notification) => !notification.read,
+      ).length,
+    }));
+  },
 
   removeNotification: (id) =>
     set((state) => ({
