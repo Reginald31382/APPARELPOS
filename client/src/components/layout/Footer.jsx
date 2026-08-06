@@ -74,7 +74,10 @@ const Footer = () => {
                   Policies
                 </Link>
 
-                <button onClick={openModal} className="block hover:text-black">
+                <button
+                  onClick={openModal}
+                  className="block hover:text-black cursor-pointer"
+                >
                   Newsletter
                 </button>
               </div>

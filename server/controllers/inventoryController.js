@@ -30,3 +30,20 @@ export const getInventoryHistory = async (req, res) => {
     });
   }
 };
+
+export const getInventoryHistoryByProduct = async (req, res) => {
+  try {
+    const history = await InventoryHistory.find({
+      product: req.params.productId,
+    })
+      .populate("performedBy", "firstName lastName")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};

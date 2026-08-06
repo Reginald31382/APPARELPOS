@@ -25,10 +25,10 @@ import Login from "../pages/auth/Login";
 import Settings from "../pages/admin/Settings";
 import Employees from "../pages/admin/Employees";
 import ReviewPage from "../pages/ReviewPage";
+import ProductDetails from "../modules/product/pages/ProductDetails";
 import ProtectedRoute from "../modules/auth/components/ProtectedRoute";
 
 import NotFound from "../pages/NotFound";
-import ProductDetails from "@/modules/product/ProductDetails";
 
 const AppRoutes = () => {
   return (

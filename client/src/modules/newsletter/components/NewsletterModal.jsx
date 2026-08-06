@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import api from "../../../api/axios";
@@ -6,11 +6,42 @@ import api from "../../../api/axios";
 const NewsletterModal = ({ open, onClose }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      inputRef.current?.focus();
+    }
+  }, [open]);
 
   if (!open) return null;
 
   const subscribe = async () => {
-    if (!email.trim()) return;
+    const subscribe = async () => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email.trim())) {
+        return toast.error("Please enter a valid email.");
+      }
+
+      try {
+        setLoading(true);
+
+        const { data } = await api.post("/newsletter", {
+          email: email.trim().toLowerCase(),
+        });
+
+        toast.success(data.message);
+
+        setEmail("");
+
+        onClose();
+      } catch (err) {
+        toast.error(err.response?.data?.message ?? "Unable to subscribe.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
     try {
       setLoading(true);
@@ -53,10 +84,16 @@ const NewsletterModal = ({ open, onClose }) => {
           </p>
 
           <input
+            ref={inputRef}
             type="email"
             placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                subscribe();
+              }
+            }}
             className="mb-4 w-full rounded-xl border px-4 py-3 outline-none focus:border-black"
           />
 

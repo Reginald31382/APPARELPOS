@@ -4,7 +4,7 @@ import InventoryStats from "../../modules/inventory/components/InventoryStats";
 import LowStockAlert from "../../modules/inventory/components/LowStockAlert";
 
 import { useMemo, useState } from "react";
-import useInventory from "../../modules/inventory/hooks/useInventory";
+import useInventory from "../../modules/product/hooks/useInventory";
 
 const Inventory = () => {
   const { data: products = [], isLoading } = useInventory();

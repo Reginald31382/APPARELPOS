@@ -8,7 +8,7 @@ import {
   ClipboardList,
   Pencil,
 } from "lucide-react";
-import useInventoryHistory from "../hooks/useInventoryHistory";
+import useInventoryHistory from "@/modules/product/hooks/useInventoryHistory";
 
 const reasonStyles = {
   "Receiving Shipment": {

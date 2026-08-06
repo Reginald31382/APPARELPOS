@@ -18,6 +18,12 @@ router.post("/", async (req, res) => {
       {
         email,
         updateEnabled: true,
+
+        listIds: [Number(process.env.BREVO_LIST_ID)],
+
+        attributes: {
+          SOURCE: "Website",
+        },
       },
       {
         headers: {

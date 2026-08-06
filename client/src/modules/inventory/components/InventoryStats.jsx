@@ -1,4 +1,4 @@
-import useInventory from "../hooks/useInventory";
+import useInventory from "@/modules/product/hooks/useInventory";
 
 const InventoryStats = () => {
   const { data = [] } = useInventory();

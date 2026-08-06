@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import useUpdateInventory from "../hooks/useUpdateInventory";
+import useUpdateInventory from "@/modules/product/hooks/useUpdateInventory";
 
 const reasons = [
   "Receiving Shipment",

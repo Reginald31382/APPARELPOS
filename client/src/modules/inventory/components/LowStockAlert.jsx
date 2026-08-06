@@ -1,4 +1,4 @@
-import useInventory from "../hooks/useInventory";
+import useInventory from "@/hooks/useInventory";
 
 const LowStockAlert = ({ onSelectItem }) => {
   const { data = [] } = useInventory();
