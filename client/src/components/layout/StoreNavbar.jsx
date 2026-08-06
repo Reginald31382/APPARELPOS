@@ -1,5 +1,13 @@
 import { Link, NavLink } from "react-router-dom";
-import { ShoppingBag, Menu, X, Mail, User, ShieldCheck } from "lucide-react";
+import {
+  ShoppingBag,
+  Menu,
+  X,
+  Mail,
+  User,
+  ShieldCheck,
+  ChevronDown,
+} from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import { GrUserWorker } from "react-icons/gr";
 import { useState } from "react";
@@ -9,9 +17,16 @@ import useMobileCartStore from "../../store/ui/useMobileCartStore";
 
 const shopLinks = [
   { name: "Shop", path: "/shop" },
-  { name: "Men", path: "/shop?category=Men" },
-  { name: "Women", path: "/shop?category=Women" },
-  { name: "Kids", path: "/shop?category=Kids" },
+  { name: "Shirts", path: "/shop?category=Shirts" },
+  { name: "Hoodies", path: "/shop?category=Hoodies" },
+  { name: "Accessories", path: "/shop?category=Accessories" },
+];
+
+const moreLinks = [
+  { name: "Sweatshirts", path: "/shop?category=Sweatshirts" },
+  { name: "Pants", path: "/shop?category=Pants" },
+  { name: "Shorts", path: "/shop?category=Shorts" },
+  { name: "Shoes", path: "/shop?category=Shoes" },
 ];
 
 const infoLinks = [
@@ -41,7 +56,7 @@ const infoLinks = [
 
 const StoreNavbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const [moreOpen, setMoreOpen] = useState(false);
   const openCart = useMobileCartStore((state) => state.openCart);
   const openNewsletterModal = useNewsletterStore((state) => state.openModal);
 
@@ -91,6 +106,36 @@ const StoreNavbar = () => {
               {link.name}
             </NavLink>
           ))}
+
+          <div className="relative">
+            <button
+              onClick={() => setMoreOpen(!moreOpen)}
+              className="flex items-center gap-1 text-sm uppercase tracking-[0.25em] text-gray-500 transition hover:text-black"
+            >
+              Collections
+              <ChevronDown
+                size={16}
+                className={`transition-transform ${
+                  moreOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {moreOpen && (
+              <div className="absolute right-0 mt-5 w-56 overflow-hidden rounded-2xl border bg-white shadow-xl">
+                {moreLinks.map((link) => (
+                  <NavLink
+                    key={link.name}
+                    to={link.path}
+                    onClick={() => setMoreOpen(false)}
+                    className="block px-5 py-4 text-sm transition hover:bg-gray-100"
+                  >
+                    {link.name}
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Right Icons */}
@@ -124,7 +169,7 @@ const StoreNavbar = () => {
       >
         {/* Shop Categories */}
         <div className="scrollbar-hide flex gap-8 overflow-x-auto border-b px-4 py-4">
-          {shopLinks.map((link) => (
+          {[...shopLinks, ...moreLinks].map((link) => (
             <NavLink
               key={link.name}
               to={link.path}
