@@ -5,15 +5,19 @@ export const fetchProducts = async (filters = {}) => {
 
   if (filters.search) params.append("search", filters.search);
   if (filters.category) params.append("category", filters.category);
+  if (filters.gender) params.append("gender", filters.gender);
   if (filters.brand) params.append("brand", filters.brand);
   if (filters.featured) params.append("featured", true);
+  if (filters.latest) {
+    params.append("latest", "true");
+  }
   if (filters.sort) params.append("sort", filters.sort);
-
-  console.log("API URL:", import.meta.env.VITE_API_URL);
-  console.log("Request:", `/products?${params.toString()}`);
+  // console.log(filters);
+  // console.log("API URL:", import.meta.env.VITE_API_URL);
+  // console.log("Request:", `/products?${params.toString()}`);
 
   const { data } = await api.get(`/products?${params.toString()}`);
-  console.log("Products Returned:", data.length);
+  // console.log("Products Returned:", data.length);
   return data;
 };
 

@@ -14,7 +14,7 @@ const NewArrivals = () => {
             </p>
 
             <h2 className="mt-4 text-3xl font-light tracking-tight sm:text-5xl">
-              The Latest Collection
+              Fresh Drops
             </h2>
           </div>
           <Link
@@ -24,8 +24,18 @@ const NewArrivals = () => {
             View All
           </Link>
         </div>
-
-        <ProductGrid CardComponent={StoreProductCard} />
+        <ProductGrid
+          CardComponent={StoreProductCard}
+          filters={{
+            search: "",
+            category: "",
+            gender: "",
+            brand: "",
+            featured: false,
+            sort: "newest",
+            latest: true,
+          }}
+        />
       </div>
     </section>
   );

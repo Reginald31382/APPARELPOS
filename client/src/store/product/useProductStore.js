@@ -8,6 +8,7 @@ const useProductStore = create((set) => ({
   // Filters
   search: "",
   category: "",
+  gender: "",
   brand: "",
   featured: false,
 
@@ -33,6 +34,11 @@ const useProductStore = create((set) => ({
       category,
     }),
 
+  setGender: (gender) =>
+    set({
+      gender,
+    }),
+
   setBrand: (brand) =>
     set({
       brand,
@@ -53,6 +59,7 @@ const useProductStore = create((set) => ({
     set({
       search: "",
       category: "",
+      gender: "",
       brand: "",
       featured: false,
       sort: "newest",

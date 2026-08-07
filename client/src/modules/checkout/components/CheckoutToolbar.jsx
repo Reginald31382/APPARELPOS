@@ -1,21 +1,36 @@
 import useProductStore from "../../../store/product/useProductStore";
+import useProducts from "../../../hooks/useProducts";
 import { Search } from "lucide-react";
 import { useRef, useEffect } from "react";
 
-const categories = ["All", "Men", "Women", "Kids", "Accessories", "Shoes"];
+const genders = ["All", "Men", "Women", "Kids", "Unisex"];
 
 const POSHeader = () => {
   const {
     search,
     category,
+    gender,
     featured,
     setSearch,
     setCategory,
+    setGender,
     setFeatured,
     clearFilters,
     sort,
     setSort,
   } = useProductStore();
+
+  const { data: products = [] } = useProducts();
+
+  const categories = [
+    "All",
+    ...new Set(
+      products
+        .map((product) => product.category)
+        .filter(Boolean)
+        .sort(),
+    ),
+  ];
 
   const searchRef = useRef(null);
 
@@ -62,20 +77,51 @@ const POSHeader = () => {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        {categories.map((item) => (
-          <button
-            key={item}
-            onClick={() => setCategory(item === "All" ? "" : item)}
-            className={`rounded-full border px-4 py-2
-            ${
-              category === (item === "All" ? "" : item)
-                ? "bg-black text-white"
-                : ""
-            }`}
-          >
-            {item}
-          </button>
-        ))}
+        <div className="flex flex-col gap-4 w-full">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Gender
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              {genders.map((item) => (
+                <button
+                  key={item}
+                  onClick={() => setGender(item === "All" ? "" : item)}
+                  className={`rounded-full border px-4 py-2 transition ${
+                    gender === (item === "All" ? "" : item)
+                      ? "bg-black text-white"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Category
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              {categories.map((item) => (
+                <button
+                  key={item}
+                  onClick={() => setCategory(item === "All" ? "" : item)}
+                  className={`rounded-full border px-4 py-2 transition ${
+                    category === (item === "All" ? "" : item)
+                      ? "bg-black text-white"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
 
         <button
           onClick={() => setFeatured(!featured)}

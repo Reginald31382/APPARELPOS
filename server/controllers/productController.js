@@ -4,7 +4,15 @@ import { logger } from "../utils/logger.js";
 
 export const getProducts = async (req, res) => {
   try {
-    const { search = "", category, brand, featured, sort } = req.query;
+    const {
+      search = "",
+      category,
+      gender,
+      brand,
+      featured,
+      latest,
+      sort,
+    } = req.query;
 
     let query = {};
 
@@ -24,12 +32,26 @@ export const getProducts = async (req, res) => {
       query.category = category;
     }
 
+    if (gender && gender.trim() !== "") {
+      query.gender = gender;
+    }
+
     if (brand && brand.trim() !== "") {
       query.brand = brand;
     }
 
     if (featured !== undefined && featured !== "") {
       query.featured = featured === "true";
+    }
+
+    if (latest === "true") {
+      const thirtyDaysAgo = new Date();
+
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      query.createdAt = {
+        $gte: thirtyDaysAgo,
+      };
     }
 
     // console.log("FINAL QUERY:", JSON.stringify(query, null, 2));

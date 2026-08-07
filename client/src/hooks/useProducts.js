@@ -7,26 +7,39 @@ import { fetchProducts } from "../services/productService.js";
 
 import { QUERY_KEYS } from "../constants/queryKeys";
 
-const useProducts = () => {
-  const { search, category, brand, featured, sort } = useProductStore();
+const useProducts = (overrideFilters = {}) => {
+  const store = useProductStore();
 
+  const { search, category, gender, brand, featured, sort } = {
+    ...store,
+    ...overrideFilters,
+  };
   const debouncedSearch = useDebounce(search, 300);
 
-  console.log({
-    search,
-    category,
-    brand,
-    featured,
-    sort,
-  });
+  // console.log({
+  //   search,
+  //   category,
+  //   gender,
+  //   brand,
+  //   featured,
+  //   sort,
+  // });
 
   return useQuery({
-    queryKey: [QUERY_KEYS.PRODUCTS, search, category, brand, featured, sort],
-
+    queryKey: [
+      QUERY_KEYS.PRODUCTS,
+      search,
+      category,
+      gender,
+      brand,
+      featured,
+      sort,
+    ],
     queryFn: () =>
       fetchProducts({
         search: debouncedSearch,
         category,
+        gender,
         brand,
         featured,
         sort,

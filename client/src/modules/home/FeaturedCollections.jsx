@@ -4,17 +4,17 @@ const collections = [
   {
     title: "Men",
     image: "https://i.postimg.cc/VkqkPfGh/jrome-mens-collection-II.png",
-    link: "/shop?category=Men",
+    link: "/shop?gender=Men",
   },
   {
     title: "Women",
     image: "https://i.postimg.cc/MGkJ2vvx/jrome-womens-collection-IV.png",
-    link: "/shop?category=Women",
+    link: "/shop?gender=Women",
   },
   {
     title: "Kids",
     image: "https://i.postimg.cc/3JwqHnL7/jrome-kids-collection.png",
-    link: "/shop?category=Kids",
+    link: "/shop?gender=Kids",
   },
 ];
 
