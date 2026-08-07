@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductGrid from "../../modules/product/ProductGrid";
+import ShopHeroBanner from "../../modules/shop/components/ShopHeroBanner";
 import useProductStore from "../../store/product/useProductStore";
 const Shop = () => {
   const [searchParams] = useSearchParams();
@@ -15,11 +16,7 @@ const Shop = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      <div className="mb-10 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-gray-500">
-          Shop Responsibly
-        </p>
-      </div>
+      <ShopHeroBanner />
       <ProductGrid
         emptyMessage={
           searchParams.get("gender")

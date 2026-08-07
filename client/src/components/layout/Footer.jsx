@@ -36,24 +36,18 @@ const Footer = () => {
                   Shop All
                 </Link>
 
-                <Link
-                  className="block hover:text-black"
-                  to="/shop?category=Men"
-                >
+                <Link className="block hover:text-black" to="/shop?gender=Men">
                   Men
                 </Link>
 
                 <Link
                   className="block hover:text-black"
-                  to="/shop?category=Women"
+                  to="/shop?gender=Women"
                 >
                   Women
                 </Link>
 
-                <Link
-                  className="block hover:text-black"
-                  to="/shop?category=Kids"
-                >
+                <Link className="block hover:text-black" to="/shop?gender=Kids">
                   Kids
                 </Link>
               </div>
