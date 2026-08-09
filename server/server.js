@@ -35,6 +35,7 @@ import stripeRoutes from "./routes/stripe.js";
 connectDB();
 
 const app = express();
+app.set("trust proxy", 1);
 app.disable("x-powered-by");
 app.use(
   helmet({
