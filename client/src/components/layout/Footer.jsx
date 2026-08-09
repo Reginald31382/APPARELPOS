@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { RiInstagramFill } from "react-icons/ri";
-import { FaClipboardList } from "react-icons/fa";
 import useNewsletterStore from "../../store/ui/useNewsletterStore";
 
 const Footer = () => {
@@ -93,17 +92,6 @@ const Footer = () => {
                 >
                   <RiInstagramFill size={18} />
                   Instagram
-                </a>
-              </div>
-              <div className="space-y-4">
-                <a
-                  href="https://consultation-jrome.netlify.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-gray-600 hover:text-black"
-                >
-                  <FaClipboardList size={18} />
-                  Consultations
                 </a>
               </div>
             </div>
