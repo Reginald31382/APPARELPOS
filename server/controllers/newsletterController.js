@@ -11,30 +11,55 @@ export const subscribe = async (req, res) => {
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const exists = await NewsletterSubscriber.findOne({
-      email,
+      email: normalizedEmail,
     });
 
     if (exists) {
-      return res.json({
-        message: "Already subscribed.",
+      return res.status(200).json({
+        success: true,
+        message: "You're already subscribed.",
       });
     }
 
-    await NewsletterSubscriber.create({
-      email,
+    const subscriber = await NewsletterSubscriber.create({
+      email: normalizedEmail,
+      status: "Subscribed",
+      source: "Website",
     });
 
-    await addSubscriberToBrevo(email);
+    try {
+      await addSubscriberToBrevo(normalizedEmail);
+    } catch (brevoError) {
+      // If MongoDB saved the subscriber but Brevo failed,
+      // remove the database record so the two systems stay consistent.
+      await NewsletterSubscriber.findByIdAndDelete(subscriber._id);
 
-    res.status(201).json({
+      throw brevoError;
+    }
+
+    return res.status(201).json({
+      success: true,
       message: "Successfully subscribed.",
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Newsletter subscription error:",
+      error.response?.data || error.message,
+    );
 
-    res.status(500).json({
-      message: "Subscription failed.",
+    const status = error.response?.status;
+
+    if (status === 400) {
+      return res.status(400).json({
+        message: "Please enter a valid email address.",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Subscription failed. Please try again.",
     });
   }
 };
