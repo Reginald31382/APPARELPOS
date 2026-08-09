@@ -81,7 +81,15 @@ const StoreNavbar = () => {
         </button>
 
         {/* Logo */}
-        <Link to="/" onClick={() => window.scrollTo(0, 0)}>
+        <Link
+          to="/"
+          onClick={() => {
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }}
+        >
           <img
             src="https://i.postimg.cc/9QCLhrdv/jrome-leo-szn.png"
             alt="J.Rome"
