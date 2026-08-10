@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { RiInstagramFill } from "react-icons/ri";
 import useNewsletterStore from "../../store/ui/useNewsletterStore";
+import { IoIosClipboard } from "react-icons/io";
 
 const Footer = () => {
   const openModal = useNewsletterStore((state) => state.openModal);
@@ -93,6 +94,16 @@ const Footer = () => {
                   <RiInstagramFill size={18} />
                   Instagram
                 </a>
+              </div>
+              <br />
+              <div className="space-y-4">
+                <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.2em]">
+                  Need a Website?
+                </h3>
+                <button className="flex items-center gap-3 text-gray-600 hover:text-black">
+                  <IoIosClipboard size={18} />
+                  Info Coming Soon...
+                </button>
               </div>
             </div>
           </div>
