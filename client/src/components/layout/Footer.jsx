@@ -98,11 +98,11 @@ const Footer = () => {
               <br />
               <div className="space-y-4">
                 <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.2em]">
-                  Need a Website?
+                  Quick Link
                 </h3>
                 <button className="flex items-center gap-3 text-gray-600 hover:text-black">
                   <IoIosClipboard size={18} />
-                  Info Coming Soon...
+                  Need a website?
                 </button>
               </div>
             </div>

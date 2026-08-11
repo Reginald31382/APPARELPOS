@@ -1,6 +1,13 @@
 const About = () => {
   return (
     <section className="bg-white">
+      <div>
+        <img
+          src="https://i.postimg.cc/9QCLhrdv/jrome-leo-szn.png"
+          alt="J.Rome"
+          className="w-48 sm:w-56"
+        />
+      </div>
       <div className="mx-auto max-w-5xl px-6 py-20 lg:px-12">
         <div className="text-center">
           <p className="text-xs uppercase tracking-[0.35em] text-gray-500">
