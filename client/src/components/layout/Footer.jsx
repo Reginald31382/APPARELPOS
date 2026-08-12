@@ -100,10 +100,15 @@ const Footer = () => {
                 <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.2em]">
                   Quick Link
                 </h3>
-                <button className="flex items-center gap-3 text-gray-600 hover:text-black">
+                <a
+                  href="https://consultation-jrome.netlify.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-gray-600 hover:text-black"
+                >
                   <IoIosClipboard size={18} />
                   Need a website?
-                </button>
+                </a>
               </div>
             </div>
           </div>
