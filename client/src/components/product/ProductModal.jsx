@@ -318,7 +318,7 @@ const ProductModal = ({
                 <div className="mt-4 space-y-4">
                   <div>
                     <label className="mb-2 block text-sm font-medium">
-                      Wholesale Cost
+                      Regular Price
                     </label>
 
                     <input
@@ -334,7 +334,7 @@ const ProductModal = ({
 
                   <div>
                     <label className="mb-2 block text-sm font-medium">
-                      Retail Price
+                      Commercial Price
                     </label>
 
                     <input
@@ -350,7 +350,7 @@ const ProductModal = ({
 
                   <div>
                     <label className="mb-2 block text-sm font-medium">
-                      Sale Price
+                      Wholesale Price
                     </label>
 
                     <input
