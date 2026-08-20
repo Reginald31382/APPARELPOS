@@ -14,16 +14,8 @@ const useProducts = (overrideFilters = {}) => {
     ...store,
     ...overrideFilters,
   };
-  const debouncedSearch = useDebounce(search, 300);
 
-  // console.log({
-  //   search,
-  //   category,
-  //   gender,
-  //   brand,
-  //   featured,
-  //   sort,
-  // });
+  const debouncedSearch = useDebounce(search, 300);
 
   return useQuery({
     queryKey: [
@@ -35,6 +27,7 @@ const useProducts = (overrideFilters = {}) => {
       featured,
       sort,
     ],
+
     queryFn: () =>
       fetchProducts({
         search: debouncedSearch,
@@ -44,8 +37,6 @@ const useProducts = (overrideFilters = {}) => {
         featured,
         sort,
       }),
-
-    placeholderData: (previous) => previous,
   });
 };
 
