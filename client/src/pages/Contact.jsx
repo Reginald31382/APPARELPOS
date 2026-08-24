@@ -1,4 +1,4 @@
-import Seo from "../components/Seo";
+import SEO from "../components/SEO";
 import { Mail, MapPin } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 
