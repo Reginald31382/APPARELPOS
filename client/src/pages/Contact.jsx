@@ -51,12 +51,12 @@ const Contact = () => {
                   <h2 className="font-semibold">Instagram</h2>
 
                   <a
-                    href="https://instagram.com"
+                    href="https://www.instagram.com/jrome_studios"
                     target="_blank"
                     rel="noreferrer"
                     className="text-gray-600 hover:text-black"
                   >
-                    @jrome
+                    @jrome_studios
                   </a>
                 </div>
               </div>

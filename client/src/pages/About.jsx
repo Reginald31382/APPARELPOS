@@ -8,7 +8,7 @@ const About = () => {
         path="/about"
       />
       <section className="bg-white">
-        <div>
+        <div className="flex justify-center">
           <img
             src="https://i.postimg.cc/9QCLhrdv/jrome-leo-szn.png"
             alt="J.Rome"
