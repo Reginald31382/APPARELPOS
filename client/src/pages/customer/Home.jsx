@@ -1,5 +1,6 @@
 import SEO from "../../components/SEO";
 import OrganizationSchema from "../../components/OrganizationSchema";
+import WebsiteSchema from "../../components/WebsiteSchema";
 import Hero from "../../modules/home/Hero";
 import FeaturedCollections from "../../modules/home/FeaturedCollections";
 import NewArrivals from "../../modules/home/NewArrivals";
@@ -13,6 +14,7 @@ const Home = () => {
         path="/"
       />
       <OrganizationSchema />
+      <WebsiteSchema />
       <Hero />
       <FeaturedCollections />
       <NewArrivals />

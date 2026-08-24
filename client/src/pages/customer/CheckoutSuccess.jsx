@@ -1,3 +1,4 @@
+import SEO from "../../components/SEO";
 import socket from "../../services/socketService";
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -113,117 +114,128 @@ const CheckoutSuccess = () => {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-16">
-      <div className="rounded-2xl border bg-white p-10 shadow-sm">
-        <div className="mb-8 text-center">
-          <div className="mb-4 text-6xl">
-            <GiGlassCelebration className="mx-auto h-20 w-20" />
+    <>
+      <SEO
+        title="Order Confirmation"
+        description="Your J.Rome Studios order confirmation."
+        path="/checkout/success"
+        noIndex
+      />
+      <div className="mx-auto max-w-4xl px-6 py-16">
+        <div className="rounded-2xl border bg-white p-10 shadow-sm">
+          <div className="mb-8 text-center">
+            <div className="mb-4 text-6xl">
+              <GiGlassCelebration className="mx-auto h-20 w-20" />
+            </div>
+
+            <h1 className="text-4xl font-bold">Thank You For Your Order!</h1>
+
+            <p className="mt-4 text-gray-600">
+              Your payment has been successfully processed.
+            </p>
           </div>
 
-          <h1 className="text-4xl font-bold">Thank You For Your Order!</h1>
+          {order !== null ? (
+            <>
+              <div className="mb-8 grid gap-6 rounded-xl bg-gray-50 p-6 md:grid-cols-2">
+                <div>
+                  <p className="text-sm text-gray-500">Order Number</p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-xl font-bold">{order.orderNumber}</p>
 
-          <p className="mt-4 text-gray-600">
-            Your payment has been successfully processed.
-          </p>
-        </div>
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                      Confirmed
+                    </span>
+                  </div>
+                </div>
 
-        {order !== null ? (
-          <>
-            <div className="mb-8 grid gap-6 rounded-xl bg-gray-50 p-6 md:grid-cols-2">
-              <div>
-                <p className="text-sm text-gray-500">Order Number</p>
-                <div className="flex items-center gap-3">
-                  <p className="text-xl font-bold">{order.orderNumber}</p>
+                <div>
+                  <p className="text-sm text-gray-500">Payment Status</p>
+                  <p className="font-semibold">{order.paymentStatus}</p>
+                </div>
 
-                  <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                    Confirmed
-                  </span>
+                <div>
+                  <p className="text-sm text-gray-500">Order Total</p>
+                  <p className="font-bold">{formatCurrency(order.total)}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p>{order.customerEmail}</p>
                 </div>
               </div>
 
-              <div>
-                <p className="text-sm text-gray-500">Payment Status</p>
-                <p className="font-semibold">{order.paymentStatus}</p>
+              <div className="mb-8">
+                <h2 className="mb-4 text-2xl font-semibold">
+                  Shipping Address
+                </h2>
+
+                <div className="rounded-xl border p-5">
+                  <p className="font-semibold">
+                    {order.shippingAddress?.firstName}
+                    {order.shippingAddress?.lastName}
+                  </p>
+
+                  <p>{order.shippingAddress?.address1}</p>
+
+                  {order.shippingAddress?.address2 && (
+                    <p>{order.shippingAddress?.address2}</p>
+                  )}
+
+                  <p>
+                    {order.shippingAddress?.city},{" "}
+                    {order.shippingAddress?.state}
+                    {order.shippingAddress?.zipCode}
+                  </p>
+
+                  <p>{order.shippingAddress?.country}</p>
+                </div>
               </div>
 
-              <div>
-                <p className="text-sm text-gray-500">Order Total</p>
-                <p className="font-bold">{formatCurrency(order.total)}</p>
-              </div>
+              <div className="mb-8">
+                <h2 className="mb-4 text-2xl font-semibold">Items Purchased</h2>
 
-              <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p>{order.customerEmail}</p>
-              </div>
-            </div>
+                <div className="space-y-4">
+                  {order.items?.map((item) => (
+                    <div
+                      key={item.sku}
+                      className="flex items-center justify-between rounded-xl border p-4"
+                    >
+                      <div>
+                        <p className="font-semibold">{item.name}</p>
 
-            <div className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold">Shipping Address</h2>
+                        <p className="text-sm text-gray-500">
+                          {item.color} / {item.size}
+                        </p>
 
-              <div className="rounded-xl border p-5">
-                <p className="font-semibold">
-                  {order.shippingAddress?.firstName}
-                  {order.shippingAddress?.lastName}
-                </p>
+                        <p className="text-sm">Qty: {item.quantity}</p>
+                      </div>
 
-                <p>{order.shippingAddress?.address1}</p>
-
-                {order.shippingAddress?.address2 && (
-                  <p>{order.shippingAddress?.address2}</p>
-                )}
-
-                <p>
-                  {order.shippingAddress?.city}, {order.shippingAddress?.state}
-                  {order.shippingAddress?.zipCode}
-                </p>
-
-                <p>{order.shippingAddress?.country}</p>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h2 className="mb-4 text-2xl font-semibold">Items Purchased</h2>
-
-              <div className="space-y-4">
-                {order.items?.map((item) => (
-                  <div
-                    key={item.sku}
-                    className="flex items-center justify-between rounded-xl border p-4"
-                  >
-                    <div>
-                      <p className="font-semibold">{item.name}</p>
-
-                      <p className="text-sm text-gray-500">
-                        {item.color} / {item.size}
-                      </p>
-
-                      <p className="text-sm">Qty: {item.quantity}</p>
+                      <div className="font-bold">
+                        {formatCurrency(item.unitPrice * item.quantity)}
+                      </div>
                     </div>
-
-                    <div className="font-bold">
-                      {formatCurrency(item.unitPrice * item.quantity)}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
+            </>
+          ) : (
+            <div className="rounded-xl bg-red-50 p-6 text-center">
+              Unable to locate your order.
             </div>
-          </>
-        ) : (
-          <div className="rounded-xl bg-red-50 p-6 text-center">
-            Unable to locate your order.
+          )}
+
+          <div className="mt-10 text-center">
+            <Link
+              to="/shop"
+              className="inline-block rounded-xl bg-black px-8 py-4 font-semibold text-white transition hover:bg-gray-800"
+            >
+              Continue Shopping
+            </Link>
           </div>
-        )}
-
-        <div className="mt-10 text-center">
-          <Link
-            to="/shop"
-            className="inline-block rounded-xl bg-black px-8 py-4 font-semibold text-white transition hover:bg-gray-800"
-          >
-            Continue Shopping
-          </Link>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,3 +1,4 @@
+import SEO from "../../components/SEO";
 import { Link, useNavigate } from "react-router-dom";
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import { formatCurrency } from "../../utils/currency";
@@ -35,113 +36,121 @@ const Cart = () => {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
-      <h1 className="mb-10 text-4xl font-bold">Shopping Cart</h1>
+    <>
+      <SEO
+        title="Shopping Cart"
+        description="Review your J.Rome Studios shopping cart."
+        path="/cart"
+        noIndex
+      />
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <h1 className="mb-10 text-4xl font-bold">Shopping Cart</h1>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-        {/* Items */}
-        <div className="space-y-6">
-          {items.map((item) => (
-            <div
-              key={item.sku}
-              className="rounded-2xl border bg-white p-4 sm:p-5"
-            >
-              <div className="flex gap-4">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="h-24 w-20 rounded-xl object-cover sm:h-32 sm:w-28"
-                />
+        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+          {/* Items */}
+          <div className="space-y-6">
+            {items.map((item) => (
+              <div
+                key={item.sku}
+                className="rounded-2xl border bg-white p-4 sm:p-5"
+              >
+                <div className="flex gap-4">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="h-24 w-20 rounded-xl object-cover sm:h-32 sm:w-28"
+                  />
 
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-lg font-semibold sm:text-xl">
-                    {item.name}
-                  </h2>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-lg font-semibold sm:text-xl">
+                      {item.name}
+                    </h2>
 
-                  <p className="text-sm text-gray-500">
-                    {item.color} / {item.size}
-                  </p>
+                    <p className="text-sm text-gray-500">
+                      {item.color} / {item.size}
+                    </p>
 
-                  <p className="mt-2 font-bold">
-                    {formatCurrency(item.unitPrice)}
-                  </p>
+                    <p className="mt-2 font-bold">
+                      {formatCurrency(item.unitPrice)}
+                    </p>
 
-                  <div className="mt-4 flex items-center gap-3">
-                    <button
-                      onClick={() => decreaseQuantity(item.sku)}
-                      className="h-9 w-9 rounded border"
-                    >
-                      −
-                    </button>
+                    <div className="mt-4 flex items-center gap-3">
+                      <button
+                        onClick={() => decreaseQuantity(item.sku)}
+                        className="h-9 w-9 rounded border"
+                      >
+                        −
+                      </button>
 
-                    <span className="w-8 text-center font-semibold">
-                      {item.quantity}
-                    </span>
+                      <span className="w-8 text-center font-semibold">
+                        {item.quantity}
+                      </span>
 
-                    <button
-                      onClick={() => increaseQuantity(item.sku)}
-                      className="h-9 w-9 rounded border"
-                    >
-                      +
-                    </button>
+                      <button
+                        onClick={() => increaseQuantity(item.sku)}
+                        className="h-9 w-9 rounded border"
+                      >
+                        +
+                      </button>
 
-                    <button
-                      onClick={() => removeItem(item.sku)}
-                      className="ml-auto text-red-600 hover:underline"
-                    >
-                      Remove
-                    </button>
-                  </div>
+                      <button
+                        onClick={() => removeItem(item.sku)}
+                        className="ml-auto text-red-600 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
 
-                  <div className="mt-4 text-right text-lg font-bold">
-                    {formatCurrency(item.unitPrice * item.quantity)}
+                    <div className="mt-4 text-right text-lg font-bold">
+                      {formatCurrency(item.unitPrice * item.quantity)}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-        {/* Summary */}
-        <aside className="order-first h-fit rounded-2xl border bg-white p-6 shadow-sm lg:order-last">
-          <h2 className="mb-6 text-2xl font-semibold">Order Summary</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-
-              <span>{formatCurrency(subtotal())}</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Shipping</span>
-
-              <span>calculated at checkout</span>
-            </div>
-
-            <hr />
-
-            <div className="flex justify-between text-xl font-bold">
-              <span>Total</span>
-
-              <span>{formatCurrency(subtotal())}</span>
-            </div>
-
-            <button
-              onClick={() => navigate("/checkout")}
-              className="mt-6 w-full rounded-xl bg-black py-4 text-lg font-semibold text-white transition hover:bg-gray-800"
-            >
-              Proceed to Checkout
-            </button>
-
-            <Link
-              to="/shop"
-              className="block text-center text-gray-600 hover:underline"
-            >
-              Continue Shopping
-            </Link>
+            ))}
           </div>
-        </aside>
+          {/* Summary */}
+          <aside className="order-first h-fit rounded-2xl border bg-white p-6 shadow-sm lg:order-last">
+            <h2 className="mb-6 text-2xl font-semibold">Order Summary</h2>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+
+                <span>{formatCurrency(subtotal())}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Shipping</span>
+
+                <span>calculated at checkout</span>
+              </div>
+
+              <hr />
+
+              <div className="flex justify-between text-xl font-bold">
+                <span>Total</span>
+
+                <span>{formatCurrency(subtotal())}</span>
+              </div>
+
+              <button
+                onClick={() => navigate("/checkout")}
+                className="mt-6 w-full rounded-xl bg-black py-4 text-lg font-semibold text-white transition hover:bg-gray-800"
+              >
+                Proceed to Checkout
+              </button>
+
+              <Link
+                to="/shop"
+                className="block text-center text-gray-600 hover:underline"
+              >
+                Continue Shopping
+              </Link>
+            </div>
+          </aside>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

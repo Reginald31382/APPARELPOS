@@ -1,3 +1,4 @@
+import SEO from "../../components/SEO";
 import useStore from "../../modules/settings/hooks/useStore";
 import api from "../../api/axios";
 import { useState } from "react";
@@ -152,225 +153,235 @@ const Checkout = () => {
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
-      <h1 className="mb-10 text-4xl font-bold">Checkout</h1>
+    <>
+      <SEO
+        title="Checkout"
+        description="Complete your J.Rome Studios order securely."
+        path="/checkout"
+        noIndex
+      />
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <h1 className="mb-10 text-4xl font-bold">Checkout</h1>
 
-      <div className="grid gap-10 lg:grid-cols-[1fr_420px]">
-        {/* Left Column */}
-        <div className="space-y-10">
-          {/* Contact */}
-          <section className="rounded-2xl border bg-white p-6 shadow-sm">
-            <h2 className="mb-6 text-2xl font-semibold">Contact Information</h2>
+        <div className="grid gap-10 lg:grid-cols-[1fr_420px]">
+          {/* Left Column */}
+          <div className="space-y-10">
+            {/* Contact */}
+            <section className="rounded-2xl border bg-white p-6 shadow-sm">
+              <h2 className="mb-6 text-2xl font-semibold">
+                Contact Information
+              </h2>
 
-            <div className="space-y-4">
-              <input
-                type="email"
-                name="email"
-                value={checkout.email}
-                onChange={handleChange}
-                placeholder="Email Address"
-                className="w-full rounded-xl border p-4 outline-none focus:border-black"
-              />
-
-              <input
-                type="tel"
-                name="phone"
-                value={checkout.phone}
-                onChange={handleChange}
-                placeholder="Phone Number (Optional)"
-                className="w-full rounded-xl border p-4 outline-none focus:border-black"
-              />
-            </div>
-          </section>
-
-          {/* Shipping */}
-          <section className="rounded-2xl border bg-white p-6 shadow-sm">
-            <h2 className="mb-6 text-2xl font-semibold">Shipping Address</h2>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <input
-                name="firstName"
-                value={checkout.firstName}
-                onChange={handleChange}
-                placeholder="First Name"
-                className="rounded-xl border p-4"
-              />
-              <input
-                name="lastName"
-                value={checkout.lastName}
-                onChange={handleChange}
-                placeholder="Last Name"
-                className="rounded-xl border p-4"
-              />
-              <input
-                name="address1"
-                value={checkout.address1}
-                onChange={handleChange}
-                placeholder="Street Address"
-                className="md:col-span-2 rounded-xl border p-4"
-              />
-              <input
-                name="address2"
-                value={checkout.address2}
-                onChange={handleChange}
-                placeholder="Apartment / Suite"
-                className="md:col-span-2 rounded-xl border p-4"
-              />
-              <input
-                name="city"
-                value={checkout.city}
-                onChange={handleChange}
-                placeholder="City"
-                className="rounded-xl border p-4"
-              />
-              <select
-                name="state"
-                value={checkout.state}
-                onChange={handleChange}
-                className="rounded-xl border bg-white p-4 outline-none focus:border-black"
-              >
-                <option value="">Select State</option>
-
-                {US_STATES.map((state) => (
-                  <option key={state.code} value={state.code}>
-                    {state.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                name="zip"
-                value={checkout.zip}
-                onChange={handleChange}
-                placeholder="ZIP Code"
-                className="rounded-xl border p-4"
-              />{" "}
-            </div>
-          </section>
-
-          {/* Shipping Method */}
-          <section className="rounded-2xl border bg-white p-6 shadow-sm">
-            <h2 className="mb-6 text-2xl font-semibold">Shipping Method</h2>
-            <button
-              type="button"
-              onClick={fetchShippingRates}
-              disabled={!isCheckoutValid || loadingRates}
-              className="mb-4 w-full rounded-lg bg-black px-4 py-3 font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
-            >
-              {loadingRates ? "Calculating..." : "Calculate Shipping"}
-            </button>
-            {loadingRates && (
-              <p className="text-gray-500">Calculating shipping...</p>
-            )}
-
-            {shippingRates.length > 0 &&
-              shippingRates.map((rate) => (
-                <label
-                  key={rate.id}
-                  className={`mb-3 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${
-                    selectedShipping?.id === rate.id
-                      ? "border-black bg-gray-100"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="radio"
-                      name="shipping"
-                      checked={selectedShipping?.id === rate.id}
-                      onChange={() => setSelectedShipping(rate)}
-                    />
-
-                    <div>
-                      <p className="font-semibold">{rate.service}</p>
-
-                      <p className="text-sm text-gray-500">
-                        {rate.estimatedDays} Business Days
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="font-bold">{formatCurrency(rate.cost)}</div>
-                </label>
-              ))}
-          </section>
-        </div>
-
-        {/* Right Column */}
-        <aside className="h-fit rounded-2xl border bg-white p-6 shadow-sm">
-          <h2 className="mb-6 text-2xl font-semibold">Order Summary</h2>
-
-          <div className="space-y-5">
-            {items.map((item) => (
-              <div key={item.sku} className="flex gap-4">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="h-20 w-20 rounded-lg object-cover"
+              <div className="space-y-4">
+                <input
+                  type="email"
+                  name="email"
+                  value={checkout.email}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                  className="w-full rounded-xl border p-4 outline-none focus:border-black"
                 />
 
-                <div className="flex-1">
-                  <h3 className="font-medium">{item.name}</h3>
-
-                  <p className="text-sm text-gray-500">
-                    {item.color} / {item.size}
-                  </p>
-
-                  <p className="text-sm">Qty: {item.quantity}</p>
-                </div>
-
-                <div className="font-semibold">
-                  {formatCurrency(item.unitPrice * item.quantity)}
-                </div>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={checkout.phone}
+                  onChange={handleChange}
+                  placeholder="Phone Number (Optional)"
+                  className="w-full rounded-xl border p-4 outline-none focus:border-black"
+                />
               </div>
-            ))}
+            </section>
 
-            <hr />
+            {/* Shipping */}
+            <section className="rounded-2xl border bg-white p-6 shadow-sm">
+              <h2 className="mb-6 text-2xl font-semibold">Shipping Address</h2>
 
-            <div className="flex justify-between">
-              <span>Subtotal</span>
+              <div className="grid gap-4 md:grid-cols-2">
+                <input
+                  name="firstName"
+                  value={checkout.firstName}
+                  onChange={handleChange}
+                  placeholder="First Name"
+                  className="rounded-xl border p-4"
+                />
+                <input
+                  name="lastName"
+                  value={checkout.lastName}
+                  onChange={handleChange}
+                  placeholder="Last Name"
+                  className="rounded-xl border p-4"
+                />
+                <input
+                  name="address1"
+                  value={checkout.address1}
+                  onChange={handleChange}
+                  placeholder="Street Address"
+                  className="md:col-span-2 rounded-xl border p-4"
+                />
+                <input
+                  name="address2"
+                  value={checkout.address2}
+                  onChange={handleChange}
+                  placeholder="Apartment / Suite"
+                  className="md:col-span-2 rounded-xl border p-4"
+                />
+                <input
+                  name="city"
+                  value={checkout.city}
+                  onChange={handleChange}
+                  placeholder="City"
+                  className="rounded-xl border p-4"
+                />
+                <select
+                  name="state"
+                  value={checkout.state}
+                  onChange={handleChange}
+                  className="rounded-xl border bg-white p-4 outline-none focus:border-black"
+                >
+                  <option value="">Select State</option>
 
-              <span>{formatCurrency(subtotal)}</span>
-            </div>
+                  {US_STATES.map((state) => (
+                    <option key={state.code} value={state.code}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  name="zip"
+                  value={checkout.zip}
+                  onChange={handleChange}
+                  placeholder="ZIP Code"
+                  className="rounded-xl border p-4"
+                />{" "}
+              </div>
+            </section>
 
-            <div className="flex justify-between">
-              <span>Tax</span>
+            {/* Shipping Method */}
+            <section className="rounded-2xl border bg-white p-6 shadow-sm">
+              <h2 className="mb-6 text-2xl font-semibold">Shipping Method</h2>
+              <button
+                type="button"
+                onClick={fetchShippingRates}
+                disabled={!isCheckoutValid || loadingRates}
+                className="mb-4 w-full rounded-lg bg-black px-4 py-3 font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
+              >
+                {loadingRates ? "Calculating..." : "Calculate Shipping"}
+              </button>
+              {loadingRates && (
+                <p className="text-gray-500">Calculating shipping...</p>
+              )}
 
-              <span>{formatCurrency(tax)}</span>
-            </div>
+              {shippingRates.length > 0 &&
+                shippingRates.map((rate) => (
+                  <label
+                    key={rate.id}
+                    className={`mb-3 flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${
+                      selectedShipping?.id === rate.id
+                        ? "border-black bg-gray-100"
+                        : "border-gray-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="radio"
+                        name="shipping"
+                        checked={selectedShipping?.id === rate.id}
+                        onChange={() => setSelectedShipping(rate)}
+                      />
 
-            <div className="flex justify-between">
-              <span>Shipping</span>
+                      <div>
+                        <p className="font-semibold">{rate.service}</p>
 
-              <span>
-                {!selectedShipping
-                  ? "Not Selected"
-                  : shippingCost === 0
-                    ? "FREE"
-                    : formatCurrency(shippingCost)}
-              </span>
-            </div>
+                        <p className="text-sm text-gray-500">
+                          {rate.estimatedDays} Business Days
+                        </p>
+                      </div>
+                    </div>
 
-            <div className="flex justify-between text-xl font-bold">
-              <span>Total</span>
-
-              <span>{formatCurrency(subtotal + tax + shippingCost)} </span>
-            </div>
-
-            <button
-              onClick={handleContinueToPayment}
-              disabled={!isCheckoutValid || !selectedShipping}
-              className={`mt-6 w-full rounded-xl py-4 text-lg font-semibold transition ${
-                isCheckoutValid && selectedShipping
-                  ? "bg-black text-white hover:bg-gray-800"
-                  : "cursor-not-allowed bg-gray-300 text-gray-500"
-              }`}
-            >
-              Continue to Payment
-            </button>
+                    <div className="font-bold">{formatCurrency(rate.cost)}</div>
+                  </label>
+                ))}
+            </section>
           </div>
-        </aside>
+
+          {/* Right Column */}
+          <aside className="h-fit rounded-2xl border bg-white p-6 shadow-sm">
+            <h2 className="mb-6 text-2xl font-semibold">Order Summary</h2>
+
+            <div className="space-y-5">
+              {items.map((item) => (
+                <div key={item.sku} className="flex gap-4">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="h-20 w-20 rounded-lg object-cover"
+                  />
+
+                  <div className="flex-1">
+                    <h3 className="font-medium">{item.name}</h3>
+
+                    <p className="text-sm text-gray-500">
+                      {item.color} / {item.size}
+                    </p>
+
+                    <p className="text-sm">Qty: {item.quantity}</p>
+                  </div>
+
+                  <div className="font-semibold">
+                    {formatCurrency(item.unitPrice * item.quantity)}
+                  </div>
+                </div>
+              ))}
+
+              <hr />
+
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+
+                <span>{formatCurrency(subtotal)}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Tax</span>
+
+                <span>{formatCurrency(tax)}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Shipping</span>
+
+                <span>
+                  {!selectedShipping
+                    ? "Not Selected"
+                    : shippingCost === 0
+                      ? "FREE"
+                      : formatCurrency(shippingCost)}
+                </span>
+              </div>
+
+              <div className="flex justify-between text-xl font-bold">
+                <span>Total</span>
+
+                <span>{formatCurrency(subtotal + tax + shippingCost)} </span>
+              </div>
+
+              <button
+                onClick={handleContinueToPayment}
+                disabled={!isCheckoutValid || !selectedShipping}
+                className={`mt-6 w-full rounded-xl py-4 text-lg font-semibold transition ${
+                  isCheckoutValid && selectedShipping
+                    ? "bg-black text-white hover:bg-gray-800"
+                    : "cursor-not-allowed bg-gray-300 text-gray-500"
+                }`}
+              >
+                Continue to Payment
+              </button>
+            </div>
+          </aside>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
