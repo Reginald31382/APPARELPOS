@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.7.0",
-    "@stripe/stripe-js": "^9.9.0"
+    "@stripe/stripe-js": "^9.9.0",
+    "react-helmet-async": "^3.0.0"
   },
   "devDependencies": {
     "concurrently": "^10.0.4",

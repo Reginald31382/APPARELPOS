@@ -2,6 +2,10 @@ import ProductImageLightbox from "../../components/product/ProductImageLightbox"
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Minus, Plus } from "lucide-react";
+
+import SEO from "../../components/SEO";
+import StructuredData from "../../components/StructuredData";
+
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useProduct from "../../hooks/useProduct";
 
@@ -65,6 +69,43 @@ const Product = () => {
     );
   }
 
+  const productDescription =
+    product.description || `Shop ${product.name} from J.Rome Studios.`;
+
+  const productUrl = `https://www.jrome-studios.com/product/${product._id}`;
+
+  const primaryVariant = product.variants?.[0];
+
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: (product.images || []).map((image) =>
+      image.startsWith("http")
+        ? image
+        : `https://www.jrome-studios.com${image}`,
+    ),
+    description: productDescription,
+    sku: primaryVariant?.sku || product._id,
+    brand: {
+      "@type": "Brand",
+      name: product.brand || "J.Rome Studios",
+    },
+    offers: {
+      "@type": "Offer",
+      url: productUrl,
+      priceCurrency: "USD",
+      price: product.price.toFixed(2),
+      availability: product.variants?.some((variant) => variant.quantity > 0)
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      seller: {
+        "@type": "Organization",
+        name: "J.Rome Studios",
+      },
+    },
+  };
+
   const colors = [...new Set(product.variants.map((v) => v.color))];
 
   const sizes = product.variants.filter(
@@ -102,185 +143,196 @@ const Product = () => {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
-      <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-        {/* Images */}
-        <div className="grid grid-cols-[90px_1fr] gap-5">
-          {/* Thumbnails */}
-          <div className="flex flex-col gap-3">
-            {product.images?.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImage(image)}
-                className={`overflow-hidden rounded-lg border-2 transition ${
-                  selectedImage === image
-                    ? "border-black"
-                    : "border-transparent hover:border-gray-300"
-                }`}
-              >
-                <img
-                  src={image}
-                  alt={product.name}
-                  className="w-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-
-          {/* Main Image */}
-          <div className="overflow-hidden rounded-xl bg-gray-100">
-            <img
-              src={selectedImage || product.images?.[0]}
-              alt={product.name}
-              loading="eager"
-              draggable={false}
-              onClick={() => setIsLightboxOpen(true)}
-              className="w-full object-cover transition duration-500 hover:scale-110 cursor-zoom-in"
-            />
-          </div>
-        </div>
-
-        {/* Product Info */}
-        <div ref={purchaseSectionRef} className="space-y-8">
-          <div>
-            <p className="uppercase tracking-[0.25em] text-sm text-gray-500">
-              {product.brand}
-            </p>
-
-            <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
-              {product.name}
-            </h1>
-
-            <p className="mt-3 text-2xl font-semibold sm:mt-4 sm:text-3xl">
-              ${product.price.toFixed(2)}
-            </p>
-          </div>
-
-          {/* Color */}
-          <div>
-            <h3 className="font-semibold mb-3">Color</h3>
-
-            <div className="flex flex-wrap gap-3">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={`min-w-[70px] rounded-lg border px-4 py-3 transition ${
-                    selectedColor === color
-                      ? "bg-black text-white border-black"
-                      : "border-gray-300 hover:border-black"
-                  }`}
-                >
-                  {color}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Size */}
-          <div>
-            <h3 className="font-semibold mb-3">Size</h3>
-
-            <div className="flex flex-wrap gap-3">
-              {sizes.map((variant) => (
-                <button
-                  key={variant.sku}
-                  onClick={() => setSelectedSize(variant.size)}
-                  className={`min-w-[56px] rounded-lg border px-4 py-3 transition ${
-                    selectedSize === variant.size
-                      ? "bg-black text-white border-black"
-                      : "border-gray-300 hover:border-black"
-                  }`}
-                >
-                  {variant.size}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {selectedVariant && (
-            <p className="text-sm text-gray-500">
-              {selectedVariant.quantity > 0
-                ? `${selectedVariant.quantity} in stock`
-                : "Out of stock"}
-            </p>
-          )}
-
-          {/* Quantity */}
-          <div>
-            <h3 className="font-semibold mb-3">Quantity</h3>
-
-            <div className="flex w-fit items-center rounded-lg border">
-              <button
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="p-4 active:bg-gray-100"
-              >
-                <Minus size={18} />
-              </button>
-
-              <span className="w-12 text-center">{quantity}</span>
-
-              <button
-                onClick={() =>
-                  setQuantity((q) =>
-                    selectedVariant
-                      ? Math.min(selectedVariant.quantity, q + 1)
-                      : q,
-                  )
-                }
-                className="p-4 active:bg-gray-100"
-              >
-                <Plus size={18} />
-              </button>
-            </div>
-          </div>
-
-          <button
-            disabled={!selectedVariant || selectedVariant.quantity === 0}
-            onClick={handleAddToCart}
-            className="w-full bg-black text-white py-4 rounded-md font-semibold transition hover:bg-neutral-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
-            {selectedVariant?.quantity ? "Add to Cart" : "Choose Color"}
-          </button>
-
-          {product.description && (
-            <div className="pt-4 border-t">
-              <h3 className="font-semibold mb-3">Description</h3>
-
-              <p className="text-gray-600 leading-7">{product.description}</p>
-            </div>
-          )}
-        </div>
-      </div>
-      <ProductImageLightbox
-        isOpen={isLightboxOpen}
-        onClose={() => setIsLightboxOpen(false)}
-        images={product.images}
-        selectedImage={selectedImage}
-        onSelect={setSelectedImage}
+    <>
+      <SEO
+        title={product.name}
+        description={productDescription}
+        path={`/product/${product._id}`}
+        image={product.images?.[0]}
       />
-      {showStickyCart && selectedVariant && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white p-4 shadow-lg lg:hidden">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+
+      <StructuredData data={productSchema} />
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+          {/* Images */}
+          <div className="grid grid-cols-[90px_1fr] gap-5">
+            {/* Thumbnails */}
+            <div className="flex flex-col gap-3">
+              {product.images?.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(image)}
+                  className={`overflow-hidden rounded-lg border-2 transition ${
+                    selectedImage === image
+                      ? "border-black"
+                      : "border-transparent hover:border-gray-300"
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt={product.name}
+                    className="w-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Main Image */}
+            <div className="overflow-hidden rounded-xl bg-gray-100">
+              <img
+                src={selectedImage || product.images?.[0]}
+                alt={product.name}
+                loading="eager"
+                draggable={false}
+                onClick={() => setIsLightboxOpen(true)}
+                className="w-full object-cover transition duration-500 hover:scale-110 cursor-zoom-in"
+              />
+            </div>
+          </div>
+
+          {/* Product Info */}
+          <div ref={purchaseSectionRef} className="space-y-8">
             <div>
-              <p className="text-sm text-gray-500">
-                {selectedColor} / {selectedSize}
+              <p className="uppercase tracking-[0.25em] text-sm text-gray-500">
+                {product.brand}
               </p>
 
-              <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
+              <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
+                {product.name}
+              </h1>
+
+              <p className="mt-3 text-2xl font-semibold sm:mt-4 sm:text-3xl">
+                ${product.price.toFixed(2)}
+              </p>
+            </div>
+
+            {/* Color */}
+            <div>
+              <h3 className="font-semibold mb-3">Color</h3>
+
+              <div className="flex flex-wrap gap-3">
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    className={`min-w-[70px] rounded-lg border px-4 py-3 transition ${
+                      selectedColor === color
+                        ? "bg-black text-white border-black"
+                        : "border-gray-300 hover:border-black"
+                    }`}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Size */}
+            <div>
+              <h3 className="font-semibold mb-3">Size</h3>
+
+              <div className="flex flex-wrap gap-3">
+                {sizes.map((variant) => (
+                  <button
+                    key={variant.sku}
+                    onClick={() => setSelectedSize(variant.size)}
+                    className={`min-w-[56px] rounded-lg border px-4 py-3 transition ${
+                      selectedSize === variant.size
+                        ? "bg-black text-white border-black"
+                        : "border-gray-300 hover:border-black"
+                    }`}
+                  >
+                    {variant.size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {selectedVariant && (
+              <p className="text-sm text-gray-500">
+                {selectedVariant.quantity > 0
+                  ? `${selectedVariant.quantity} in stock`
+                  : "Out of stock"}
+              </p>
+            )}
+
+            {/* Quantity */}
+            <div>
+              <h3 className="font-semibold mb-3">Quantity</h3>
+
+              <div className="flex w-fit items-center rounded-lg border">
+                <button
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="p-4 active:bg-gray-100"
+                >
+                  <Minus size={18} />
+                </button>
+
+                <span className="w-12 text-center">{quantity}</span>
+
+                <button
+                  onClick={() =>
+                    setQuantity((q) =>
+                      selectedVariant
+                        ? Math.min(selectedVariant.quantity, q + 1)
+                        : q,
+                    )
+                  }
+                  className="p-4 active:bg-gray-100"
+                >
+                  <Plus size={18} />
+                </button>
+              </div>
             </div>
 
             <button
-              disabled={selectedVariant.quantity === 0}
+              disabled={!selectedVariant || selectedVariant.quantity === 0}
               onClick={handleAddToCart}
-              className="rounded-lg bg-black px-8 py-4 font-semibold text-white disabled:bg-gray-300"
+              className="w-full bg-black text-white py-4 rounded-md font-semibold transition hover:bg-neutral-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              Add to Cart
+              {selectedVariant?.quantity ? "Add to Cart" : "Choose Color"}
             </button>
+
+            {product.description && (
+              <div className="pt-4 border-t">
+                <h3 className="font-semibold mb-3">Description</h3>
+
+                <p className="text-gray-600 leading-7">{product.description}</p>
+              </div>
+            )}
           </div>
         </div>
-      )}
-    </div>
+        <ProductImageLightbox
+          isOpen={isLightboxOpen}
+          onClose={() => setIsLightboxOpen(false)}
+          images={product.images}
+          selectedImage={selectedImage}
+          onSelect={setSelectedImage}
+        />
+        {showStickyCart && selectedVariant && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white p-4 shadow-lg lg:hidden">
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-gray-500">
+                  {selectedColor} / {selectedSize}
+                </p>
+
+                <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
+              </div>
+
+              <button
+                disabled={selectedVariant.quantity === 0}
+                onClick={handleAddToCart}
+                className="rounded-lg bg-black px-8 py-4 font-semibold text-white disabled:bg-gray-300"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 
