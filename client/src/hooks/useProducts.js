@@ -10,7 +10,7 @@ import { QUERY_KEYS } from "../constants/queryKeys";
 const useProducts = (overrideFilters = {}) => {
   const store = useProductStore();
 
-  const { search, category, gender, brand, featured, sort } = {
+  const { search, category, gender, brand, featured, sort, latest } = {
     ...store,
     ...overrideFilters,
   };
@@ -26,6 +26,7 @@ const useProducts = (overrideFilters = {}) => {
       brand,
       featured,
       sort,
+      latest,
     ],
 
     queryFn: () =>
@@ -36,6 +37,7 @@ const useProducts = (overrideFilters = {}) => {
         brand,
         featured,
         sort,
+        latest,
       }),
   });
 };

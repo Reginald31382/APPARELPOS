@@ -45,12 +45,12 @@ export const getProducts = async (req, res) => {
     }
 
     if (latest === "true") {
-      const thirtyDaysAgo = new Date();
+      const sevenDaysAgo = new Date();
 
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
       query.createdAt = {
-        $gte: thirtyDaysAgo,
+        $gte: sevenDaysAgo,
       };
     }
 
