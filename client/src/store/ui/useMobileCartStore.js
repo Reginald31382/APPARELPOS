@@ -14,7 +14,7 @@ const useMobileCartStore = create((set) => ({
     })),
 
   // Desktop Cart
-  isDesktopCollapsed: false,
+  isDesktopCollapsed: true,
 
   collapseDesktopCart: () =>
     set({

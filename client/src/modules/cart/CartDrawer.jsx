@@ -10,9 +10,11 @@ import { formatCurrency } from "../../utils/currency";
 
 const CartDrawer = () => {
   const items = useCartStore((state) => state.items);
+
   const [discountOpen, setDiscountOpen] = useState(false);
   const [managerApprovalOpen, setManagerApprovalOpen] = useState(false);
   const [quantityInputs, setQuantityInputs] = useState({});
+
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
 
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
@@ -68,7 +70,9 @@ const CartDrawer = () => {
 
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* =========================================================
+          MOBILE BACKDROP
+      ========================================================= */}
       {isOpen && (
         <div
           onClick={closeCart}
@@ -76,26 +80,67 @@ const CartDrawer = () => {
         />
       )}
 
+      {/* =========================================================
+          CART DRAWER
+      ========================================================= */}
       <div
         className={`
-    fixed right-0 top-0 z-50 flex h-full w-full max-w-md
-    flex-col border-l bg-white shadow-2xl
-    transition-all duration-300
+          fixed right-0 top-0 z-50 flex h-full w-full max-w-md
+          flex-col border-l bg-white shadow-2xl
+          transition-all duration-300
 
-    lg:static
-    lg:translate-x-0
-    ${isDesktopCollapsed ? "lg:w-16" : "lg:w-[380px]"}
+          lg:static
+          lg:translate-x-0
 
-    ${isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
-  `}
+          ${isDesktopCollapsed ? "lg:w-20" : "lg:w-[380px]"}
+
+          ${isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
+        `}
       >
+        {/* =======================================================
+            CART HEADER
+        ======================================================= */}
         <div className="relative border-b p-4">
-          <button
-            onClick={toggleDesktopCart}
-            className="absolute right-4 top-4 hidden rounded border bg-white px-2 py-1 text-lg hover:bg-gray-100 lg:block"
-          >
-            {isDesktopCollapsed ? "◀" : "close"}
-          </button>
+          {/* Desktop Expanded Collapse Button */}
+          {!isDesktopCollapsed && (
+            <button
+              onClick={toggleDesktopCart}
+              className="
+                absolute right-4 top-4
+                hidden rounded-lg border
+                bg-white px-3 py-2 text-lg
+                shadow-sm transition
+                hover:bg-gray-100
+                lg:block
+              "
+              title="Collapse cart"
+              aria-label="Collapse cart"
+            >
+              ←
+            </button>
+          )}
+
+          {/* Desktop Collapsed Open Button */}
+          {isDesktopCollapsed && (
+            <button
+              onClick={toggleDesktopCart}
+              className="
+                absolute left-1/2 top-4
+                hidden -translate-x-1/2
+                rounded-lg border
+                bg-white p-2
+                text-lg shadow-sm
+                transition hover:bg-gray-100
+                lg:block
+              "
+              title="Open cart"
+              aria-label="Open cart"
+            >
+              🛒
+            </button>
+          )}
+
+          {/* Expanded Cart Heading */}
           {!isDesktopCollapsed && (
             <>
               <h1 className="text-lg font-bold sm:text-xl">Shopping Cart</h1>
@@ -104,13 +149,47 @@ const CartDrawer = () => {
             </>
           )}
 
+          {/* Mobile Close */}
           <button
             onClick={closeCart}
-            className="absolute right-16 top-4 text-2xl lg:hidden"
+            className="
+              absolute right-4 top-4
+              text-2xl
+              lg:hidden
+            "
+            aria-label="Close cart"
           >
             ×
           </button>
         </div>
+
+        {/* =======================================================
+            COLLAPSED DESKTOP CART
+        ======================================================= */}
+        {isDesktopCollapsed && (
+          <div className="hidden flex-1 flex-col items-center justify-center gap-3 lg:flex">
+            <button
+              onClick={toggleDesktopCart}
+              className="
+                flex flex-col items-center
+                gap-2 rounded-xl p-3
+                transition hover:bg-gray-100
+              "
+              title="Open shopping cart"
+              aria-label="Open shopping cart"
+            >
+              <span className="text-2xl">🛒</span>
+
+              <span className="text-xs font-semibold text-gray-500">
+                {items.length}
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* =======================================================
+            CART ITEMS
+        ======================================================= */}
         {!isDesktopCollapsed && (
           <div className="flex-1 space-y-4 overflow-y-auto p-3 sm:p-4">
             {items.length === 0 && (
@@ -148,6 +227,7 @@ const CartDrawer = () => {
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         updateQuantity(item.sku, e.target.value);
+
                         e.target.blur();
                       }
 
@@ -163,7 +243,6 @@ const CartDrawer = () => {
                     onBlur={(e) => {
                       updateQuantity(item.sku, e.target.value);
 
-                      // Restore whatever quantity is actually in the cart.
                       const currentItem = items.find((i) => i.sku === item.sku);
 
                       setQuantityInputs((prev) => ({
@@ -176,7 +255,11 @@ const CartDrawer = () => {
 
                   <button
                     onClick={() => removeItem(item.sku)}
-                    className="ml-auto text-sm font-medium text-red-500 hover:text-red-700"
+                    className="
+                      ml-auto text-sm font-medium
+                      text-red-500
+                      hover:text-red-700
+                    "
                   >
                     Remove
                   </button>
@@ -186,13 +269,19 @@ const CartDrawer = () => {
           </div>
         )}
 
+        {/* =======================================================
+            CART TOTALS / CHECKOUT
+        ======================================================= */}
         {!isDesktopCollapsed && (
           <div className="space-y-2 border-t bg-white p-4">
+            {/* Subtotal */}
             <div className="flex justify-between">
               <span>Subtotal</span>
 
               <span>{formatCurrency(subtotal())}</span>
             </div>
+
+            {/* Discount */}
             {discount() > 0 && (
               <div className="rounded-lg border border-green-200 bg-green-50 p-3">
                 <div className="flex items-center justify-between">
@@ -213,7 +302,10 @@ const CartDrawer = () => {
 
                     <button
                       onClick={clearDiscount}
-                      className="text-xs text-red-600 hover:underline"
+                      className="
+                        text-xs text-red-600
+                        hover:underline
+                      "
                     >
                       Remove
                     </button>
@@ -221,34 +313,52 @@ const CartDrawer = () => {
                 </div>
               </div>
             )}
+
+            {/* Tax */}
             <div className="flex justify-between">
               <span>Tax</span>
 
               <span>{formatCurrency(tax())}</span>
             </div>
 
+            {/* Total */}
             <div className="flex justify-between text-lg font-bold">
               <span>Total</span>
 
               <span>{formatCurrency(total())}</span>
             </div>
+
+            {/* Discount Button */}
             <button
               onClick={handleDiscountClick}
-              className="w-full rounded-lg border border-dashed py-3 font-medium hover:bg-gray-50"
+              className="
+                w-full rounded-lg
+                border border-dashed
+                py-3 font-medium
+                hover:bg-gray-50
+              "
             >
               Apply Discount
             </button>
+
+            {/* Checkout */}
             <CheckoutButton />
           </div>
         )}
       </div>
+
+      {/* =========================================================
+          DISCOUNT MODAL
+      ========================================================= */}
       <DiscountModal open={discountOpen} onOpenChange={setDiscountOpen} />
+
+      {/* =========================================================
+          MANAGER APPROVAL MODAL
+      ========================================================= */}
       <ManagerApprovalModal
         open={managerApprovalOpen}
         onClose={() => setManagerApprovalOpen(false)}
         onApprove={(result) => {
-          // console.log("Manager Approved:", result);
-
           setManagerApprovalOpen(false);
 
           setDiscountOpen(true);
