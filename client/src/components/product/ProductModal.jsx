@@ -318,7 +318,7 @@ const ProductModal = ({
                 <div className="mt-4 space-y-4">
                   <div>
                     <label className="mb-2 block text-sm font-medium">
-                      Regular Price
+                      My Selling Price
                     </label>
 
                     <input
