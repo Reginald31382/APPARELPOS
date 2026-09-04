@@ -18,8 +18,7 @@ const ProductGrid = ({
         <h2 className="text-3xl font-bold">{emptyMessage}</h2>
 
         <p className="mt-4 max-w-md text-gray-500">
-          We're working on expanding this collection. Check back soon for new
-          arrivals.
+          Check back soon for new arrivals.
         </p>
       </div>
     );
