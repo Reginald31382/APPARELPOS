@@ -101,7 +101,7 @@ const Footer = () => {
                   Quick Link
                 </h3>
                 <a
-                  href="https://consultation-jrome.netlify.app"
+                  href="https://web-studio-jrome.netlify.app/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-gray-600 hover:text-black"
