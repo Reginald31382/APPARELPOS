@@ -99,7 +99,7 @@ const Footer = () => {
               <br />
               <div className="space-y-4">
                 <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.2em]">
-                  Quick Link
+                  Quick Links
                 </h3>
                 <a
                   href="https://web-studio-jrome.netlify.app/"
