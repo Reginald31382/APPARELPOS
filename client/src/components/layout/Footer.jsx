@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { RiInstagramFill } from "react-icons/ri";
 import useNewsletterStore from "../../store/ui/useNewsletterStore";
 import { IoIosClipboard } from "react-icons/io";
+import { MdPhotoLibrary } from "react-icons/md";
 
 const Footer = () => {
   const openModal = useNewsletterStore((state) => state.openModal);
@@ -115,7 +116,7 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-gray-600 hover:text-black"
                 >
-                  <IoIosClipboard size={18} />
+                  <MdPhotoLibrary size={18} />
                   Gallery
                 </a>
               </div>
