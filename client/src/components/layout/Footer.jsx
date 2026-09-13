@@ -109,6 +109,15 @@ const Footer = () => {
                   <IoIosClipboard size={18} />
                   Need a website?
                 </a>
+                <a
+                  href="https://jrome-gallery.netlify.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-gray-600 hover:text-black"
+                >
+                  <IoIosClipboard size={18} />
+                  Gallery
+                </a>
               </div>
             </div>
           </div>
