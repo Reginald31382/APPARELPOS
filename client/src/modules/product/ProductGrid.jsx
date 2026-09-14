@@ -1,6 +1,7 @@
 import StoreProductCard from "./StoreProductCard";
 import useProducts from "../../hooks/useProducts";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
+import { PiEyesFill } from "react-icons/pi";
 
 const ProductGrid = ({
   CardComponent = StoreProductCard,
@@ -16,6 +17,7 @@ const ProductGrid = ({
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         {/* <h2 className="text-3xl font-bold">{emptyMessage}</h2> */}
+        <PiEyesFill />
 
         <p className="mt-4 max-w-md text-gray-500">
           Check back soon for new arrivals.
