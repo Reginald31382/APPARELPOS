@@ -1,7 +1,7 @@
 import StoreProductCard from "./StoreProductCard";
 import useProducts from "../../hooks/useProducts";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
-import { PiEyesFill } from "react-icons/pi";
+import looking from "../../assets/images/looking_out.png";
 
 const ProductGrid = ({
   CardComponent = StoreProductCard,
@@ -17,8 +17,11 @@ const ProductGrid = ({
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         {/* <h2 className="text-3xl font-bold">{emptyMessage}</h2> */}
-        <PiEyesFill size={48} />
-        <Image src="/assets/images/looking.png" alt="No products found" />
+        <img
+          src={looking}
+          alt="No products found"
+          className="mt-4 h-auto w-48 object-contain"
+        />
         <p className="mt-4 max-w-md text-gray-500">
           Check back soon for new arrivals.
         </p>
