@@ -18,7 +18,7 @@ const ProductGrid = ({
       <div className="flex flex-col items-center justify-center py-24 text-center">
         {/* <h2 className="text-3xl font-bold">{emptyMessage}</h2> */}
         <PiEyesFill size={48} />
-
+        <Image src="/assets/images/looking.png" alt="No products found" />
         <p className="mt-4 max-w-md text-gray-500">
           Check back soon for new arrivals.
         </p>
