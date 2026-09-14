@@ -3,7 +3,9 @@ import { STORE_CONFIG } from "../../config/storeConfig";
 const messages = [
   `FREE SHIPPING ON ORDERS OVER $${STORE_CONFIG.FREE_SHIPPING_THRESHOLD}`,
   "PREMIUM QUALITY",
-  "SECURE CHECKOUT",
+  <>
+    SECURE CHECKOUT <span className="text-[#635BFF]">BY STRIPE</span>
+  </>,
   "ORDERS TYPICALLY SHIP WITHIN 1 to 3 BUSINESS DAYS",
   "SHOP THE COLLECTION",
 ];
