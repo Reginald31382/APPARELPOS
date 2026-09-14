@@ -17,7 +17,7 @@ const ProductGrid = ({
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         {/* <h2 className="text-3xl font-bold">{emptyMessage}</h2> */}
-        <PiEyesFill />
+        <PiEyesFill size={48} />
 
         <p className="mt-4 max-w-md text-gray-500">
           Check back soon for new arrivals.
