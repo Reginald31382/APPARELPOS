@@ -14,6 +14,7 @@ import { useState } from "react";
 import useNewsletterStore from "../../store/ui/useNewsletterStore";
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
+import useContactStore from "../../store/ui/useContactStore";
 
 const shopLinks = [
   { name: "Shop", path: "/shop" },
@@ -59,6 +60,8 @@ const StoreNavbar = () => {
   const [moreOpen, setMoreOpen] = useState(false);
   const openCart = useMobileCartStore((state) => state.openCart);
   const openNewsletterModal = useNewsletterStore((state) => state.openModal);
+
+  const openContactModal = useContactStore((state) => state.openModal);
 
   const items = useCustomerCartStore((state) => state.items);
 
@@ -148,6 +151,13 @@ const StoreNavbar = () => {
 
         {/* Right Icons */}
         <div className="flex items-center gap-5">
+          {/* Custom */}
+          <button
+            onClick={openContactModal}
+            className="text-sm font-medium uppercase tracking-[0.2em] transition hover:text-gray-500 cursor-pointer"
+          >
+            CUSTOM
+          </button>
           <button
             onClick={openCart}
             className="relative"

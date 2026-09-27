@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import AnnouncementBar from "../components/layout/AnnouncementBar";
 import StoreNavbar from "../components/layout/StoreNavbar";
 import StoreCartModal from "../modules/cart/StoreCartModal";
+import CustomModal from "../components/ui/CustomModal";
 import Footer from "../components/layout/Footer";
 
 import NewsletterModal from "../modules/newsletter/components/NewsletterModal";
@@ -23,6 +24,7 @@ const MainLayout = () => {
         </main>
       </div>
       <StoreCartModal />
+      <CustomModal />
       <NewsletterModal open={open} onClose={closeModal} />
       {isHomePage && <Footer />}
     </div>
