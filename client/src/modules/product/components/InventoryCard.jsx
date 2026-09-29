@@ -69,10 +69,10 @@ const InventoryCard = ({ variant, refetch }) => {
       <div className="mt-8">
         <p className="text-sm text-gray-500">Quantity</p>
 
-        <div className="mt-3 flex items-center gap-3">
+        <div className="mt-3 flex items-center justify-center gap-3">
           <button
             onClick={() => setQuantity((qty) => Math.max(0, qty - 1))}
-            className="h-11 w-11 rounded-xl text-xl transition hover:bg-gray-100 cursor-pointer"
+            className="h-11 w-11 shrink-0 rounded-xl text-xl transition hover:bg-gray-100 cursor-pointer"
           >
             −
           </button>
@@ -81,12 +81,12 @@ const InventoryCard = ({ variant, refetch }) => {
             type="number"
             value={quantity}
             onChange={(e) => setQuantity(Number(e.target.value))}
-            className="flex-1 rounded-xl border p-3 text-center text-xl font-bold "
+            className="w-24 rounded-xl border p-3 text-center text-xl font-bold"
           />
 
           <button
             onClick={() => setQuantity((qty) => qty + 1)}
-            className="h-11 w-11 rounded-xl text-xl transition hover:bg-gray-100 cursor-pointer"
+            className="h-11 w-11 shrink-0 rounded-xl text-xl transition hover:bg-gray-100 cursor-pointer"
           >
             +
           </button>
