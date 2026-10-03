@@ -62,7 +62,12 @@ const CustomModal = () => {
           </a>
 
           {/* Instagram */}
-          
+          <a
+            href="https://www.instagram.com/jrome_studios"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-4 rounded-2xl border border-gray-200 p-4 transition hover:bg-gray-50"
+          >
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100">
               <Phone size={20} />
             </div>
@@ -74,7 +79,7 @@ const CustomModal = () => {
 
               <p className="text-sm font-medium text-gray-900">313-474-1286</p>
             </div>
-          
+          </a>
         </div>
 
         {/* Close */}
