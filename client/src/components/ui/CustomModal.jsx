@@ -60,7 +60,7 @@ const CustomModal = () => {
               </p>
             </div>
           </a>
-          ```jsx
+          
           {/* Phone */}
           <a
             href="tel:+13134741286"
@@ -78,7 +78,7 @@ const CustomModal = () => {
               <p className="text-sm font-medium text-gray-900">313-474-1286</p>
             </div>
           </a>
-          ```
+        
         </div>
 
         {/* Close */}
