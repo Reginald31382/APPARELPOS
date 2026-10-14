@@ -29,6 +29,54 @@ const orderItemSchema = new mongoose.Schema(
     quantity: Number,
 
     unitPrice: Number,
+
+    fulfillmentType: {
+      type: String,
+      enum: ["InHouse", "PrintOnDemand", "Dropship"],
+      default: "InHouse",
+    },
+
+    supplier: {
+      name: {
+        type: String,
+        default: "",
+      },
+
+      productId: {
+        type: String,
+        default: "",
+      },
+
+      variantId: {
+        type: String,
+        default: "",
+      },
+
+      orderId: {
+        type: String,
+        default: "",
+      },
+
+      status: {
+        type: String,
+        enum: [
+          "Not Required",
+          "Pending",
+          "Submitted",
+          "Processing",
+          "Shipped",
+          "Delivered",
+          "Failed",
+          "Cancelled",
+        ],
+        default: "Not Required",
+      },
+
+      lastError: {
+        type: String,
+        default: "",
+      },
+    },
   },
   {
     _id: false,

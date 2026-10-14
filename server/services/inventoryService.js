@@ -7,10 +7,21 @@ import Product from "../models/Products.js";
 */
 export const reduceInventory = async (items, session = null) => {
   for (const item of items) {
-    const product = await Product.findById(item.productId).session(session);
+    const productQuery = Product.findById(item.productId);
+
+    const product = session
+      ? await productQuery.session(session)
+      : await productQuery;
 
     if (!product) {
       throw new Error(`Product not found: ${item.productId}`);
+    }
+
+    // Supplier-fulfilled products do not use local warehouse inventory.
+    const fulfillmentType = product.fulfillmentType || "InHouse";
+
+    if (fulfillmentType !== "InHouse") {
+      continue;
     }
 
     const variant = product.variants.find((v) => v.sku === item.sku);
@@ -25,7 +36,7 @@ export const reduceInventory = async (items, session = null) => {
 
     variant.quantity -= item.quantity;
 
-    await product.save({ session });
+    await product.save(session ? { session } : {});
   }
 };
 
@@ -36,9 +47,20 @@ export const reduceInventory = async (items, session = null) => {
 */
 export const restoreInventory = async (items, session = null) => {
   for (const item of items) {
-    const product = await Product.findById(item.productId).session(session);
+    const productQuery = Product.findById(item.productId);
+
+    const product = session
+      ? await productQuery.session(session)
+      : await productQuery;
 
     if (!product) continue;
+
+    // Only restore stock that belongs to the local warehouse.
+    const fulfillmentType = product.fulfillmentType || "InHouse";
+
+    if (fulfillmentType !== "InHouse") {
+      continue;
+    }
 
     const variant = product.variants.find((v) => v.sku === item.sku);
 
@@ -46,7 +68,7 @@ export const restoreInventory = async (items, session = null) => {
 
     variant.quantity += item.quantity;
 
-    await product.save({ session });
+    await product.save(session ? { session } : {});
   }
 };
 
@@ -64,10 +86,22 @@ export const adjustInventory = async (sku, quantity) => {
     throw new Error("Variant not found.");
   }
 
+  const fulfillmentType = product.fulfillmentType || "InHouse";
+
+  if (fulfillmentType !== "InHouse") {
+    throw new Error(
+      "Local inventory adjustments are only allowed for InHouse products.",
+    );
+  }
+
   const variant = product.variants.find((v) => v.sku === sku);
 
   if (!variant) {
     throw new Error("Variant not found.");
+  }
+
+  if (!Number.isInteger(quantity) || quantity < 0) {
+    throw new Error("Inventory quantity must be a non-negative integer.");
   }
 
   variant.quantity = quantity;

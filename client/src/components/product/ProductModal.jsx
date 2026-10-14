@@ -57,6 +57,7 @@ const ProductModal = ({
   };
 
   const [variant, setVariant] = useState(emptyVariant);
+  const [editingVariantIndex, setEditingVariantIndex] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -102,16 +103,35 @@ const ProductModal = ({
   };
 
   const addVariant = () => {
-    if (!variant.color || !variant.size || !variant.sku) {
+    if (!variant.color.trim() || !variant.size.trim() || !variant.sku.trim()) {
+      alert("Color, size, and SKU are required.");
       return;
     }
 
-    setProduct((prev) => ({
-      ...prev,
-      variants: [...prev.variants, variant],
-    }));
+    if (editingVariantIndex !== null) {
+      // Update the existing variant.
+      setProduct((prev) => ({
+        ...prev,
+        variants: prev.variants.map((item, index) =>
+          index === editingVariantIndex ? { ...item, ...variant } : item,
+        ),
+      }));
 
-    setVariant(emptyVariant);
+      setEditingVariantIndex(null);
+    } else {
+      // Add a new variant.
+      setProduct((prev) => ({
+        ...prev,
+        variants: [...prev.variants, { ...variant }],
+      }));
+    }
+
+    setVariant({ ...emptyVariant });
+  };
+
+  const editVariant = (index) => {
+    setVariant({ ...emptyVariant, ...product.variants[index] });
+    setEditingVariantIndex(index);
   };
 
   const removeVariant = (index) => {
@@ -119,6 +139,14 @@ const ProductModal = ({
       ...prev,
       variants: prev.variants.filter((_, i) => i !== index),
     }));
+
+    // Keep the editing index correct if a row is removed.
+    if (editingVariantIndex === index) {
+      setEditingVariantIndex(null);
+      setVariant({ ...emptyVariant });
+    } else if (editingVariantIndex !== null && editingVariantIndex > index) {
+      setEditingVariantIndex((prev) => prev - 1);
+    }
   };
 
   const handleSaveProduct = async () => {
@@ -577,8 +605,23 @@ const ProductModal = ({
                 onClick={addVariant}
                 className="rounded-lg bg-black px-5 py-2 text-white transition hover:bg-gray-800"
               >
-                + Add Variant
+                {editingVariantIndex !== null
+                  ? "Save Variant Changes"
+                  : "+ Add Variant"}
               </button>
+
+              {editingVariantIndex !== null && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setVariant({ ...emptyVariant });
+                    setEditingVariantIndex(null);
+                  }}
+                  className="ml-2 rounded-lg border px-5 py-2 transition hover:bg-gray-100"
+                >
+                  Cancel Edit
+                </button>
+              )}
 
               {product.variants.length === 0 ? (
                 <div className="rounded-lg border border-dashed p-6 text-center text-gray-500">
@@ -608,13 +651,23 @@ const ProductModal = ({
                           <td className="px-4 py-3">{item.barcode || "-"}</td>
 
                           <td className="px-4 py-3 text-center">
-                            <button
-                              type="button"
-                              onClick={() => removeVariant(index)}
-                              className="rounded bg-red-600 px-3 py-1 text-white transition hover:bg-red-700"
-                            >
-                              Remove
-                            </button>
+                            <div className="flex justify-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => editVariant(index)}
+                                className="rounded bg-blue-600 px-3 py-1 text-white transition hover:bg-blue-700"
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => removeVariant(index)}
+                                className="rounded bg-red-600 px-3 py-1 text-white transition hover:bg-red-700"
+                              >
+                                Remove
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

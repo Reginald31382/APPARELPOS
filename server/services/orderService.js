@@ -34,7 +34,6 @@ export async function completeOrder({
   stripeCheckoutSessionId,
   stripePaymentIntentId,
 }) {
-  const session = await mongoose.startSession();
   if (stripeCheckoutSessionId) {
     const existingOrder = await Order.findOne({
       stripeCheckoutSessionId,
@@ -44,6 +43,8 @@ export async function completeOrder({
       return existingOrder;
     }
   }
+
+  const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
@@ -170,6 +171,10 @@ export async function completeOrder({
 */
 
 export async function createStripeOrder(session) {
+  if (session.payment_status !== "paid") {
+    throw new Error(`Stripe session ${session.id} is not paid.`);
+  }
+
   const { subtotal, tax, total, shipping, shippingAddress, items } =
     session.metadata;
 

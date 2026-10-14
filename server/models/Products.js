@@ -22,6 +22,18 @@ const variantSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    supplierVariantId: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    supplierSku: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   {
     _id: true,
@@ -94,6 +106,32 @@ const productSchema = new mongoose.Schema(
     ],
 
     variants: [variantSchema],
+
+    fulfillmentType: {
+      type: String,
+      enum: ["InHouse", "PrintOnDemand", "Dropship"],
+      default: "InHouse",
+      index: true,
+    },
+
+    supplier: {
+      name: {
+        type: String,
+        default: "",
+        trim: true,
+      },
+
+      productId: {
+        type: String,
+        default: "",
+        trim: true,
+      },
+
+      syncEnabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
 
     featured: {
       type: Boolean,

@@ -12,13 +12,21 @@ export const getProducts = async (req, res) => {
       featured,
       latest,
       sort,
+      status,
     } = req.query;
 
     let query = {};
 
-    query.active = { $ne: false };
+    // Default to active products.
+    // Admin product management can request all products with status=all.
+    if (status === "all") {
+      // Do not filter by active status.
+    } else if (status === "inactive") {
+      query.active = false;
+    } else {
+      query.active = { $ne: false };
+    }
 
-    // ONLY apply search if meaningful
     if (search && search.trim() !== "") {
       query.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -46,15 +54,10 @@ export const getProducts = async (req, res) => {
 
     if (latest === "true") {
       const sevenDaysAgo = new Date();
-
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      query.createdAt = {
-        $gte: sevenDaysAgo,
-      };
+      query.createdAt = { $gte: sevenDaysAgo };
     }
-
-    // console.log("FINAL QUERY:", JSON.stringify(query, null, 2));
 
     let sortQuery = {};
 
@@ -62,19 +65,15 @@ export const getProducts = async (req, res) => {
       case "priceLow":
         sortQuery.price = 1;
         break;
-
       case "priceHigh":
         sortQuery.price = -1;
         break;
-
       case "name":
         sortQuery.name = 1;
         break;
-
       case "featured":
         sortQuery.featured = -1;
         break;
-
       default:
         sortQuery.createdAt = -1;
     }

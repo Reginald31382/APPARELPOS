@@ -1,5 +1,64 @@
+import Product from "../models/Products.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { getStripe } from "../services/stripeService.js";
+
+const validateCheckoutItems = async (items) => {
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error("Your cart is empty.");
+  }
+
+  const validatedItems = [];
+
+  for (const item of items) {
+    const quantity = Number(item.quantity);
+
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+      throw new Error("Invalid item quantity.");
+    }
+
+    const product = await Product.findById(item.productId);
+
+    if (!product || !product.active) {
+      throw new Error("A product in your cart is unavailable.");
+    }
+
+    const variant = product.variants.find(
+      (variant) =>
+        variant.sku === item.sku &&
+        variant.color === item.color &&
+        variant.size === item.size,
+    );
+
+    if (!variant) {
+      throw new Error(
+        `The selected variant for ${product.name} is unavailable.`,
+      );
+    }
+
+    const unitPrice =
+      product.salePrice > 0 && product.salePrice < product.price
+        ? product.salePrice
+        : product.price;
+
+    validatedItems.push({
+      productId: product._id.toString(),
+      name: product.name,
+      sku: variant.sku,
+      color: variant.color,
+      size: variant.size,
+      quantity,
+      unitPrice,
+      fulfillmentType: product.fulfillmentType || "InHouse",
+      supplier: product.supplier?.name || "",
+      supplierProductId: product.supplier?.productId || "",
+      supplierVariantId: variant.supplierVariantId || "",
+      image: product.images?.[0] || "",
+      weight: product.weight || 0,
+    });
+  }
+
+  return validatedItems;
+};
 
 export const createCheckoutSession = asyncHandler(async (req, res) => {
   const stripe = getStripe();

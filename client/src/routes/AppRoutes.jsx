@@ -26,6 +26,7 @@ import Settings from "../pages/admin/Settings";
 import Employees from "../pages/admin/Employees";
 import ReviewPage from "../pages/ReviewPage";
 import ProductDetails from "../modules/product/pages/ProductDetails";
+import PrintfulProducts from "../pages/admin/PrintfulProducts";
 import ProtectedRoute from "../modules/auth/components/ProtectedRoute";
 
 import NotFound from "../pages/NotFound";
@@ -73,6 +74,7 @@ const AppRoutes = () => {
         <Route index element={<DashboardPage />} />
         <Route path="products" element={<Products />} />
         <Route path="products/:id" element={<ProductDetails />} />
+        <Route path="printful" element={<PrintfulProducts />} />
         <Route path="orders" element={<Orders />} />
         <Route path="receipts" element={<Receipts />} />
         <Route path="employees" element={<Employees />} />

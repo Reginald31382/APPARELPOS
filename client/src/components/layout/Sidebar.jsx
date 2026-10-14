@@ -7,6 +7,7 @@ import {
   FaClipboardList,
   FaWarehouse,
   FaChartLine,
+  FaTshirt,
 } from "react-icons/fa";
 import { IoSettingsSharp, IoReceiptSharp } from "react-icons/io5";
 import { BsPeopleFill } from "react-icons/bs";
@@ -37,6 +38,11 @@ const Sidebar = () => {
         <NavLink to="/admin/products" className={linkClasses}>
           <FaBoxOpen />
           Products
+        </NavLink>
+
+        <NavLink to="/admin/printful" className={linkClasses}>
+          <FaTshirt />
+          Printful Products
         </NavLink>
 
         <NavLink to="/admin/orders" className={linkClasses}>

@@ -8,16 +8,18 @@ export const fetchProducts = async (filters = {}) => {
   if (filters.gender) params.append("gender", filters.gender);
   if (filters.brand) params.append("brand", filters.brand);
   if (filters.featured) params.append("featured", true);
+
   if (filters.latest) {
     params.append("latest", "true");
   }
+
   if (filters.sort) params.append("sort", filters.sort);
-  // console.log(filters);
-  // console.log("API URL:", import.meta.env.VITE_API_URL);
-  // console.log("Request:", `/products?${params.toString()}`);
+
+  // Include status when requested by the admin catalog.
+  if (filters.status) params.append("status", filters.status);
 
   const { data } = await api.get(`/products?${params.toString()}`);
-  // console.log("Products Returned:", data.length);
+
   return data;
 };
 

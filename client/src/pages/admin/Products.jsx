@@ -14,7 +14,7 @@ const Products = () => {
     try {
       setLoading(true);
 
-      const data = await fetchProducts();
+      const data = await fetchProducts({ status: "all" });
 
       setProducts(data);
     } catch (error) {
