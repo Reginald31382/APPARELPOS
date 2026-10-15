@@ -3,10 +3,10 @@ import Product from "../models/Products.js";
 import {
   getPrintfulProducts,
   getPrintfulProductDetails,
+  getPrintfulVariantCost,
 } from "../services/printfulService.js";
 
 // GET /api/printful/products
-// Retrieve products synced to your Printful store.
 export const getProducts = asyncHandler(async (req, res) => {
   const data = await getPrintfulProducts();
 
@@ -17,11 +17,8 @@ export const getProducts = asyncHandler(async (req, res) => {
 });
 
 // GET /api/printful/products/:id/details
-// Retrieve full details for a Printful product before importing it.
 export const getProductDetails = asyncHandler(async (req, res) => {
   const details = await getPrintfulProductDetails(req.params.id);
-
-  console.log("Printful product details:", JSON.stringify(details, null, 2));
 
   res.status(200).json({
     success: true,
@@ -30,11 +27,9 @@ export const getProductDetails = asyncHandler(async (req, res) => {
 });
 
 // POST /api/printful/products/:id/import
-// Import a Printful product into the ApparelPOS catalog.
 export const importProduct = asyncHandler(async (req, res) => {
   const printfulProductId = String(req.params.id);
 
-  // Prevent importing the same Printful product twice.
   const existingProduct = await Product.findOne({
     "supplier.name": "Printful",
     "supplier.productId": printfulProductId,
@@ -48,7 +43,6 @@ export const importProduct = asyncHandler(async (req, res) => {
   }
 
   const details = await getPrintfulProductDetails(printfulProductId);
-
   const syncProduct = details?.sync_product;
   const syncVariants = details?.sync_variants || [];
 
@@ -58,25 +52,40 @@ export const importProduct = asyncHandler(async (req, res) => {
     });
   }
 
-  const variants = syncVariants.map((variant) => {
-    const parts = (variant.name || "").split("/").map((part) => part.trim());
+  const variants = await Promise.all(
+    syncVariants.map(async (variant) => {
+      const parts = (variant.name || "").split("/").map((part) => part.trim());
 
-    const color = parts.length > 1 ? parts[0] : "Default";
-    const size =
-      parts.length > 1 ? parts.slice(1).join(" / ") : parts[0] || "One Size";
+      const color = parts.length > 1 ? parts[0] : "Default";
+      const size =
+        parts.length > 1 ? parts.slice(1).join(" / ") : parts[0] || "One Size";
 
-    return {
-      color,
-      size,
-      quantity: 0,
-      sku: `PF-${variant.id}`,
-      supplierVariantId: String(variant.id),
-      supplierSku: variant.sku || "",
-      barcode: "",
-    };
-  });
+      const cost = await getPrintfulVariantCost(variant.variant_id);
 
-  const firstPrice = Number(syncVariants[0].retail_price);
+      if (!Number.isFinite(cost) || cost <= 0) {
+        throw new Error(
+          `Invalid Printful cost for variant ${variant.variant_id}.`,
+        );
+      }
+
+      // Target 30% gross margin; round UP to a .99 retail price.
+      const minimumPrice = cost / 0.7;
+      const retailPrice = Math.ceil(minimumPrice + 0.01) - 0.01;
+
+      return {
+        color,
+        size,
+        quantity: 0,
+        sku: `PF-${variant.id}`,
+        supplierVariantId: String(variant.id),
+        supplierSku: variant.sku || "",
+        barcode: "",
+        cost: Number(cost.toFixed(2)),
+        price: Number(retailPrice.toFixed(2)),
+        salePrice: null,
+      };
+    }),
+  );
 
   const product = await Product.create({
     name: syncProduct.name,
@@ -84,8 +93,9 @@ export const importProduct = asyncHandler(async (req, res) => {
     brand: "J.Rome",
     category: "Apparel",
     gender: "Unisex",
-    price: Number.isFinite(firstPrice) && firstPrice > 0 ? firstPrice : 0,
-    cost: 0,
+    price: variants[0].price,
+    salePrice: 0,
+    cost: variants[0].cost,
     weight: 0,
     images: syncProduct.thumbnail_url ? [syncProduct.thumbnail_url] : [],
     variants,

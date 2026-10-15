@@ -9,6 +9,20 @@ import StructuredData from "../../components/StructuredData";
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useProduct from "../../hooks/useProduct";
 
+const getVariantPricing = (variant, productPrice) => {
+  const regularPrice = Number(variant?.price ?? productPrice ?? 0);
+  const salePrice = Number(variant?.salePrice ?? 0);
+
+  const effectivePrice =
+    salePrice > 0 && salePrice < regularPrice ? salePrice : regularPrice;
+
+  return {
+    regularPrice,
+    salePrice: salePrice > 0 && salePrice < regularPrice ? salePrice : null,
+    effectivePrice,
+  };
+};
+
 const Product = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -117,6 +131,8 @@ const Product = () => {
       variant.color === selectedColor && variant.size === selectedSize,
   );
 
+  const selectedPricing = getVariantPricing(selectedVariant, product.price);
+
   const handleAddToCart = () => {
     if (!selectedVariant) {
       return;
@@ -135,7 +151,7 @@ const Product = () => {
       color: selectedColor,
       size: selectedSize,
       stock: selectedVariant.quantity,
-      unitPrice: product.price,
+      unitPrice: selectedPricing.effectivePrice,
       quantity,
     });
 
@@ -202,9 +218,17 @@ const Product = () => {
                 {product.name}
               </h1>
 
-              <p className="mt-3 text-2xl font-semibold sm:mt-4 sm:text-3xl">
-                ${product.price.toFixed(2)}
-              </p>
+              <div className="mt-3 flex flex-wrap items-baseline gap-3 sm:mt-4">
+                <p className="text-2xl font-semibold sm:text-3xl">
+                  ${selectedPricing.effectivePrice.toFixed(2)}
+                </p>
+
+                {selectedPricing.salePrice !== null && (
+                  <p className="text-lg text-gray-400 line-through">
+                    ${selectedPricing.regularPrice.toFixed(2)}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Color */}
@@ -318,7 +342,17 @@ const Product = () => {
                   {selectedColor} / {selectedSize}
                 </p>
 
-                <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-lg font-bold">
+                    ${selectedPricing.effectivePrice.toFixed(2)}
+                  </p>
+
+                  {selectedPricing.salePrice !== null && (
+                    <p className="text-sm text-gray-400 line-through">
+                      ${selectedPricing.regularPrice.toFixed(2)}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <button

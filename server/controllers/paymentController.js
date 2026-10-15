@@ -1,4 +1,5 @@
 import Product from "../models/Products.js";
+import Settings from "../models/Settings.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { getStripe } from "../services/stripeService.js";
 
@@ -35,10 +36,13 @@ const validateCheckoutItems = async (items) => {
       );
     }
 
+    const regularPrice = Number(variant.price ?? product.price ?? 0);
+    const variantSalePrice = Number(variant.salePrice ?? 0);
+
     const unitPrice =
-      product.salePrice > 0 && product.salePrice < product.price
-        ? product.salePrice
-        : product.price;
+      variantSalePrice > 0 && variantSalePrice < regularPrice
+        ? variantSalePrice
+        : regularPrice;
 
     validatedItems.push({
       productId: product._id.toString(),
@@ -63,14 +67,52 @@ const validateCheckoutItems = async (items) => {
 export const createCheckoutSession = asyncHandler(async (req, res) => {
   const stripe = getStripe();
 
-  const { items, shipping, shippingAddress, subtotal, total } = req.body;
+  const { items, shipping, shippingAddress } = req.body;
+
+  if (!shipping || !shippingAddress) {
+    return res.status(400).json({
+      message: "Shipping selection and shipping address are required.",
+    });
+  }
+
+  const shippingCost = Number(shipping.cost);
+
+  if (!Number.isFinite(shippingCost) || shippingCost < 0) {
+    return res.status(400).json({
+      message: "Invalid shipping cost.",
+    });
+  }
+
+  // Always retrieve authoritative prices from MongoDB.
+  const validatedItems = await validateCheckoutItems(items);
+
+  const subtotal = Number(
+    validatedItems
+      .reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+      .toFixed(2),
+  );
+
+  const settings = await Settings.findOne().lean();
+
+  const configuredTaxRate = Number(settings?.taxRate ?? 0.06);
+
+  // Support settings stored as either 0.06 or 6.
+  // Values from 0 to 1 are treated as decimal rates.
+  const taxMultiplier =
+    configuredTaxRate > 0 && configuredTaxRate <= 1
+      ? configuredTaxRate
+      : configuredTaxRate / 100;
+
+  const tax = Number((subtotal * taxMultiplier).toFixed(2));
+
+  const total = Number((subtotal + tax + shippingCost).toFixed(2));
 
   const line_items = [
-    ...items.map((item) => ({
+    ...validatedItems.map((item) => ({
       price_data: {
         currency: "usd",
         product_data: {
-          name: item.name,
+          name: `${item.name} - ${item.color} / ${item.size}`,
           metadata: {
             productId: item.productId,
             sku: item.sku,
@@ -82,13 +124,27 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
       },
       quantity: item.quantity,
     })),
+    ...(shippingCost > 0
+      ? [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: shipping.service || "Shipping",
+              },
+              unit_amount: Math.round(shippingCost * 100),
+            },
+            quantity: 1,
+          },
+        ]
+      : []),
     {
       price_data: {
         currency: "usd",
         product_data: {
-          name: shipping.service,
+          name: "Sales Tax",
         },
-        unit_amount: Math.round(shipping.cost * 100),
+        unit_amount: Math.round(tax * 100),
       },
       quantity: 1,
     },
@@ -97,9 +153,7 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     payment_method_types: ["card"],
-
     line_items,
-
     customer_email: shippingAddress.email,
 
     success_url: `${process.env.CLIENT_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -108,11 +162,14 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     metadata: {
       paymentSource: "stripe_checkout",
       subtotal: String(subtotal),
-      tax: String(req.body.tax),
+      tax: String(tax),
       total: String(total),
-      shipping: JSON.stringify(shipping),
+      shipping: JSON.stringify({
+        ...shipping,
+        cost: shippingCost,
+      }),
       shippingAddress: JSON.stringify(shippingAddress),
-      items: JSON.stringify(items),
+      items: JSON.stringify(validatedItems),
     },
 
     expand: ["payment_intent"],

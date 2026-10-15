@@ -12,6 +12,7 @@ import { sendReceiptEmail } from "./email/sendReceiptEmail.js";
 import { addTimelineEvent } from "./orders/timelineService.js";
 import { sendOrderSMS } from "./sms/sendOrderSMS.js";
 import { createReceipt } from "./receiptService.js";
+import { submitPrintfulOrder } from "./printfulOrderService.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -63,6 +64,18 @@ export async function completeOrder({
           items: items.map((item) => ({
             ...item,
             weight: item.weight || 0,
+            supplier: {
+              name: item.supplier || "",
+              productId: item.supplierProductId || "",
+              variantId: item.supplierVariantId || "",
+              orderId: "",
+              status:
+                item.fulfillmentType === "PrintOnDemand" &&
+                item.supplier === "Printful"
+                  ? "Pending"
+                  : "Not Required",
+              lastError: "",
+            },
           })),
 
           subtotal,
@@ -122,6 +135,37 @@ export async function completeOrder({
     await reduceInventory(order.items, session);
     await session.commitTransaction();
     session.endSession();
+
+    // Submit Printful items after the paid order is safely committed.
+    try {
+      // await submitPrintfulOrder(order._id);
+    } catch (error) {
+      console.error(
+        `Printful fulfillment failed for order ${order.orderNumber}:`,
+        error.message,
+      );
+
+      // Keep the paid order and record the failure for a later retry.
+      for (const item of order.items) {
+        if (
+          item.fulfillmentType === "PrintOnDemand" &&
+          item.supplier?.name === "Printful" &&
+          item.supplier.status === "Pending"
+        ) {
+          item.supplier.status = "Failed";
+          item.supplier.lastError = error.message;
+        }
+      }
+
+      try {
+        await order.save();
+      } catch (saveError) {
+        console.error(
+          "Failed to save Printful fulfillment error:",
+          saveError.message,
+        );
+      }
+    }
 
     await createNotification({
       type: "NEW_ORDER",

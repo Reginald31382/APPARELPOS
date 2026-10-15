@@ -3,6 +3,47 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import ProductModal from "../../components/product/ProductModal";
 import { fetchProducts, deleteProduct } from "../../services/productService";
+
+const getProductPricing = (product) => {
+  const variants = product.variants || [];
+  const productCost = Number(product.cost || 0);
+
+  const prices = variants.map((variant) => {
+    const regularPrice = Number(variant.price ?? product.price ?? 0);
+    const salePrice = Number(variant.salePrice ?? 0);
+
+    const effectivePrice =
+      salePrice > 0 && salePrice < regularPrice ? salePrice : regularPrice;
+
+    return {
+      regularPrice,
+      effectivePrice,
+      salePrice: salePrice > 0 && salePrice < regularPrice ? salePrice : null,
+      profit: effectivePrice - productCost,
+    };
+  });
+
+  const effectivePrices = prices.map((item) => item.effectivePrice);
+  const regularPrices = prices.map((item) => item.regularPrice);
+  const profits = prices.map((item) => item.profit);
+
+  return {
+    minPrice: Math.min(...effectivePrices),
+    maxPrice: Math.max(...effectivePrices),
+    minProfit: Math.min(...profits),
+    maxProfit: Math.max(...profits),
+
+    hasVariantPriceOverride: variants.some(
+      (variant) =>
+        variant.price !== null &&
+        variant.price !== undefined &&
+        Number(variant.price) !== Number(product.price),
+    ),
+
+    hasSale: prices.some((item) => item.salePrice !== null),
+  };
+};
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,15 +151,14 @@ const Products = () => {
                 0,
               );
 
-              const profit = Number(product.price) - Number(product.cost || 0);
-
+              const pricing = getProductPricing(product);
               return (
                 <div
                   key={product._id}
                   onClick={() => navigate(`/admin/products/${product._id}`)}
                   className="cursor-pointer rounded-xl border bg-white transition hover:border-black hover:shadow-md"
                 >
-                  <div className="flex items-center gap-5 p-5">
+                  <div className="flex flex-wrap items-center gap-4 p-5">
                     {/* Image */}
                     <img
                       src={
@@ -130,11 +170,10 @@ const Products = () => {
                     />
 
                     {/* Product */}
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-[180px] flex-1">
                       <h2 className="truncate text-lg font-semibold">
                         {product.name}
                       </h2>
-
                       <p className="text-sm text-gray-500">
                         {product.brand || "No Brand"} •{" "}
                         {product.category || "Uncategorized"}
@@ -142,12 +181,26 @@ const Products = () => {
                     </div>
 
                     {/* Retail */}
-                    <div className="hidden w-24 text-center md:block">
+                    <div className="hidden w-36 shrink-0 text-center md:block">
                       <p className="text-xs text-gray-500">Retail</p>
 
                       <p className="font-semibold">
-                        ${Number(product.price).toFixed(2)}
+                        {pricing.minPrice === pricing.maxPrice
+                          ? `$${pricing.minPrice.toFixed(2)}`
+                          : `$${pricing.minPrice.toFixed(2)} – $${pricing.maxPrice.toFixed(2)}`}
                       </p>
+
+                      {pricing.hasSale && (
+                        <p className="text-xs text-red-600">
+                          Sale price active
+                        </p>
+                      )}
+
+                      {pricing.hasVariantPriceOverride && (
+                        <p className="text-xs text-blue-600">
+                          Variant override
+                        </p>
+                      )}
                     </div>
 
                     {/* Cost */}
@@ -158,12 +211,22 @@ const Products = () => {
                     </div>
 
                     {/* Profit */}
-                    <div className="hidden w-24 text-center lg:block">
+                    <div className="hidden w-36 shrink-0 text-center lg:block">
                       <p className="text-xs text-gray-500">Profit</p>
 
-                      <p className="font-semibold text-green-600">
-                        ${profit.toFixed(2)}
+                      <p
+                        className={`font-semibold ${
+                          pricing.minProfit < 0
+                            ? "text-red-600"
+                            : "text-green-600"
+                        }`}
+                      >
+                        {pricing.minProfit === pricing.maxProfit
+                          ? `$${pricing.minProfit.toFixed(2)}`
+                          : `$${pricing.minProfit.toFixed(2)} – $${pricing.maxProfit.toFixed(2)}`}
                       </p>
+
+                      <p className="text-xs text-gray-500">Before fees</p>
                     </div>
 
                     {/* Stock */}

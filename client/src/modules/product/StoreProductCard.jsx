@@ -1,12 +1,38 @@
 import { Link } from "react-router-dom";
 import { formatCurrency } from "../../utils/currency";
 
+const getVariantPrice = (variant, productPrice) => {
+  const regularPrice = Number(variant.price ?? productPrice ?? 0);
+  const salePrice = Number(variant.salePrice ?? 0);
+
+  return salePrice > 0 && salePrice < regularPrice ? salePrice : regularPrice;
+};
+
 const StoreProductCard = ({ product }) => {
+  const variants = product.variants || [];
+
+  const prices =
+    variants.length > 0
+      ? variants.map((variant) => getVariantPrice(variant, product.price))
+      : [Number(product.price || 0)];
+
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  const hasPriceRange = minPrice !== maxPrice;
+
+  const regularPrices =
+    variants.length > 0
+      ? variants.map((variant) => Number(variant.price ?? product.price ?? 0))
+      : [Number(product.price || 0)];
+
+  const minRegularPrice = Math.min(...regularPrices);
+  const hasSale = minPrice < minRegularPrice;
+
   return (
     <Link to={`/product/${product._id}`} className="group flex h-full flex-col">
       <div className="relative overflow-hidden rounded-xl bg-[#f7f5f2]">
         <div className="relative aspect-[4/5] overflow-hidden">
-          {/* Primary Image */}
           <img
             src={product.images?.[0]}
             alt={product.name}
@@ -17,7 +43,6 @@ const StoreProductCard = ({ product }) => {
             }`}
           />
 
-          {/* Secondary Image */}
           {product.images?.length > 1 && (
             <img
               src={product.images[1]}
@@ -44,9 +69,21 @@ const StoreProductCard = ({ product }) => {
         </div>
 
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-lg font-bold">
-            {formatCurrency(product.price)}
-          </span>
+          <div className="flex flex-wrap items-baseline gap-2">
+            <span className="text-lg font-bold">
+              {hasPriceRange
+                ? `From ${formatCurrency(minPrice)}`
+                : formatCurrency(minPrice)}
+            </span>
+
+            {hasSale && (
+              <span className="text-sm text-gray-400 line-through">
+                {hasPriceRange
+                  ? `From ${formatCurrency(minRegularPrice)}`
+                  : formatCurrency(minRegularPrice)}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </Link>

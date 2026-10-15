@@ -10,6 +10,21 @@ const variantSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    price: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
+    cost: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
+    salePrice: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
     quantity: {
       type: Number,
       default: 0,

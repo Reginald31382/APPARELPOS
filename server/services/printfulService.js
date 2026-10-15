@@ -56,3 +56,39 @@ export async function getPrintfulProductDetails(productId) {
 
   return data.result;
 }
+
+export async function getPrintfulVariantCost(variantId) {
+  const token = process.env.PRINTFUL_API_TOKEN;
+
+  if (!token) {
+    throw new Error("PRINTFUL_API_TOKEN is not configured.");
+  }
+
+  const response = await fetch(
+    `${PRINTFUL_API_URL}/products/variant/${variantId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      `Unable to retrieve Printful variant ${variantId} pricing.`,
+    );
+  }
+
+  const cost = Number(data?.result?.variant?.price);
+
+  if (!Number.isFinite(cost) || cost <= 0) {
+    throw new Error(
+      `Invalid fulfillment cost returned for Printful variant ${variantId}.`,
+    );
+  }
+
+  return cost;
+}

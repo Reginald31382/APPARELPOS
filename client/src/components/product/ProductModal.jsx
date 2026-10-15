@@ -353,11 +353,29 @@ const ProductModal = ({
                       type="number"
                       step="0.01"
                       name="price"
-                      value={product.price}
+                      value={
+                        product.variants?.find(
+                          (item) =>
+                            Number(item.salePrice) > 0 &&
+                            Number(item.salePrice) <
+                              Number(item.price ?? product.price),
+                        )?.salePrice ?? product.price
+                      }
                       onChange={handleChange}
                       placeholder="0.00"
                       className="w-full rounded-lg border p-3"
                     />
+
+                    {product.variants?.some(
+                      (item) =>
+                        item.price !== null &&
+                        item.price !== undefined &&
+                        Number(item.price) !== Number(product.price),
+                    ) && (
+                      <p className="mt-2 text-sm text-blue-600">
+                        Variant pricing overrides are active.
+                      </p>
+                    )}
                   </div>
 
                   <div>

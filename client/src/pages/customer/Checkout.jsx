@@ -29,7 +29,12 @@ const Checkout = () => {
   const [loadingRates, setLoadingRates] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState(null);
 
-  const taxRate = store?.taxRate ?? 6;
+  const configuredTaxRate = Number(store?.taxRate ?? 0.06);
+
+  const taxRate =
+    configuredTaxRate > 0 && configuredTaxRate <= 1
+      ? configuredTaxRate * 100
+      : configuredTaxRate;
 
   const tax = subtotal * (taxRate / 100);
 

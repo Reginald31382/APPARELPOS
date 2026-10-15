@@ -7,6 +7,7 @@ import ProductHero from "../components/ProductHero";
 import ProductStats from "../components/ProductStats";
 import InventoryGrid from "../components/InventoryGrid";
 import InventoryHistory from "../components/InventoryHistory";
+import VariantPricing from "../../../components/product/VariantPricing";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -36,6 +37,8 @@ const ProductDetails = () => {
       <ProductHero product={product} />
 
       <ProductStats product={product} />
+
+      <VariantPricing product={product} refetch={refetch} />
 
       <InventoryGrid product={product} refetch={refetch} />
 
