@@ -62,7 +62,7 @@ export const sendNewOrderNotification = async (order) => {
       },
     );
 
-    console.log("📧 Admin order notification sent");
+    // console.log("📧 Admin order notification sent");
   } catch (error) {
     console.error("Brevo Admin Notification Error:");
 

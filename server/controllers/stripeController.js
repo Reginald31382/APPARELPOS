@@ -31,10 +31,10 @@ export const webhook = async (req, res) => {
   try {
     const stripeSession = event.data.object;
 
-    console.log("Webhook event type:", event.type);
-    console.log("Webhook session ID:", stripeSession.id);
-    console.log("Webhook payment status:", stripeSession.payment_status);
-    console.log("Webhook session metadata:", stripeSession.metadata);
+    // console.log("Webhook event type:", event.type);
+    // console.log("Webhook session ID:", stripeSession.id);
+    // console.log("Webhook payment status:", stripeSession.payment_status);
+    // console.log("Webhook session metadata:", stripeSession.metadata);
 
     await createStripeOrder(stripeSession);
 

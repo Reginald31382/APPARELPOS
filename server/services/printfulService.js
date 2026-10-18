@@ -23,7 +23,7 @@ export async function getPrintfulProducts() {
     );
   }
 
-  console.log("Printful products response:", JSON.stringify(data, null, 2));
+  // console.log("Printful products response:", JSON.stringify(data, null, 2));
 
   return data;
 }

@@ -17,7 +17,7 @@ const generateOrderNumber = async () => {
 
   await counter.save();
 
-  console.log("Counter sequence:", counter.sequence);
+  // console.log("Counter sequence:", counter.sequence);
 
   return `${PREFIX}${counter.sequence}`;
 };

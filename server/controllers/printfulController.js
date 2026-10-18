@@ -46,17 +46,17 @@ export const importProduct = asyncHandler(async (req, res) => {
   const syncProduct = details?.sync_product;
   const syncVariants = details?.sync_variants || [];
 
-  console.log(
-    "Printful variant mapping:",
-    syncVariants.map((variant) => ({
-      id: variant.id,
-      variant_id: variant.variant_id,
-      name: variant.name,
-      size: variant.size,
-      color: variant.color,
-      color_code: variant.color_code,
-    })),
-  );
+  // console.log(
+  //   "Printful variant mapping:",
+  //   syncVariants.map((variant) => ({
+  //     id: variant.id,
+  //     variant_id: variant.variant_id,
+  //     name: variant.name,
+  //     size: variant.size,
+  //     color: variant.color,
+  //     color_code: variant.color_code,
+  //   })),
+  // );
 
   if (!syncProduct || syncVariants.length === 0) {
     return res.status(400).json({

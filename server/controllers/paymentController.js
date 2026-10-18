@@ -102,8 +102,8 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     shippingAddress,
   });
 
-  console.log("Selected shipping rate from frontend:", shipping);
-  console.log("Available shipping rates from backend:", availableRates);
+  // console.log("Selected shipping rate from frontend:", shipping);
+  // console.log("Available shipping rates from backend:", availableRates);
 
   const selectedRate = availableRates.find(
     (rate) =>
