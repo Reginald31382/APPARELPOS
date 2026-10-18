@@ -137,16 +137,40 @@ export const updateOrderStatus = async (req, res) => {
 /*
 DELETE /api/orders/:id
 */
+
 export const deleteOrder = async (req, res) => {
   try {
-    await Order.findByIdAndDelete(req.params.id);
+    const order = await Order.findById(req.params.id);
 
-    res.json({
-      message: "Order deleted",
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found.",
+      });
+    }
+
+    // Prevent accidental deletion of paid orders through this endpoint.
+    if (order.paymentStatus === "Paid") {
+      return res.status(409).json({
+        success: false,
+        message:
+          "Paid orders cannot be deleted through this endpoint. Resolve the payment and fulfillment status first.",
+      });
+    }
+
+    await order.deleteOne();
+
+    return res.status(200).json({
+      success: true,
+      message: "Order deleted successfully.",
+      orderId: String(order._id),
     });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    console.error("Failed to delete order:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete order.",
     });
   }
 };

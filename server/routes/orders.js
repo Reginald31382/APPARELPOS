@@ -75,6 +75,6 @@ router.put("/:id", updateOrder);
 
 router.patch("/:id/status", protect, updateOrderStatus);
 
-router.delete("/:id", deleteOrder);
+router.delete("/:id", protect, authorize("Admin"), deleteOrder);
 
 export default router;

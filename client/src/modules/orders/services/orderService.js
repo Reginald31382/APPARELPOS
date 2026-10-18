@@ -28,3 +28,8 @@ export const fetchOrderStats = async () => {
   const { data } = await api.get("/orders/stats");
   return data;
 };
+
+export const deleteOrder = async (orderId) => {
+  const { data } = await api.delete(`/orders/${orderId}`);
+  return data;
+};

@@ -8,8 +8,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QUERY_KEYS } from "../../constants/queryKeys";
 import { formatCurrency } from "../../utils/currency";
+import { deleteOrder } from "../../modules/orders/services/orderService";
 
-import { ShoppingCart, DollarSign, Package } from "lucide-react";
+import { ShoppingCart, DollarSign, Package, Trash2 } from "lucide-react";
 
 const Orders = () => {
   const { data: orders = [], isLoading } = useOrders();
@@ -29,6 +30,28 @@ const Orders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const handleDeleteOrder = (order) => {
+    const confirmed = window.confirm(
+      `Delete order ${order.orderNumber}? This action cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    deleteOrder(order._id)
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: ["orders"] });
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.ORDERS],
+        });
+
+        window.alert(`Order ${order.orderNumber} deleted successfully.`);
+      })
+      .catch((error) => {
+        window.alert(
+          error.response?.data?.message || "Unable to delete this order.",
+        );
+      });
+  };
 
   useEffect(() => {
     if (orders.length === 0) return;
@@ -246,15 +269,31 @@ const Orders = () => {
                 </td>
 
                 <td className="p-4 text-center">
-                  <button
-                    onClick={() => {
-                      setSelectedOrder(order);
-                      setIsModalOpen(true);
-                    }}
-                    className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
-                  >
-                    View
-                  </button>
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setIsModalOpen(true);
+                      }}
+                      className="rounded-lg bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
+                    >
+                      View
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteOrder(order)}
+                      disabled={order.paymentStatus === "Paid"}
+                      title={
+                        order.paymentStatus === "Paid"
+                          ? "Paid orders cannot be deleted"
+                          : "Delete order"
+                      }
+                      className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-2 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <Trash2 size={16} />
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
