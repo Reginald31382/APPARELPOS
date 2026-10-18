@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import Order from "../models/Order.js";
+import PendingCheckout from "../models/PendingCheckout.js";
 
 import generateOrderNumber from "../utils/generateOrderNumber.js";
 
@@ -10,9 +11,7 @@ import { sendNewOrderNotification } from "./email/sendNewOrderNotification.js";
 import { emitOrderCreated } from "./socketService.js";
 import { sendReceiptEmail } from "./email/sendReceiptEmail.js";
 import { addTimelineEvent } from "./orders/timelineService.js";
-import { sendOrderSMS } from "./sms/sendOrderSMS.js";
 import { createReceipt } from "./receiptService.js";
-import { submitPrintfulOrder } from "./printfulOrderService.js";
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +34,7 @@ export async function completeOrder({
   stripeCheckoutSessionId,
   stripePaymentIntentId,
 }) {
+  // Idempotency: do not create the same Stripe order twice.
   if (stripeCheckoutSessionId) {
     const existingOrder = await Order.findOne({
       stripeCheckoutSessionId,
@@ -45,25 +45,25 @@ export async function completeOrder({
     }
   }
 
-  const session = await mongoose.startSession();
+  const dbSession = await mongoose.startSession();
+  let order;
 
   try {
-    session.startTransaction();
+    dbSession.startTransaction();
 
     const orderNumber = await generateOrderNumber();
 
-    const [order] = await Order.create(
+    [order] = await Order.create(
       [
         {
           orderNumber,
-
           customerEmail: customerEmail || shippingAddress?.email || "",
-
-          orderType: orderType || "Online",
+          orderType,
 
           items: items.map((item) => ({
             ...item,
             weight: item.weight || 0,
+
             supplier: {
               name: item.supplier || "",
               productId: item.supplierProductId || "",
@@ -79,37 +79,24 @@ export async function completeOrder({
           })),
 
           subtotal,
-
           tax,
 
           shipping: {
             carrier: shipping.carrier || "USPS",
-
             service: shipping.service || "Ground Advantage",
-
             cost: shipping.cost || 0,
-
             trackingNumber: shipping.trackingNumber || "",
-
             labelUrl: shipping.labelUrl || "",
-
             status: shipping.status || "Pending",
-
             estimatedDelivery: shipping.estimatedDelivery || null,
-
             shippedAt: shipping.shippedAt || null,
-
             deliveredAt: shipping.deliveredAt || null,
           },
 
           shippingAddress,
-
           total,
-
           paymentMethod,
-
           paymentStatus,
-
           status,
 
           ...(stripeCheckoutSessionId && {
@@ -121,7 +108,7 @@ export async function completeOrder({
           }),
         },
       ],
-      { session },
+      { session: dbSession },
     );
 
     addTimelineEvent(
@@ -130,131 +117,150 @@ export async function completeOrder({
       "Payment received and order created.",
     );
 
-    await order.save({ session });
-    await createReceipt(order);
-    await reduceInventory(order.items, session);
-    await session.commitTransaction();
-    session.endSession();
+    await order.save({ session: dbSession });
 
-    // Submit Printful items after the paid order is safely committed.
-    try {
-      // await submitPrintfulOrder(order._id);
-    } catch (error) {
-      console.error(
-        `Printful fulfillment failed for order ${order.orderNumber}:`,
-        error.message,
-      );
+    await createReceipt(order, dbSession);
 
-      // Keep the paid order and record the failure for a later retry.
-      for (const item of order.items) {
-        if (
-          item.fulfillmentType === "PrintOnDemand" &&
-          item.supplier?.name === "Printful" &&
-          item.supplier.status === "Pending"
-        ) {
-          item.supplier.status = "Failed";
-          item.supplier.lastError = error.message;
-        }
-      }
+    await reduceInventory(order.items, dbSession);
 
-      try {
-        await order.save();
-      } catch (saveError) {
-        console.error(
-          "Failed to save Printful fulfillment error:",
-          saveError.message,
-        );
-      }
+    await dbSession.commitTransaction();
+  } catch (error) {
+    if (dbSession.inTransaction()) {
+      await dbSession.abortTransaction();
     }
 
+    throw error;
+  } finally {
+    await dbSession.endSession();
+  }
+
+  // Notifications happen after the database transaction commits.
+  try {
     await createNotification({
       type: "NEW_ORDER",
       title: "New Order",
       message: `${order.orderNumber} has been placed by ${order.customerEmail}`,
       orderId: order._id,
     });
-
-    emitOrderCreated(order);
-
-    // console.log("📱 About to send SMS...");
-
-    try {
-      // await sendOrderSMS(order);
-      // console.log("✅ SMS function completed");
-    } catch (err) {
-      // console.error("❌ SMS Notification Failed");
-      // console.error(err);
-    }
-
-    // console.log("📧 About to send receipt email...");
-
-    try {
-      await sendReceiptEmail(order);
-    } catch (err) {
-      console.error("Customer receipt failed:", err);
-    }
-
-    try {
-      await sendNewOrderNotification(order);
-    } catch (err) {
-      console.error("Admin notification failed:", err);
-    }
-
-    return order;
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    throw error;
+    console.error("Order notification failed:", error);
   }
+
+  try {
+    emitOrderCreated(order);
+  } catch (error) {
+    console.error("Order socket notification failed:", error);
+  }
+
+  // SMS remains disabled.
+  try {
+    // await sendOrderSMS(order);
+  } catch (error) {
+    console.error("Order SMS failed:", error);
+  }
+
+  try {
+    await sendReceiptEmail(order);
+  } catch (error) {
+    console.error("Customer receipt failed:", error);
+  }
+
+  try {
+    await sendNewOrderNotification(order);
+  } catch (error) {
+    console.error("Admin notification failed:", error);
+  }
+
+  return order;
 }
 
 /*
 |--------------------------------------------------------------------------
-| Stripe Checkout
+| Create Order From Paid Stripe Checkout
 |--------------------------------------------------------------------------
 */
 
-export async function createStripeOrder(session) {
-  if (session.payment_status !== "paid") {
-    throw new Error(`Stripe session ${session.id} is not paid.`);
+export async function createStripeOrder(stripeSession) {
+  if (stripeSession.payment_status !== "paid") {
+    throw new Error(`Stripe session ${stripeSession.id} is not paid.`);
   }
 
-  const { subtotal, tax, total, shipping, shippingAddress, items } =
-    session.metadata;
+  // Handle webhook retries before attempting to create another order.
+  const existingOrder = await Order.findOne({
+    stripeCheckoutSessionId: stripeSession.id,
+  });
 
-  if (!shipping || !shippingAddress || !items) {
+  if (existingOrder) {
+    // Repair the pending checkout status if a previous attempt
+    // created the order but failed before updating this record.
+    const pendingCheckoutId = stripeSession.metadata?.pendingCheckoutId;
+
+    if (pendingCheckoutId) {
+      await PendingCheckout.findByIdAndUpdate(pendingCheckoutId, {
+        status: "Completed",
+      });
+    }
+
+    return existingOrder;
+  }
+
+  const pendingCheckoutId = stripeSession.metadata?.pendingCheckoutId;
+
+  if (!pendingCheckoutId) {
+    throw new Error("Stripe Checkout metadata is missing pendingCheckoutId.");
+  }
+
+  const pendingCheckout = await PendingCheckout.findById(pendingCheckoutId);
+
+  if (!pendingCheckout) {
+    throw new Error(`Pending checkout ${pendingCheckoutId} was not found.`);
+  }
+
+  // If the session ID was saved, ensure it matches this webhook.
+  // It can temporarily be empty if the webhook arrives very quickly.
+  if (
+    pendingCheckout.stripeCheckoutSessionId &&
+    pendingCheckout.stripeCheckoutSessionId !== stripeSession.id
+  ) {
+    throw new Error("Stripe session does not match the pending checkout.");
+  }
+
+  if (pendingCheckout.status === "Completed") {
     throw new Error(
-      "Checkout session metadata is incomplete. Expected shipping, shippingAddress, and items.",
+      `Pending checkout ${pendingCheckoutId} is already completed, but its order was not found.`,
     );
   }
 
-  // console.log("About to create order with:");
+  const paymentIntentId =
+    typeof stripeSession.payment_intent === "string"
+      ? stripeSession.payment_intent
+      : stripeSession.payment_intent?.id;
 
-  // console.log({
-  //   stripeCheckoutSessionId: session.id,
-  //   stripePaymentIntentId:
-  //     typeof session.payment_intent === "string"
-  //       ? session.payment_intent
-  //       : session.payment_intent.id,
-  // });
+  const order = await completeOrder({
+    customerEmail:
+      pendingCheckout.shippingAddress?.email ||
+      stripeSession.customer_details?.email ||
+      "",
 
-  return completeOrder({
-    customerEmail: JSON.parse(shippingAddress).email,
-    items: JSON.parse(items),
-    subtotal: Number(subtotal),
-    tax: Number(tax),
-    shipping: JSON.parse(shipping),
-    shippingAddress: JSON.parse(shippingAddress),
-    total: Number(total),
+    items: pendingCheckout.items,
+    subtotal: pendingCheckout.subtotal,
+    tax: pendingCheckout.tax,
+    shipping: pendingCheckout.shipping,
+    shippingAddress: pendingCheckout.shippingAddress,
+    total: pendingCheckout.total,
 
     paymentMethod: "Stripe",
     paymentStatus: "Paid",
     status: "Processing",
 
-    stripeCheckoutSessionId: session.id,
-    stripePaymentIntentId:
-      typeof session.payment_intent === "string"
-        ? session.payment_intent
-        : session.payment_intent.id,
+    stripeCheckoutSessionId: stripeSession.id,
+    stripePaymentIntentId: paymentIntentId,
   });
+
+  // Only mark completed after the order has been created successfully.
+  await PendingCheckout.findByIdAndUpdate(pendingCheckout._id, {
+    status: "Completed",
+  });
+
+  return order;
 }

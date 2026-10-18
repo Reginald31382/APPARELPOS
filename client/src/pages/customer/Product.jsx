@@ -44,15 +44,13 @@ const Product = () => {
   }, [product, selectedImage]);
 
   useEffect(() => {
-    if (!product?.variants?.length) return;
+    if (!product?.variants?.length || !selectedColor) return;
 
     const firstVariantForColor = product.variants.find(
-      (variant) => variant.color === selectedColor,
+      (variant) => normalizeColor(variant.color) === selectedColor,
     );
 
-    if (firstVariantForColor) {
-      setSelectedSize(firstVariantForColor.size);
-    }
+    setSelectedSize(firstVariantForColor?.size || "");
   }, [selectedColor, product]);
 
   useEffect(() => {
@@ -90,6 +88,10 @@ const Product = () => {
 
   const primaryVariant = product.variants?.[0];
 
+  const isPrintOnDemand = product.fulfillmentType === "PrintOnDemand";
+  const canPurchase = (variant) =>
+    Boolean(variant) && (isPrintOnDemand || variant.quantity > 0);
+
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -120,15 +122,22 @@ const Product = () => {
     },
   };
 
-  const colors = [...new Set(product.variants.map((v) => v.color))];
+  const normalizeColor = (color) =>
+    (color || "Default").trim().replace(/\s+/g, " ");
 
+  const colors = [
+    ...new Set(
+      product.variants.map((variant) => normalizeColor(variant.color)),
+    ),
+  ];
   const sizes = product.variants.filter(
-    (variant) => variant.color === selectedColor,
+    (variant) => normalizeColor(variant.color) === selectedColor,
   );
 
   const selectedVariant = product.variants.find(
     (variant) =>
-      variant.color === selectedColor && variant.size === selectedSize,
+      normalizeColor(variant.color) === selectedColor &&
+      variant.size === selectedSize,
   );
 
   const selectedPricing = getVariantPricing(selectedVariant, product.price);
@@ -275,9 +284,11 @@ const Product = () => {
 
             {selectedVariant && (
               <p className="text-sm text-gray-500">
-                {selectedVariant.quantity > 0
-                  ? `${selectedVariant.quantity} in stock`
-                  : "Out of stock"}
+                {isPrintOnDemand
+                  ? "Made to order"
+                  : selectedVariant.quantity > 0
+                    ? `${selectedVariant.quantity} in stock`
+                    : "Out of stock"}
               </p>
             )}
 
@@ -298,8 +309,9 @@ const Product = () => {
                 <button
                   onClick={() =>
                     setQuantity((q) =>
-                      selectedVariant
-                        ? Math.min(selectedVariant.quantity, q + 1)
+                      selectedVariant &&
+                      (isPrintOnDemand || q < selectedVariant.quantity)
+                        ? q + 1
                         : q,
                     )
                   }
@@ -311,7 +323,7 @@ const Product = () => {
             </div>
 
             <button
-              disabled={!selectedVariant || selectedVariant.quantity === 0}
+              disabled={!canPurchase(selectedVariant)}
               onClick={handleAddToCart}
               className="w-full bg-black text-white py-4 rounded-md font-semibold transition hover:bg-neutral-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
@@ -356,7 +368,7 @@ const Product = () => {
               </div>
 
               <button
-                disabled={selectedVariant.quantity === 0}
+                disabled={!canPurchase(selectedVariant)}
                 onClick={handleAddToCart}
                 className="rounded-lg bg-black px-8 py-4 font-semibold text-white disabled:bg-gray-300"
               >

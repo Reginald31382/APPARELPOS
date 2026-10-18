@@ -3,6 +3,9 @@ import {
   getProducts,
   importProduct,
   getProductDetails,
+  validateImportedPrintfulProduct,
+  verifyPrintfulVariantIds,
+  dryRunPrintfulVariant,
 } from "../controllers/printfulController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
@@ -22,6 +25,48 @@ router.post(
   protect,
   authorize("Admin", "Manager"),
   importProduct,
+);
+
+router.get(
+  "/products/:id/validate",
+  protect,
+  authorize("Admin", "Manager"),
+  validateImportedPrintfulProduct,
+);
+
+router.get(
+  "/products/:id/dry-run-variant",
+  protect,
+  authorize("Admin", "Manager"),
+  dryRunPrintfulVariant,
+);
+
+router.get(
+  "/products/:id/verify-variants",
+  protect,
+  authorize("Admin", "Manager"),
+  verifyPrintfulVariantIds,
+);
+
+router.get(
+  "/test-connection",
+  protect,
+  authorize("Admin", "Manager"),
+  async (req, res, next) => {
+    try {
+      const { getPrintfulProducts } =
+        await import("../services/printfulService.js");
+
+      await getPrintfulProducts();
+
+      res.json({
+        success: true,
+        message: "Printful connection successful.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 );
 
 export default router;

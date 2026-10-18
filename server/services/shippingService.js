@@ -1,6 +1,27 @@
 import Store from "../models/Store.js";
 import Product from "../models/Products.js";
 import { createShipment } from "./shipping/createShipment.js";
+import { calculatePrintfulShipping } from "../config/printfulShippingRates.js";
+
+const normalizeCountry = (country) => {
+  const value = String(country || "US")
+    .trim()
+    .toLowerCase();
+
+  if (
+    ["us", "usa", "united states", "united states of america"].includes(value)
+  ) {
+    return "US";
+  }
+
+  return value.toUpperCase();
+};
+
+const isPrintfulProduct = (product) =>
+  product.fulfillmentType === "PrintOnDemand" &&
+  product.supplier?.name?.trim().toLowerCase() === "printful";
+
+const isInHouseProduct = (product) => product.fulfillmentType === "InHouse";
 
 export const getShippingRates = async ({ items, shippingAddress }) => {
   if (!Array.isArray(items) || items.length === 0) {
@@ -11,6 +32,97 @@ export const getShippingRates = async ({ items, shippingAddress }) => {
     throw new Error("Shipping address is required.");
   }
 
+  const toAddress = {
+    name: shippingAddress.name || "Customer",
+    street1: shippingAddress.address1,
+    street2: shippingAddress.address2 || undefined,
+    city: shippingAddress.city,
+    state: shippingAddress.state,
+    zip: shippingAddress.zipCode || shippingAddress.zip,
+    country: normalizeCountry(shippingAddress.country),
+    phone: shippingAddress.phone || undefined,
+    email: shippingAddress.email || undefined,
+  };
+
+  if (
+    !toAddress.street1 ||
+    !toAddress.city ||
+    !toAddress.state ||
+    !toAddress.zip
+  ) {
+    throw new Error("A complete shipping address is required.");
+  }
+
+  const validatedItems = [];
+
+  for (const item of items) {
+    const quantity = Number(item.quantity);
+
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+      throw new Error("Invalid item quantity.");
+    }
+
+    if (!item.productId) {
+      throw new Error("A valid product ID is required.");
+    }
+
+    const product = await Product.findById(item.productId);
+
+    if (!product || !product.active) {
+      throw new Error("A product in your cart is unavailable.");
+    }
+
+    const printful = isPrintfulProduct(product);
+    const inHouse = isInHouseProduct(product);
+
+    if (!printful && !inHouse) {
+      throw new Error(`Shipping is not configured for "${product.name}".`);
+    }
+
+    validatedItems.push({
+      product,
+      quantity,
+      printful,
+      inHouse,
+    });
+  }
+
+  const printfulItems = validatedItems.filter((item) => item.printful);
+
+  const inHouseItems = validatedItems.filter((item) => item.inHouse);
+
+  const hasPrintful = printfulItems.length > 0;
+  const hasInHouse = inHouseItems.length > 0;
+
+  // PRINTFUL ONLY: Use the configured Printful rate table.
+  if (hasPrintful && !hasInHouse) {
+    if (toAddress.country !== "US") {
+      throw new Error(
+        "International Printful shipping rates are not configured yet.",
+      );
+    }
+
+    const cost = calculatePrintfulShipping(
+      printfulItems.map(({ product, quantity }) => ({
+        category: product.category,
+        gender: product.gender,
+        quantity,
+      })),
+    );
+
+    return [
+      {
+        id: "printful-standard",
+        shipmentId: null,
+        carrier: "Printful",
+        service: "Standard Shipping",
+        cost,
+        estimatedDays: null,
+      },
+    ];
+  }
+
+  // IN-HOUSE ONLY OR MIXED CART: Use Shippo.
   const store = await Store.findOne().lean();
 
   if (!store?.shipping) {
@@ -27,48 +139,11 @@ export const getShippingRates = async ({ items, shippingAddress }) => {
     city: settings.city,
     state: settings.state,
     zip: settings.zip,
-    country: settings.country || "US",
+    country: normalizeCountry(settings.country),
     phone: settings.phone || undefined,
     email: settings.email || undefined,
   };
 
-  const toAddress = {
-    name: shippingAddress.name || "Customer",
-    street1: shippingAddress.address1,
-    street2: shippingAddress.address2 || undefined,
-    city: shippingAddress.city,
-    state: shippingAddress.state,
-    zip: shippingAddress.zipCode || shippingAddress.zip,
-    country: shippingAddress.country || "US",
-    phone: shippingAddress.phone || undefined,
-    email: shippingAddress.email || undefined,
-  };
-
-  if (
-    !toAddress.street1 ||
-    !toAddress.city ||
-    !toAddress.state ||
-    !toAddress.zip
-  ) {
-    throw new Error("A complete shipping address is required.");
-  }
-
-  // Verify that each submitted product exists and is active.
-  for (const item of items) {
-    const quantity = Number(item.quantity);
-
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
-      throw new Error("Invalid item quantity.");
-    }
-
-    const product = await Product.findById(item.productId);
-
-    if (!product || !product.active) {
-      throw new Error("A product in your cart is unavailable.");
-    }
-  }
-
-  // Use the parcel settings configured for your existing Shippo workflow.
   const parcel = {
     length: String(settings.packageLength),
     width: String(settings.packageWidth),
@@ -90,7 +165,7 @@ export const getShippingRates = async ({ items, shippingAddress }) => {
     );
   }
 
-  return shipment.rates
+  const rates = shipment.rates
     .filter((rate) => {
       const cost = Number(rate.amount);
 
@@ -109,4 +184,24 @@ export const getShippingRates = async ({ items, shippingAddress }) => {
       cost: Number(rate.amount),
       estimatedDays: rate.estimatedDays ?? null,
     }));
+
+  // MIXED CART: Only offer USPS Ground Advantage.
+  if (hasPrintful && hasInHouse) {
+    const groundAdvantageRates = rates.filter(
+      (rate) =>
+        /usps/i.test(rate.carrier || "") &&
+        /ground advantage/i.test(rate.service || ""),
+    );
+
+    if (groundAdvantageRates.length === 0) {
+      throw new Error(
+        "USPS Ground Advantage is unavailable for this address. Please try again later or contact the store.",
+      );
+    }
+
+    return groundAdvantageRates;
+  }
+
+  // IN-HOUSE ONLY: Return all valid Shippo rates.
+  return rates;
 };

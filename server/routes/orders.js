@@ -12,6 +12,8 @@ import {
   getOrderStats,
 } from "../controllers/orderController.js";
 
+import { validatePrintfulOrder } from "../services/printfulOrderService.js";
+
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -23,6 +25,37 @@ router.get("/success/:sessionId", getSuccessOrder);
 router.get("/number/:orderNumber", getOrderByNumber);
 
 router.get("/stats", getOrderStats);
+
+router.post("/:id/printful/retry", protect, async (req, res, next) => {
+  try {
+    const { submitPrintfulOrder } =
+      await import("../services/printfulOrderService.js");
+
+    const order = await submitPrintfulOrder(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Printful order recovery check completed.",
+      order,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/:id/printful/validate", protect, async (req, res, next) => {
+  try {
+    const result = await validatePrintfulOrder(req.params.id);
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get("/:id", getOrder);
 

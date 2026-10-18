@@ -62,6 +62,7 @@ const orderItemSchema = new mongoose.Schema(
         enum: [
           "Not Required",
           "Pending",
+          "Submitting",
           "Submitted",
           "Processing",
           "Shipped",
