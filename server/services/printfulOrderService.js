@@ -213,7 +213,11 @@ export async function submitPrintfulOrder(orderId) {
 
     console.error("Printful submission needs review:", {
       orderId: claimedOrder._id,
+      externalId: `AP-${claimedOrder._id}`,
+      status: "Submitting",
       error: error.message,
+      action:
+        "Check Printful for the external ID before attempting another submission.",
     });
 
     throw error;
