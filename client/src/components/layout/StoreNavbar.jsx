@@ -156,7 +156,7 @@ const StoreNavbar = () => {
             onClick={openContactModal}
             className="text-sm font-medium uppercase tracking-[0.2em] transition hover:text-gray-500 cursor-pointer"
           >
-            CUSTOM
+            CUSTOM FITS
           </button>
           <button
             onClick={openCart}
