@@ -82,7 +82,8 @@ const PrintfulProducts = () => {
       ) : (
         <div className="space-y-4">
           {products.map((product) => {
-            const isImported = importedIds.includes(product.id);
+            const isImported =
+              product.imported || importedIds.includes(product.id);
             const isImporting = importingId === product.id;
 
             return (
@@ -107,9 +108,7 @@ const PrintfulProducts = () => {
                     {product.synced} of {product.variants} variants synced
                   </p>
                   <p className="mt-2 text-sm font-medium">
-                    {isImported
-                      ? "Imported into ApparelPOS"
-                      : "Ready to import"}
+                    {isImported ? "Imported" : "Ready to import"}
                   </p>
                 </div>
 

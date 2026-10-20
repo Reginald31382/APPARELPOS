@@ -7,12 +7,29 @@ import {
 } from "../services/printfulService.js";
 
 // GET /api/printful/products
+
 export const getProducts = asyncHandler(async (req, res) => {
   const data = await getPrintfulProducts();
+  const printfulProducts = data.result || [];
+
+  const importedProducts = await Product.find({
+    "supplier.name": "Printful",
+  })
+    .select("supplier.productId")
+    .lean();
+
+  const importedIds = new Set(
+    importedProducts.map((product) => String(product.supplier?.productId)),
+  );
+
+  const products = printfulProducts.map((product) => ({
+    ...product,
+    imported: importedIds.has(String(product.id)),
+  }));
 
   res.status(200).json({
     success: true,
-    products: data.result || [],
+    products,
   });
 });
 

@@ -1,20 +1,23 @@
 import SEO from "../components/SEO";
+
 const About = () => {
   return (
     <>
       <SEO
         title="About J.Rome Studios"
-        description="Learn about J.Rome Studios, an urban apparel and streetwear brand built around creativity, culture, individuality, and expressive fashion."
+        description="Discover J.Rome Studios, a lifestyle apparel brand built around thoughtful design, quality materials, timeless style, and everyday confidence."
         path="/about"
       />
+
       <section className="bg-white">
         <div className="flex justify-center">
           <img
             src="https://i.postimg.cc/9QCLhrdv/jrome-leo-szn.png"
-            alt="J.Rome"
+            alt="J.Rome Studios logo"
             className="w-48 sm:w-56"
           />
         </div>
+
         <div className="mx-auto max-w-5xl px-6 py-20 lg:px-12">
           <div className="text-center">
             <p className="text-xs uppercase tracking-[0.35em] text-gray-500">
@@ -37,32 +40,36 @@ const About = () => {
             </p>
 
             <p>
-              Our garments are thoughtfully selected with an emphasis on
-              <span className="font-semibold text-black"> 100% cotton</span>,
-              delivering the comfort, durability, and breathable feel that make
-              a difference every time you wear them. We believe great clothing
-              starts with great materials.
+              Our garments are thoughtfully selected with an emphasis on{" "}
+              <span className="font-semibold text-black">
+                quality materials, comfort, durability, and everyday versatility
+              </span>
+              . From soft cotton to carefully chosen fabric blends, we
+              prioritize materials that complement each design and deliver a
+              comfortable feel you can appreciate every time you wear them. We
+              believe great clothing starts with thoughtful material selection
+              and attention to detail.
             </p>
 
             <p>
               While J.Rome began as a creative brand focused on design and
               branding, it has evolved into a lifestyle apparel company built
               around craftsmanship, simplicity, and everyday wear. Every piece
-              is created to become a staple in your wardrobe—not just another
+              is designed to become a staple in your wardrobe—not just another
               item in your closet.
             </p>
 
             <p>
               Whether you're representing your city, expressing your personal
               style, or simply looking for apparel you can rely on, J.Rome is
-              committed to providing premium-quality products that you'll be
-              proud to wear.
+              committed to offering thoughtfully designed, quality apparel
+              you'll be proud to wear.
             </p>
           </div>
 
           <div className="mt-16 border-t pt-8 text-center">
             <p className="text-sm uppercase tracking-[0.3em] text-gray-500">
-              Premium Materials. Timeless Style. Built to Last.
+              Quality Materials. Timeless Style. Everyday Confidence.
             </p>
 
             <h2 className="mt-2 text-3xl font-bold">SINCE 2010</h2>
