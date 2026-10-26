@@ -14,3 +14,8 @@ export const importPrintfulProduct = async (id) => {
   const { data } = await api.post(`/printful/products/${id}/import`);
   return data;
 };
+
+export const deleteImportedPrintfulProduct = async (id) => {
+  const { data } = await api.delete(`/printful/products/${id}/import`);
+  return data;
+};

@@ -1,5 +1,6 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import Product from "../models/Products.js";
+import Order from "../models/Order.js";
 import {
   getPrintfulProducts,
   getPrintfulProductDetails,
@@ -342,5 +343,47 @@ export const dryRunPrintfulVariant = asyncHandler(async (req, res) => {
     createsMongoOrder: false,
     createsStripeSession: false,
     submitsToPrintful: false,
+  });
+});
+
+export const deleteImportedPrintfulProduct = asyncHandler(async (req, res) => {
+  const printfulProductId = String(req.params.id);
+
+  const product = await Product.findOne({
+    "supplier.name": "Printful",
+    "supplier.productId": printfulProductId,
+  });
+
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: "Imported Printful product not found in ApparelPOS.",
+    });
+  }
+
+  const orderReference = await Order.exists({
+    $or: [
+      { "items.productId": product._id },
+      {
+        "items.supplier.name": "Printful",
+        "items.supplier.productId": printfulProductId,
+      },
+    ],
+  });
+
+  if (orderReference) {
+    return res.status(409).json({
+      success: false,
+      message:
+        "This product is referenced by an order and cannot be deleted. Deactivate it instead to preserve order history.",
+    });
+  }
+
+  await product.deleteOne();
+
+  return res.status(200).json({
+    success: true,
+    message: `${product.name} was removed from ApparelPOS.`,
+    productId: printfulProductId,
   });
 });

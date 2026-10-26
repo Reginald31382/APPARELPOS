@@ -3,30 +3,32 @@ import { toast } from "react-hot-toast";
 import {
   fetchPrintfulProducts,
   importPrintfulProduct,
+  deleteImportedPrintfulProduct,
 } from "../../services/printfulService";
 
 const PrintfulProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [importingId, setImportingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const [importedIds, setImportedIds] = useState([]);
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchPrintfulProducts();
-        setProducts(data);
-      } catch (error) {
-        console.error("Failed to load Printful products:", error);
-        toast.error(
-          error.response?.data?.message || "Unable to load Printful products.",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchPrintfulProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error("Failed to load Printful products:", error);
+      toast.error(
+        error.response?.data?.message || "Unable to load Printful products.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadProducts();
   }, []);
 
@@ -36,13 +38,31 @@ const PrintfulProducts = () => {
 
       const result = await importPrintfulProduct(product.id);
 
-      setImportedIds((current) => [...current, product.id]);
+      setImportedIds((current) =>
+        current.includes(product.id) ? current : [...current, product.id],
+      );
+
+      setProducts((current) =>
+        current.map((item) =>
+          String(item.id) === String(product.id)
+            ? { ...item, imported: true }
+            : item,
+        ),
+      );
 
       toast.success(result.message || `${product.name} imported successfully.`);
     } catch (error) {
       if (error.response?.status === 409) {
         setImportedIds((current) =>
           current.includes(product.id) ? current : [...current, product.id],
+        );
+
+        setProducts((current) =>
+          current.map((item) =>
+            String(item.id) === String(product.id)
+              ? { ...item, imported: true }
+              : item,
+          ),
         );
 
         toast.error("This product is already in ApparelPOS.");
@@ -56,6 +76,44 @@ const PrintfulProducts = () => {
       }
     } finally {
       setImportingId(null);
+    }
+  };
+
+  const handleDelete = async (product) => {
+    const confirmed = window.confirm(
+      `Delete "${product.name}" from ApparelPOS?\n\nThis removes the product from your ApparelPOS database only. It does not delete the product from Printful.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeletingId(product.id);
+
+      const result = await deleteImportedPrintfulProduct(product.id);
+
+      setImportedIds((current) =>
+        current.filter((id) => String(id) !== String(product.id)),
+      );
+
+      setProducts((current) =>
+        current.map((item) =>
+          String(item.id) === String(product.id)
+            ? { ...item, imported: false }
+            : item,
+        ),
+      );
+
+      toast.success(
+        result.message || `${product.name} deleted from ApparelPOS.`,
+      );
+    } catch (error) {
+      console.error("Printful product deletion failed:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Unable to delete this product from ApparelPOS.",
+      );
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -83,8 +141,12 @@ const PrintfulProducts = () => {
         <div className="space-y-4">
           {products.map((product) => {
             const isImported =
-              product.imported || importedIds.includes(product.id);
-            const isImporting = importingId === product.id;
+              product.imported ||
+              importedIds.some((id) => String(id) === String(product.id));
+
+            const isImporting = String(importingId) === String(product.id);
+            const isDeleting = String(deletingId) === String(product.id);
+            const isBusy = isImporting || isDeleting;
 
             return (
               <div
@@ -112,18 +174,31 @@ const PrintfulProducts = () => {
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => handleImport(product)}
-                  disabled={isImported || isImporting}
-                  className="rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isImporting
-                    ? "Importing..."
-                    : isImported
-                      ? "Already Imported"
-                      : "Import to ApparelPOS"}
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleImport(product)}
+                    disabled={isImported || isBusy}
+                    className="rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isImporting
+                      ? "Importing..."
+                      : isImported
+                        ? "Already Imported"
+                        : "Import to ApparelPOS"}
+                  </button>
+
+                  {isImported && (
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(product)}
+                      disabled={isBusy}
+                      className="rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}

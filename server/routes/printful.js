@@ -6,6 +6,7 @@ import {
   validateImportedPrintfulProduct,
   verifyPrintfulVariantIds,
   dryRunPrintfulVariant,
+  deleteImportedPrintfulProduct,
 } from "../controllers/printfulController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
@@ -67,6 +68,13 @@ router.get(
       next(error);
     }
   },
+);
+
+router.delete(
+  "/products/:id/import",
+  protect,
+  authorize("Admin"),
+  deleteImportedPrintfulProduct,
 );
 
 export default router;
