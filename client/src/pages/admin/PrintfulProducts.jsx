@@ -12,6 +12,7 @@ const PrintfulProducts = () => {
   const [importingId, setImportingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [importedIds, setImportedIds] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadProducts = async () => {
     try {
@@ -117,13 +118,48 @@ const PrintfulProducts = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true);
+
+      const data = await fetchPrintfulProducts();
+      setProducts(data);
+
+      setImportedIds(
+        data.filter((product) => product.imported).map((product) => product.id),
+      );
+
+      toast.success("Printful products refreshed.");
+    } catch (error) {
+      console.error("Failed to refresh Printful products:", error);
+      toast.error(
+        error.response?.data?.message || "Unable to refresh Printful products.",
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Printful Products</h1>
-        <p className="mt-1 text-gray-500">
-          Import synced Printful products into ApparelPOS.
-        </p>
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Printful Products</h1>
+          <p className="mt-1 text-gray-500">
+            Import synced Printful products into ApparelPOS.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleRefresh}
+          disabled={
+            loading || refreshing || importingId !== null || deletingId !== null
+          }
+          className="rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {refreshing ? "Refreshing..." : "Refresh Products"}
+        </button>
       </div>
 
       {loading ? (
