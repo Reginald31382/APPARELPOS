@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { emitOrderUpdated } from "../services/socketService.js";
 import { getStripe } from "../services/stripeService.js";
 import { completeOrder, createStripeOrder } from "../services/orderService.js";
+import { submitPrintfulOrder } from "../services/printfulOrderService.js";
 
 /*
 GET /api/orders
@@ -57,13 +58,20 @@ export const createOrder = async (req, res) => {
 
     const order = await completeOrder({
       ...req.body,
-
       paymentMethod: req.body.paymentMethod || "Cash",
-
       paymentStatus: "Paid",
-
       status: "Processing",
     });
+
+    const hasPrintfulItems = order.items.some(
+      (item) =>
+        item.fulfillmentType === "PrintOnDemand" &&
+        item.supplier?.name === "Printful",
+    );
+
+    if (hasPrintfulItems) {
+      await submitPrintfulOrder(order._id);
+    }
 
     res.status(201).json(order);
   } catch (error) {
@@ -209,11 +217,11 @@ export const getSuccessOrder = async (req, res) => {
     });
 
     if (!order) {
-      // console.log("🛠 Creating missing order from Stripe session...");
-
       order = await createStripeOrder(session);
+    }
 
-      // console.log("✅ Recovery successful:", order.orderNumber);
+    if (order.paymentStatus === "Paid") {
+      await submitPrintfulOrder(order._id);
     }
 
     res.json(order);
