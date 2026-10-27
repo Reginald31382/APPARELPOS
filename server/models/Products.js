@@ -157,6 +157,11 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    recommendedProduct: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      default: null,
+    },
   },
   {
     timestamps: true,

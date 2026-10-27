@@ -89,7 +89,14 @@ export const getProducts = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).lean();
+    const product = await Product.findById(req.params.id)
+      .populate({
+        path: "recommendedProduct",
+        select: "name price salePrice images variants active fulfillmentType",
+        match: { active: { $ne: false } },
+      })
+      .lean();
+
     if (!product) {
       return res.status(404).json({
         message: "Product not found.",
@@ -191,7 +198,13 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).lean();
+    const product = await Product.findById(req.params.id)
+      .populate({
+        path: "recommendedProduct",
+        select: "name price salePrice images variants active fulfillmentType",
+        match: { active: { $ne: false } },
+      })
+      .lean();
     if (!product) {
       return res.status(404).json({
         message: "Product not found.",

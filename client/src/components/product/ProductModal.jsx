@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { createProduct, updateProduct } from "../../services/productService";
+import {
+  createProduct,
+  updateProduct,
+  fetchProducts,
+} from "../../services/productService";
 
 const initialProduct = {
   name: "",
@@ -19,6 +23,7 @@ const initialProduct = {
 
   images: [],
   variants: [],
+  recommendedProduct: "",
 };
 
 const ProductModal = ({
@@ -29,7 +34,9 @@ const ProductModal = ({
 }) => {
   const [product, setProduct] = useState(initialProduct);
   const [imageUrl, setImageUrl] = useState("");
+  const [recommendationProducts, setRecommendationProducts] = useState([]);
   const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -40,6 +47,10 @@ const ProductModal = ({
         salePrice: selectedProduct.salePrice ?? "",
         cost: selectedProduct.cost ?? "",
         weight: selectedProduct.weight ?? "",
+        recommendedProduct:
+          selectedProduct.recommendedProduct?._id ||
+          selectedProduct.recommendedProduct ||
+          "",
       });
     } else {
       setProduct(initialProduct);
@@ -47,6 +58,22 @@ const ProductModal = ({
 
     setImageUrl("");
   }, [selectedProduct, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const loadProducts = async () => {
+      try {
+        const products = await fetchProducts({ status: "all" });
+        setRecommendationProducts(Array.isArray(products) ? products : []);
+      } catch (error) {
+        console.error("Failed to load recommendation products:", error);
+        setRecommendationProducts([]);
+      }
+    };
+
+    loadProducts();
+  }, [isOpen]);
 
   const emptyVariant = {
     color: "",
@@ -189,6 +216,7 @@ const ProductModal = ({
         salePrice: Number(product.salePrice || 0),
         cost: Number(product.cost || 0),
         weight: Number(product.weight),
+        recommendedProduct: product.recommendedProduct || null,
       };
 
       if (selectedProduct) {
@@ -504,6 +532,41 @@ const ProductModal = ({
                     />
                     Active Product
                   </label>
+
+                  <div className="border-t pt-4">
+                    <label
+                      htmlFor="recommendedProduct"
+                      className="mb-2 block text-sm font-medium"
+                    >
+                      Recommend Another Product
+                    </label>
+
+                    <select
+                      id="recommendedProduct"
+                      name="recommendedProduct"
+                      value={product.recommendedProduct || ""}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border p-3"
+                    >
+                      <option value="">No recommendation</option>
+                      {recommendationProducts
+                        .filter(
+                          (item) =>
+                            item._id !== selectedProduct?._id &&
+                            item.active !== false,
+                        )
+                        .map((item) => (
+                          <option key={item._id} value={item._id}>
+                            {item.name}
+                          </option>
+                        ))}
+                    </select>
+
+                    <p className="mt-2 text-sm text-gray-500">
+                      Choose the product to promote on this product's page.
+                      Leave this empty to hide the promotion.
+                    </p>
+                  </div>
                 </div>
               </div>
             </section>

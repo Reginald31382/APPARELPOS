@@ -23,6 +23,33 @@ const getVariantPricing = (variant, productPrice) => {
   };
 };
 
+const getRecommendationPricing = (product) => {
+  const variants = product?.variants || [];
+
+  const prices = variants.map((variant) => {
+    const regularPrice = Number(variant.price ?? product.price ?? 0);
+
+    const salePrice = Number(variant.salePrice ?? 0);
+
+    const validSalePrice =
+      salePrice > 0 && salePrice < regularPrice ? salePrice : null;
+
+    return {
+      regularPrice,
+      salePrice: validSalePrice,
+      effectivePrice: validSalePrice ?? regularPrice,
+    };
+  });
+
+  if (prices.length === 0) {
+    return getVariantPricing(null, product?.price);
+  }
+
+  return prices.reduce((lowest, current) =>
+    current.effectivePrice < lowest.effectivePrice ? current : lowest,
+  );
+};
+
 const Product = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -36,6 +63,13 @@ const Product = () => {
   const [showStickyCart, setShowStickyCart] = useState(false);
   const addItem = useCustomerCartStore((state) => state.addItem);
   const { data: product, isLoading, isError } = useProduct(id);
+
+  useEffect(() => {
+    if (product) {
+      console.log("CURRENT PRODUCT:", product);
+      console.log("RECOMMENDED PRODUCT:", product.recommendedProduct);
+    }
+  }, [product]);
 
   useEffect(() => {
     if (product?.images?.length && !selectedImage) {
@@ -391,6 +425,70 @@ const Product = () => {
             )}
           </div>
         </div>
+        {product.recommendedProduct && (
+          <section className="mt-12 border-t pt-10">
+            <h2 className="mb-6 text-2xl font-bold sm:text-3xl">
+              What Most People Buy With This Product
+            </h2>
+
+            {(() => {
+              const recommended = product.recommendedProduct;
+              const pricing = getRecommendationPricing(recommended);
+              const image = recommended.images?.[0];
+
+              return (
+                <div className="flex flex-col gap-5 rounded-2xl border p-4 sm:flex-row sm:items-center sm:p-6">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/product/${recommended._id}`)}
+                    className="block w-full shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:w-48"
+                    aria-label={`View ${recommended.name}`}
+                  >
+                    {image ? (
+                      <img
+                        src={image}
+                        alt={recommended.name}
+                        loading="lazy"
+                        className="aspect-square w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex aspect-square items-center justify-center text-sm text-gray-500">
+                        No image available
+                      </div>
+                    )}
+                  </button>
+
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold">
+                      {recommended.name}
+                    </h3>
+
+                    <div className="mt-3 flex flex-wrap items-baseline gap-3">
+                      <p className="text-xl font-bold">
+                        {recommended.variants?.length ? "From " : ""}$
+                        {pricing.effectivePrice.toFixed(2)}
+                      </p>
+
+                      {pricing.salePrice !== null && (
+                        <p className="text-base text-gray-400 line-through">
+                          ${pricing.regularPrice.toFixed(2)}
+                        </p>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/product/${recommended._id}`)}
+                      className="mt-5 rounded-lg bg-black px-6 py-3 font-semibold text-white transition hover:bg-neutral-800"
+                    >
+                      View Product
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </section>
+        )}
         <ProductImageLightbox
           isOpen={isLightboxOpen}
           onClose={() => setIsLightboxOpen(false)}
