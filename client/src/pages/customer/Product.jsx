@@ -112,9 +112,11 @@ const Product = () => {
       url: productUrl,
       priceCurrency: "USD",
       price: product.price.toFixed(2),
-      availability: product.variants?.some((variant) => variant.quantity > 0)
-        ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock",
+      availability:
+        product.fulfillmentType === "PrintOnDemand" ||
+        product.variants?.some((variant) => variant.quantity > 0)
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
       seller: {
         "@type": "Organization",
         name: "J.Rome Studios",
@@ -327,7 +329,7 @@ const Product = () => {
               onClick={handleAddToCart}
               className="w-full bg-black text-white py-4 rounded-md font-semibold transition hover:bg-neutral-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {selectedVariant?.quantity ? "Add to Cart" : "Choose Color"}
+              {selectedVariant ? "Add to Cart" : "Choose Color"}
             </button>
 
             {product.description && (
