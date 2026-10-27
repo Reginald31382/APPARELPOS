@@ -41,7 +41,17 @@ export const getProducts = async (req, res) => {
     }
 
     if (gender && gender.trim() !== "") {
-      query.gender = gender;
+      const normalizedGender = gender.trim().toLowerCase();
+
+      if (normalizedGender === "men") {
+        query.gender = { $in: ["Men", "Unisex"] };
+      } else if (normalizedGender === "women") {
+        query.gender = { $in: ["Women", "Unisex"] };
+      } else if (normalizedGender === "unisex") {
+        query.gender = "Unisex";
+      } else if (normalizedGender === "kids") {
+        query.gender = "Kids";
+      }
     }
 
     if (brand && brand.trim() !== "") {
