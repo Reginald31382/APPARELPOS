@@ -1,5 +1,6 @@
 import { createStripeOrder } from "../services/orderService.js";
 import { getStripe } from "../services/stripeService.js";
+import { submitPrintfulOrder } from "../services/printfulOrderService.js";
 
 export const webhook = async (req, res) => {
   const stripe = getStripe();
@@ -36,7 +37,8 @@ export const webhook = async (req, res) => {
     // console.log("Webhook payment status:", stripeSession.payment_status);
     // console.log("Webhook session metadata:", stripeSession.metadata);
 
-    await createStripeOrder(stripeSession);
+    const order = await createStripeOrder(stripeSession);
+    await submitPrintfulOrder(order._id);
 
     return res.status(200).json({ received: true });
   } catch (error) {

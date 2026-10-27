@@ -44,13 +44,42 @@ const Product = () => {
   }, [product, selectedImage]);
 
   useEffect(() => {
+    if (!product?.variants?.length) return;
+
+    const availableColors = [
+      ...new Set(
+        product.variants.map((variant) => normalizeColor(variant.color)),
+      ),
+    ];
+
+    setSelectedColor((current) =>
+      availableColors.includes(current) ? current : availableColors[0],
+    );
+    setSelectedSize("");
+  }, [product]);
+
+  useEffect(() => {
     if (!product?.variants?.length || !selectedColor) return;
 
-    const firstVariantForColor = product.variants.find(
+    const variantsForColor = product.variants.filter(
       (variant) => normalizeColor(variant.color) === selectedColor,
     );
 
-    setSelectedSize(firstVariantForColor?.size || "");
+    const availableSizes = [
+      ...new Set(
+        variantsForColor
+          .map((variant) => String(variant.size || "").trim())
+          .filter(
+            (size) =>
+              size && !["one size", "default"].includes(size.toLowerCase()),
+          ),
+      ),
+    ];
+
+    setSelectedSize((current) => {
+      if (availableSizes.includes(current)) return current;
+      return availableSizes[0] || variantsForColor[0]?.size || "";
+    });
   }, [selectedColor, product]);
 
   useEffect(() => {
@@ -127,19 +156,33 @@ const Product = () => {
   const normalizeColor = (color) =>
     (color || "Default").trim().replace(/\s+/g, " ");
 
+  const variants = product.variants || [];
+
   const colors = [
-    ...new Set(
-      product.variants.map((variant) => normalizeColor(variant.color)),
-    ),
+    ...new Set(variants.map((variant) => normalizeColor(variant.color))),
   ];
-  const sizes = product.variants.filter(
+
+  const hasColorOptions = colors.length > 1;
+
+  const variantsForColor = variants.filter(
     (variant) => normalizeColor(variant.color) === selectedColor,
   );
 
-  const selectedVariant = product.variants.find(
-    (variant) =>
-      normalizeColor(variant.color) === selectedColor &&
-      variant.size === selectedSize,
+  const sizeOptions = [
+    ...new Set(
+      variantsForColor
+        .map((variant) => String(variant.size || "").trim())
+        .filter(
+          (size) =>
+            size && !["one size", "default"].includes(size.toLowerCase()),
+        ),
+    ),
+  ];
+
+  const hasSizeOptions = sizeOptions.length > 1;
+
+  const selectedVariant = variantsForColor.find((variant) =>
+    hasSizeOptions ? String(variant.size || "").trim() === selectedSize : true,
   );
 
   const selectedPricing = getVariantPricing(selectedVariant, product.price);
@@ -164,6 +207,9 @@ const Product = () => {
       stock: selectedVariant.quantity,
       unitPrice: selectedPricing.effectivePrice,
       quantity,
+      fulfillmentType: product.fulfillmentType,
+      supplier: product.supplier,
+      supplierVariantId: selectedVariant.supplierVariantId,
     });
 
     navigate("/cart");
@@ -243,46 +289,50 @@ const Product = () => {
             </div>
 
             {/* Color */}
-            <div>
-              <h3 className="font-semibold mb-3">Color</h3>
+            {hasColorOptions && (
+              <div>
+                <h3 className="mb-3 font-semibold">Color</h3>
 
-              <div className="flex flex-wrap gap-3">
-                {colors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`min-w-[70px] rounded-lg border px-4 py-3 transition ${
-                      selectedColor === color
-                        ? "bg-black text-white border-black"
-                        : "border-gray-300 hover:border-black"
-                    }`}
-                  >
-                    {color}
-                  </button>
-                ))}
+                <div className="flex flex-wrap gap-3">
+                  {colors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`min-w-[70px] rounded-lg border px-4 py-3 transition ${
+                        selectedColor === color
+                          ? "border-black bg-black text-white"
+                          : "border-gray-300 hover:border-black"
+                      }`}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Size */}
-            <div>
-              <h3 className="font-semibold mb-3">Size</h3>
+            {hasSizeOptions && (
+              <div>
+                <h3 className="mb-3 font-semibold">Size / Model</h3>
 
-              <div className="flex flex-wrap gap-3">
-                {sizes.map((variant) => (
-                  <button
-                    key={variant.sku}
-                    onClick={() => setSelectedSize(variant.size)}
-                    className={`min-w-[56px] rounded-lg border px-4 py-3 transition ${
-                      selectedSize === variant.size
-                        ? "bg-black text-white border-black"
-                        : "border-gray-300 hover:border-black"
-                    }`}
-                  >
-                    {variant.size}
-                  </button>
-                ))}
+                <div className="flex flex-wrap gap-3">
+                  {sizeOptions.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`min-w-[56px] rounded-lg border px-4 py-3 transition ${
+                        selectedSize === size
+                          ? "border-black bg-black text-white"
+                          : "border-gray-300 hover:border-black"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {selectedVariant && (
               <p className="text-sm text-gray-500">
@@ -353,7 +403,12 @@ const Product = () => {
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
               <div>
                 <p className="text-sm text-gray-500">
-                  {selectedColor} / {selectedSize}
+                  {[
+                    hasColorOptions ? selectedColor : "",
+                    hasSizeOptions ? selectedSize : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" / ") || "Standard option"}
                 </p>
 
                 <div className="flex items-baseline gap-2">

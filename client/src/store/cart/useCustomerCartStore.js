@@ -26,7 +26,10 @@ const useCustomerCartStore = create(
         if (existingIndex !== -1) {
           const newQuantity = items[existingIndex].quantity + quantityToAdd;
 
-          if (newQuantity > item.stock) {
+          if (
+            item.fulfillmentType !== "PrintOnDemand" &&
+            newQuantity > item.stock
+          ) {
             notifyError("Not enough inventory");
             return;
           }
@@ -59,7 +62,10 @@ const useCustomerCartStore = create(
 
         if (!item) return;
 
-        if (item.quantity >= item.stock) {
+        if (
+          item.fulfillmentType !== "PrintOnDemand" &&
+          item.quantity >= item.stock
+        ) {
           notifyError("Not enough inventory");
           return;
         }
@@ -110,7 +116,10 @@ const useCustomerCartStore = create(
           return true;
         }
 
-        if (newQuantity > item.stock) {
+        if (
+          item.fulfillmentType !== "PrintOnDemand" &&
+          newQuantity > item.stock
+        ) {
           notifyError("Not enough inventory");
           return false;
         }
