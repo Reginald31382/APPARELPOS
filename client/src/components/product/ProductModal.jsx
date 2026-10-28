@@ -344,6 +344,7 @@ const ProductModal = ({
                   <option value="Shorts">Shorts</option>
                   <option value="Shoes">Shoes</option>
                   <option value="Accessories">Accessories</option>
+                  <option value="Accessories">Hats</option>
                 </select>
               </div>
 
