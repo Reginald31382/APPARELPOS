@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lavishly+Yours&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&family=Lavishly+Yours&display=swap");
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -7,7 +8,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: var(--font-sans);
+  --font-heading: "Cormorant Garamond", serif;
   --font-sans: "Geist Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -122,11 +123,69 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
     @apply font-sans;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Geist Variable", sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 4vw, 3.5rem);
+  }
+
+  h2 {
+    font-size: clamp(1.875rem, 3vw, 2.75rem);
+  }
+
+  h3 {
+    font-size: clamp(1.5rem, 2vw, 2rem);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button {
+    letter-spacing: 0.02em;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  a {
+    text-underline-offset: 3px;
+  }
+
+  ::selection {
+    background: #e8ded0;
+    color: #171717;
   }
 }
 
@@ -178,4 +237,41 @@
 
 .announcement-track:hover {
   animation-play-state: paused;
+}
+
+/* Premium navigation */
+nav a {
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+}
+
+/* Product titles */
+.product-title {
+  font-family: "Geist Variable", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.45;
+}
+
+/* Product prices */
+.product-price {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Small labels and product details */
+.product-label,
+.product-details {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Premium button typography */
+.btn-premium {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
