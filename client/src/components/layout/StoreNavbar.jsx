@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { RiInstagramFill } from "react-icons/ri";
 import { GrUserWorker } from "react-icons/gr";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import useNewsletterStore from "../../store/ui/useNewsletterStore";
 import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useMobileCartStore from "../../store/ui/useMobileCartStore";
@@ -70,6 +70,35 @@ const StoreNavbar = () => {
     0,
   );
 
+  const collectionsRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        collectionsRef.current &&
+        !collectionsRef.current.contains(event.target)
+      ) {
+        setMoreOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setMoreOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
       {/* Top Bar */}
@@ -118,9 +147,12 @@ const StoreNavbar = () => {
             </NavLink>
           ))}
 
-          <div className="relative">
+          <div className="relative" ref={collectionsRef}>
             <button
-              onClick={() => setMoreOpen(!moreOpen)}
+              type="button"
+              aria-expanded={moreOpen}
+              aria-haspopup="true"
+              onClick={() => setMoreOpen((prev) => !prev)}
               className="flex items-center gap-1 text-sm uppercase tracking-[0.25em] text-gray-500 transition hover:text-black"
             >
               Collections
