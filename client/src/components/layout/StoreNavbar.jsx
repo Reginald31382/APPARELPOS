@@ -28,6 +28,7 @@ const moreLinks = [
   { name: "Pants", path: "/shop?category=Pants" },
   { name: "Shorts", path: "/shop?category=Shorts" },
   { name: "Shoes", path: "/shop?category=Shoes" },
+  { name: "Hats", path: "/shop?category=Hats" },
 ];
 
 const infoLinks = [
