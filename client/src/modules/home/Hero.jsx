@@ -38,12 +38,12 @@ const Hero = () => {
                 Explore Collection
               </Link>
 
-              <Link
+              {/* <Link
                 to="/shop?sort=newest"
                 className="rounded-lg border border-white px-8 py-4 text-center font-semibold uppercase tracking-wide text-white transition hover:bg-white hover:text-black"
               >
                 New Arrivals
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
