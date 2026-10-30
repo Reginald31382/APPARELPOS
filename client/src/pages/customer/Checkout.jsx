@@ -85,13 +85,21 @@ const Checkout = () => {
       const payload = {
         items: items.map((item) => ({
           productId: item._id,
+          sku: item.sku,
+          color: item.color,
+          size: item.size,
           quantity: item.quantity,
         })),
         shippingAddress: {
+          firstName: checkout.firstName,
+          lastName: checkout.lastName,
+          email: checkout.email,
+          phone: checkout.phone,
           zipCode: checkout.zip,
           state: checkout.state,
           city: checkout.city,
           address1: checkout.address1,
+          address2: checkout.address2,
           country: "US",
         },
       };

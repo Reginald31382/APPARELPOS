@@ -159,6 +159,11 @@ const orderSchema = new mongoose.Schema(
         default: "Ground Advantage",
       },
 
+      rateId: {
+        type: String,
+        default: "",
+      },
+
       cost: {
         type: Number,
         default: 0,

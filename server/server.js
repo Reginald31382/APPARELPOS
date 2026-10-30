@@ -30,6 +30,7 @@ import reviewRoutes from "./routes/review.js";
 import receiptRoutes from "./routes/receipts.js";
 import newsletterRoutes from "./routes/newsletter.js";
 import printfulRoutes from "./routes/printful.js";
+import printifyRoutes from "./routes/printify.js";
 
 import stripeRoutes from "./routes/stripe.js";
 
@@ -110,6 +111,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/receipts", receiptRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/printful", printfulRoutes);
+app.use("/api/printify", printifyRoutes);
 
 app.get("/", (req, res) => {
   res.json({

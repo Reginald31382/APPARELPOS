@@ -1,6 +1,7 @@
 import { createStripeOrder } from "../services/orderService.js";
 import { getStripe } from "../services/stripeService.js";
 import { submitPrintfulOrder } from "../services/printfulOrderService.js";
+import { submitPrintifyOrder } from "../services/printifyOrderService.js";
 
 export const webhook = async (req, res) => {
   const stripe = getStripe();
@@ -24,7 +25,6 @@ export const webhook = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
-  // Acknowledge events this handler does not process.
   if (event.type !== "checkout.session.completed") {
     return res.status(200).json({ received: true });
   }
@@ -32,19 +32,86 @@ export const webhook = async (req, res) => {
   try {
     const stripeSession = event.data.object;
 
-    // console.log("Webhook event type:", event.type);
-    // console.log("Webhook session ID:", stripeSession.id);
-    // console.log("Webhook payment status:", stripeSession.payment_status);
-    // console.log("Webhook session metadata:", stripeSession.metadata);
-
+    // Create or retrieve the order. This function should be idempotent.
     const order = await createStripeOrder(stripeSession);
-    await submitPrintfulOrder(order._id);
 
-    return res.status(200).json({ received: true });
+    const fulfillmentErrors = [];
+
+    const supplierFulfillmentEnabled =
+      process.env.ENABLE_SUPPLIER_FULFILLMENT === "true";
+
+    if (supplierFulfillmentEnabled) {
+      try {
+        await submitPrintfulOrder(order._id);
+      } catch (error) {
+        fulfillmentErrors.push({
+          supplier: "Printful",
+          message: error.message,
+        });
+
+        console.error("Printful fulfillment failed:", {
+          orderId: String(order._id),
+          error: error.message,
+        });
+      }
+
+      try {
+        await submitPrintifyOrder(order._id);
+      } catch (error) {
+        fulfillmentErrors.push({
+          supplier: "Printify",
+          message: error.message,
+        });
+
+        console.error("Printify fulfillment failed:", {
+          orderId: String(order._id),
+          error: error.message,
+        });
+      }
+    } else {
+      console.log(
+        "Supplier fulfillment skipped: ENABLE_SUPPLIER_FULFILLMENT is not true.",
+      );
+    }
+
+    try {
+      await submitPrintfulOrder(order._id);
+    } catch (error) {
+      fulfillmentErrors.push({
+        supplier: "Printful",
+        message: error.message,
+      });
+
+      console.error("Printful fulfillment failed:", {
+        orderId: String(order._id),
+        error: error.message,
+      });
+    }
+
+    try {
+      await submitPrintifyOrder(order._id);
+    } catch (error) {
+      fulfillmentErrors.push({
+        supplier: "Printify",
+        message: error.message,
+      });
+
+      console.error("Printify fulfillment failed:", {
+        orderId: String(order._id),
+        error: error.message,
+      });
+    }
+
+    // The paid order is saved, so acknowledge the event rather than
+    // repeatedly retrying fulfillment automatically via Stripe.
+    return res.status(200).json({
+      received: true,
+      orderId: String(order._id),
+      fulfillmentErrors,
+    });
   } catch (error) {
     console.error("Stripe checkout order processing failed:", error);
 
-    // A non-2xx response tells Stripe to retry the webhook.
     return res.status(500).json({
       received: false,
       message: "Order processing failed.",

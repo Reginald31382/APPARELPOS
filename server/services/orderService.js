@@ -71,7 +71,7 @@ export async function completeOrder({
               orderId: "",
               status:
                 item.fulfillmentType === "PrintOnDemand" &&
-                item.supplier === "Printful"
+                ["Printful", "Printify"].includes(item.supplier)
                   ? "Pending"
                   : "Not Required",
               lastError: "",
@@ -84,6 +84,7 @@ export async function completeOrder({
           shipping: {
             carrier: shipping.carrier || "USPS",
             service: shipping.service || "Ground Advantage",
+            rateId: shipping.id || shipping.rateId || "",
             cost: shipping.cost || 0,
             trackingNumber: shipping.trackingNumber || "",
             labelUrl: shipping.labelUrl || "",

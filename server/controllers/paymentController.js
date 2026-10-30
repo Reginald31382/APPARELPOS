@@ -98,6 +98,9 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     items: validatedItems.map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
+      sku: item.sku,
+      color: item.color,
+      size: item.size,
     })),
     shippingAddress,
   });
