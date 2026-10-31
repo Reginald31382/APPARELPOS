@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import ProductImageLightbox from "../../components/product/ProductImageLightbox";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,7 +29,6 @@ const getRecommendationPricing = (product) => {
 
   const prices = variants.map((variant) => {
     const regularPrice = Number(variant.price ?? product.price ?? 0);
-
     const salePrice = Number(variant.salePrice ?? 0);
 
     const validSalePrice =
@@ -50,6 +50,9 @@ const getRecommendationPricing = (product) => {
   );
 };
 
+const normalizeColor = (color) =>
+  (color || "Default").trim().replace(/\s+/g, " ");
+
 const Product = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -59,17 +62,20 @@ const Product = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
   const purchaseSectionRef = useRef(null);
   const [showStickyCart, setShowStickyCart] = useState(false);
+
   const addItem = useCustomerCartStore((state) => state.addItem);
   const { data: product, isLoading, isError } = useProduct(id);
 
+  // Reset selections when product changes
   useEffect(() => {
-    if (product) {
-      console.log("CURRENT PRODUCT:", product);
-      console.log("RECOMMENDED PRODUCT:", product.recommendedProduct);
-    }
-  }, [product]);
+    setSelectedImage("");
+    setSelectedColor("");
+    setSelectedSize("");
+    setQuantity(1);
+  }, [id]);
 
   useEffect(() => {
     if (product?.images?.length && !selectedImage) {
@@ -89,6 +95,7 @@ const Product = () => {
     setSelectedColor((current) =>
       availableColors.includes(current) ? current : availableColors[0],
     );
+
     setSelectedSize("");
   }, [product]);
 
@@ -147,13 +154,21 @@ const Product = () => {
   const productDescription =
     product.description || `Shop ${product.name} from J.Rome Studios.`;
 
+  const sanitizedDescription = DOMPurify.sanitize(product.description || "", {
+    USE_PROFILES: { html: true },
+  });
+
   const productUrl = `https://www.jrome-studios.com/product/${product._id}`;
 
   const primaryVariant = product.variants?.[0];
 
   const isPrintOnDemand = product.fulfillmentType === "PrintOnDemand";
+
+  // A sold-out product cannot be purchased, regardless of fulfillment type.
   const canPurchase = (variant) =>
-    Boolean(variant) && (isPrintOnDemand || variant.quantity > 0);
+    !product.soldOut &&
+    Boolean(variant) &&
+    (isPrintOnDemand || variant.quantity > 0);
 
   const productSchema = {
     "@context": "https://schema.org",
@@ -175,9 +190,10 @@ const Product = () => {
       url: productUrl,
       priceCurrency: "USD",
       price: product.price.toFixed(2),
-      availability:
-        product.fulfillmentType === "PrintOnDemand" ||
-        product.variants?.some((variant) => variant.quantity > 0)
+      availability: product.soldOut
+        ? "https://schema.org/OutOfStock"
+        : product.fulfillmentType === "PrintOnDemand" ||
+            product.variants?.some((variant) => variant.quantity > 0)
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
       seller: {
@@ -186,9 +202,6 @@ const Product = () => {
       },
     },
   };
-
-  const normalizeColor = (color) =>
-    (color || "Default").trim().replace(/\s+/g, " ");
 
   const variants = product.variants || [];
 
@@ -222,12 +235,14 @@ const Product = () => {
   const selectedPricing = getVariantPricing(selectedVariant, product.price);
 
   const handleAddToCart = () => {
-    if (!selectedVariant) {
+    if (!canPurchase(selectedVariant)) {
       return;
     }
 
     addItem({
       _id: product._id,
+      productId: product._id,
+      soldOut: product.soldOut,
       sku: selectedVariant.sku,
       name: product.name,
 
@@ -246,7 +261,15 @@ const Product = () => {
       supplierVariantId: selectedVariant.supplierVariantId,
     });
 
-    navigate("/cart");
+    // Do not navigate if the cart rejected the item.
+    const cartItems = useCustomerCartStore.getState().items;
+    const addedItem = cartItems.find(
+      (item) => item.sku === selectedVariant.sku,
+    );
+
+    if (addedItem) {
+      navigate("/cart");
+    }
   };
 
   return (
@@ -263,14 +286,41 @@ const Product = () => {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Images */}
-          <div className="grid grid-cols-[90px_1fr] gap-5">
-            {/* Thumbnails */}
-            <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-[90px_minmax(0,1fr)] sm:gap-5">
+            {/* Main Product Image */}
+            <div className="relative order-1 aspect-[4/5] w-full self-start overflow-hidden rounded-xl bg-gray-100 sm:order-2">
+              <img
+                src={selectedImage || product.images?.[0]}
+                alt={product.name}
+                loading="eager"
+                draggable={false}
+                onClick={() => setIsLightboxOpen(true)}
+                onError={(e) => {
+                  console.error(
+                    "Product image failed to load:",
+                    e.currentTarget.src,
+                  );
+                }}
+                className="h-full w-full cursor-zoom-in object-contain"
+              />
+
+              {/* Sold Out Overlay */}
+              {product.soldOut && (
+                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-black/40">
+                  <span className="border border-white/70 px-5 py-3 text-center text-xs font-medium uppercase tracking-[0.25em] text-white">
+                    Sold Out
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail Gallery */}
+            <div className="order-2 flex max-w-full gap-3 overflow-x-auto pb-2 sm:order-1 sm:max-h-[700px] sm:flex-col sm:overflow-x-hidden sm:overflow-y-auto sm:pr-1 sm:pb-0">
               {product.images?.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(image)}
-                  className={`overflow-hidden rounded-lg border-2 transition ${
+                  className={`w-20 shrink-0 overflow-hidden rounded-lg border-2 transition sm:w-full ${
                     selectedImage === image
                       ? "border-black"
                       : "border-transparent hover:border-gray-300"
@@ -278,23 +328,12 @@ const Product = () => {
                 >
                   <img
                     src={image}
-                    alt={product.name}
-                    className="w-full object-cover"
+                    alt={`${product.name} view ${index + 1}`}
+                    loading="lazy"
+                    className="aspect-[4/5] w-full object-cover"
                   />
                 </button>
               ))}
-            </div>
-
-            {/* Main Image */}
-            <div className="overflow-hidden rounded-xl bg-gray-100">
-              <img
-                src={selectedImage || product.images?.[0]}
-                alt={product.name}
-                loading="eager"
-                draggable={false}
-                onClick={() => setIsLightboxOpen(true)}
-                className="w-full object-cover transition duration-500 hover:scale-110 cursor-zoom-in"
-              />
             </div>
           </div>
 
@@ -368,7 +407,12 @@ const Product = () => {
               </div>
             )}
 
-            {selectedVariant && (
+            {/* Product Availability */}
+            {product.soldOut ? (
+              <p className="text-sm font-medium uppercase tracking-wider text-gray-500">
+                Sold Out
+              </p>
+            ) : selectedVariant ? (
               <p className="text-sm text-gray-500">
                 {isPrintOnDemand
                   ? "Made to order"
@@ -376,55 +420,96 @@ const Product = () => {
                     ? `${selectedVariant.quantity} in stock`
                     : "Out of stock"}
               </p>
-            )}
+            ) : null}
 
             {/* Quantity */}
-            <div>
-              <h3 className="font-semibold mb-3">Quantity</h3>
+            {!product.soldOut && (
+              <div>
+                <h3 className="font-semibold mb-3">Quantity</h3>
 
-              <div className="flex w-fit items-center rounded-lg border">
-                <button
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-4 active:bg-gray-100"
-                >
-                  <Minus size={18} />
-                </button>
+                <div className="flex w-fit items-center rounded-lg border">
+                  <button
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="p-4 active:bg-gray-100"
+                  >
+                    <Minus size={18} />
+                  </button>
 
-                <span className="w-12 text-center">{quantity}</span>
+                  <span className="w-12 text-center">{quantity}</span>
 
-                <button
-                  onClick={() =>
-                    setQuantity((q) =>
-                      selectedVariant &&
-                      (isPrintOnDemand || q < selectedVariant.quantity)
-                        ? q + 1
-                        : q,
-                    )
-                  }
-                  className="p-4 active:bg-gray-100"
-                >
-                  <Plus size={18} />
-                </button>
+                  <button
+                    onClick={() =>
+                      setQuantity((q) =>
+                        selectedVariant &&
+                        (isPrintOnDemand || q < selectedVariant.quantity)
+                          ? q + 1
+                          : q,
+                      )
+                    }
+                    className="p-4 active:bg-gray-100"
+                  >
+                    <Plus size={18} />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
+            {/* Add to Cart */}
             <button
               disabled={!canPurchase(selectedVariant)}
               onClick={handleAddToCart}
               className="w-full bg-black text-white py-4 rounded-md font-semibold transition hover:bg-neutral-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {selectedVariant ? "Add to Cart" : "Choose Color"}
+              {product.soldOut
+                ? "Sold Out"
+                : selectedVariant
+                  ? "Add to Cart"
+                  : "Choose Color"}
             </button>
 
+            {/* Description */}
             {product.description && (
-              <div className="pt-4 border-t">
-                <h3 className="font-semibold mb-3">Description</h3>
+              <div className="border-t pt-6">
+                <h3 className="mb-4 text-lg font-semibold tracking-tight">
+                  Product Description
+                </h3>
 
-                <p className="text-gray-600 leading-7">{product.description}</p>
+                <div
+                  className="
+        product-description
+        text-sm leading-7 text-gray-600
+        [&_p]:mb-4
+        [&_p:last-child]:mb-0
+        [&_ul]:mb-4
+        [&_ul]:list-disc
+        [&_ul]:pl-6
+        [&_ol]:mb-4
+        [&_ol]:list-decimal
+        [&_ol]:pl-6
+        [&_li]:mb-1
+        [&_strong]:font-semibold
+        [&_strong]:text-gray-900
+        [&_b]:font-semibold
+        [&_h2]:mb-3
+        [&_h2]:mt-5
+        [&_h2]:text-base
+        [&_h2]:font-semibold
+        [&_h3]:mb-2
+        [&_h3]:mt-4
+        [&_h3]:font-semibold
+        [&_a]:text-black
+        [&_a]:underline
+      "
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizedDescription,
+                  }}
+                />
               </div>
             )}
           </div>
         </div>
+
+        {/* Recommended Products */}
         {product.recommendedProduct && (
           <section className="mt-12 border-t pt-10">
             <h2 className="mb-6 text-2xl font-bold sm:text-3xl">
@@ -489,6 +574,7 @@ const Product = () => {
             })()}
           </section>
         )}
+
         <ProductImageLightbox
           isOpen={isLightboxOpen}
           onClose={() => setIsLightboxOpen(false)}
@@ -496,6 +582,8 @@ const Product = () => {
           selectedImage={selectedImage}
           onSelect={setSelectedImage}
         />
+
+        {/* Mobile Sticky Cart */}
         {showStickyCart && selectedVariant && (
           <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white p-4 shadow-lg lg:hidden">
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
@@ -525,9 +613,9 @@ const Product = () => {
               <button
                 disabled={!canPurchase(selectedVariant)}
                 onClick={handleAddToCart}
-                className="rounded-lg bg-black px-8 py-4 font-semibold text-white disabled:bg-gray-300"
+                className="rounded-lg bg-black px-8 py-4 font-semibold text-white disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                Add to Cart
+                {product.soldOut ? "Unavailable" : "Add to Cart"}
               </button>
             </div>
           </div>

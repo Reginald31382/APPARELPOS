@@ -4,6 +4,7 @@ import {
   getProducts,
   importProduct,
   testPrintifyShipping,
+  validatePrintifyOrderController,
 } from "../controllers/printifyController.js";
 
 import { protect, authorize } from "../middleware/authMiddleware.js";
@@ -22,6 +23,13 @@ router.post(
   protect,
   authorize("Admin", "Manager"),
   testPrintifyShipping,
+);
+
+router.post(
+  "/validate-order",
+  protect,
+  authorize("Admin", "Manager"),
+  validatePrintifyOrderController,
 );
 
 router.get("/products", protect, authorize("Admin", "Manager"), getProducts);

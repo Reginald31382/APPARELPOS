@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import useCartStore from "../../store/cart/useCartStore";
+import DOMPurify from "dompurify";
+import useCustomerCartStore from "../../store/cart/useCustomerCartStore";
 import useProductStore from "../../store/product/useProductStore";
 
 import { formatCurrency } from "../../utils/currency";
@@ -16,7 +17,7 @@ import { notifySuccess, notifyError } from "../../utils/notifications";
 const ProductQuickView = () => {
   const { isOpen, selectedProduct, closeProduct } = useProductStore();
 
-  const addItem = useCartStore((state) => state.addItem);
+  const addItem = useCustomerCartStore((state) => state.addItem);
 
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -32,6 +33,11 @@ const ProductQuickView = () => {
   }, [selectedProduct]);
 
   const variants = selectedProduct?.variants || [];
+
+  const sanitizedDescription = DOMPurify.sanitize(
+    selectedProduct?.description || "",
+    { USE_PROFILES: { html: true } },
+  );
 
   const colors = [...new Set(variants.map((v) => v.color))];
 
@@ -95,7 +101,34 @@ const ProductQuickView = () => {
             )}
           </div>
 
-          <p className="text-gray-600">{selectedProduct.description}</p>
+          <div
+            className="
+    product-description
+    text-sm leading-7 text-gray-600
+    [&_p]:mb-4
+    [&_p:last-child]:mb-0
+    [&_ul]:mb-4
+    [&_ul]:list-disc
+    [&_ul]:pl-6
+    [&_ol]:mb-4
+    [&_ol]:list-decimal
+    [&_ol]:pl-6
+    [&_li]:mb-1
+    [&_strong]:font-semibold
+    [&_strong]:text-gray-900
+    [&_b]:font-semibold
+    [&_h2]:mb-3
+    [&_h2]:mt-5
+    [&_h2]:text-base
+    [&_h2]:font-semibold
+    [&_h3]:mb-2
+    [&_h3]:mt-4
+    [&_h3]:font-semibold
+    [&_a]:text-black
+    [&_a]:underline
+  "
+            dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+          />
 
           <p className="text-2xl font-bold">
             {formatCurrency(selectedProduct.price)}
@@ -156,9 +189,13 @@ const ProductQuickView = () => {
             </div>
           </div>
 
-          {/* STOCK */}
+          {/* PRODUCT AVAILABILITY / STOCK */}
           <div>
-            {selectedVariant ? (
+            {selectedProduct.soldOut ? (
+              <p className="text-sm font-medium uppercase tracking-wider text-gray-500">
+                Currently Unavailable
+              </p>
+            ) : selectedVariant ? (
               <p
                 className={`font-medium ${
                   selectedVariant.quantity > 0
@@ -176,26 +213,42 @@ const ProductQuickView = () => {
           </div>
 
           {/* ADD TO CART */}
-          <button
-            disabled={!selectedVariant || selectedVariant.quantity <= 0}
-            onClick={() => {
-              addItem({
-                productId: selectedProduct._id,
-                sku: selectedVariant.sku,
-                image: selectedProduct.images[0],
-                name: selectedProduct.name,
-                color: selectedVariant.color,
-                size: selectedVariant.size,
-                unitPrice: selectedProduct.price,
-                stock: selectedVariant.quantity,
-              });
-              notifySuccess("Added to cart");
-              closeProduct();
-            }}
-            className="w-full rounded bg-black py-3 text-white transition disabled:opacity-50"
-          >
-            Add to Cart
-          </button>
+          {selectedProduct.soldOut ? (
+            <button
+              disabled
+              className="w-full rounded border border-gray-300 bg-gray-100 py-3 text-sm font-medium uppercase tracking-wider text-gray-500 cursor-not-allowed"
+            >
+              Currently Unavailable
+            </button>
+          ) : (
+            <button
+              disabled={!selectedVariant || selectedVariant.quantity <= 0}
+              onClick={() => {
+                const added = addItem({
+                  productId: selectedProduct._id,
+                  soldOut: selectedProduct.soldOut,
+                  sku: selectedVariant.sku,
+                  image: selectedProduct.images?.[0],
+                  name: selectedProduct.name,
+                  color: selectedVariant.color,
+                  size: selectedVariant.size,
+                  unitPrice: selectedProduct.price,
+                  stock: selectedVariant.quantity,
+                  fulfillmentType: selectedProduct.fulfillmentType,
+                  supplier: selectedProduct.supplier,
+                  supplierVariantId: selectedVariant.supplierVariantId,
+                });
+
+                if (!added) return;
+
+                notifySuccess("Added to cart");
+                closeProduct();
+              }}
+              className="w-full rounded bg-black py-3 text-white transition disabled:opacity-50"
+            >
+              Add to Cart
+            </button>
+          )}
         </div>
       </SheetContent>
     </Sheet>

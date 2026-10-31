@@ -33,26 +33,37 @@ const StoreProductCard = ({ product }) => {
     <Link to={`/product/${product._id}`} className="group flex h-full flex-col">
       <div className="relative overflow-hidden rounded-xl bg-[#f7f5f2]">
         <div className="relative aspect-[4/5] overflow-hidden">
+          {/* Primary Image */}
           <img
             src={product.images?.[0]}
             alt={product.name}
-            className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ${
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
               product.images?.length > 1
-                ? "group-hover:scale-105 group-hover:opacity-0"
-                : "group-hover:scale-105"
+                ? "opacity-100 group-hover:opacity-0"
+                : "opacity-100"
             }`}
           />
 
+          {/* Secondary Image */}
           {product.images?.length > 1 && (
             <img
               src={product.images[1]}
-              alt={product.name}
-              className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-all duration-700 group-hover:scale-100 group-hover:opacity-100"
+              alt={`${product.name} alternate view`}
+              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
             />
+          )}
+
+          {/* Sold Out Overlay */}
+          {product.soldOut && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/45">
+              <span className="border border-white/70 px-5 py-3 text-center text-xs font-medium uppercase tracking-[0.25em] text-white">
+                Sold Out
+              </span>
+            </div>
           )}
         </div>
 
-        <div className="absolute inset-0 bg-black/0 transition group-hover:bg-black/5" />
+        <div className="pointer-events-none absolute inset-0 bg-black/0 transition group-hover:bg-black/5" />
       </div>
 
       <div className="flex flex-1 flex-col justify-between py-3">

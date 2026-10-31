@@ -157,6 +157,11 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    soldOut: {
+      type: Boolean,
+      default: false,
+    },
+
     recommendedProduct: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",

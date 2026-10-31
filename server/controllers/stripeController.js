@@ -25,6 +25,7 @@ export const webhook = async (req, res) => {
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
+  // Only process completed checkout sessions.
   if (event.type !== "checkout.session.completed") {
     return res.status(200).json({ received: true });
   }
@@ -32,15 +33,18 @@ export const webhook = async (req, res) => {
   try {
     const stripeSession = event.data.object;
 
-    // Create or retrieve the order. This function should be idempotent.
+    // Create or retrieve the order.
+    // This function should be idempotent.
     const order = await createStripeOrder(stripeSession);
 
     const fulfillmentErrors = [];
 
+    // Supplier fulfillment safety switch.
     const supplierFulfillmentEnabled =
       process.env.ENABLE_SUPPLIER_FULFILLMENT === "true";
 
-    if (supplierFulfillmentEnabled) {
+    if (supplierFulfillmentEnabled && !order.fulfillmentReview?.required) {
+      // Printful fulfillment
       try {
         await submitPrintfulOrder(order._id);
       } catch (error) {
@@ -55,6 +59,7 @@ export const webhook = async (req, res) => {
         });
       }
 
+      // Printify fulfillment
       try {
         await submitPrintifyOrder(order._id);
       } catch (error) {
@@ -70,36 +75,10 @@ export const webhook = async (req, res) => {
       }
     } else {
       console.log(
-        "Supplier fulfillment skipped: ENABLE_SUPPLIER_FULFILLMENT is not true.",
+        order.fulfillmentReview?.required
+          ? `Supplier fulfillment held for order ${order.orderNumber}: administrative review required.`
+          : "Supplier fulfillment skipped: ENABLE_SUPPLIER_FULFILLMENT is not true.",
       );
-    }
-
-    try {
-      await submitPrintfulOrder(order._id);
-    } catch (error) {
-      fulfillmentErrors.push({
-        supplier: "Printful",
-        message: error.message,
-      });
-
-      console.error("Printful fulfillment failed:", {
-        orderId: String(order._id),
-        error: error.message,
-      });
-    }
-
-    try {
-      await submitPrintifyOrder(order._id);
-    } catch (error) {
-      fulfillmentErrors.push({
-        supplier: "Printify",
-        message: error.message,
-      });
-
-      console.error("Printify fulfillment failed:", {
-        orderId: String(order._id),
-        error: error.message,
-      });
     }
 
     // The paid order is saved, so acknowledge the event rather than

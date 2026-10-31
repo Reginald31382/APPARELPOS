@@ -20,6 +20,7 @@ const initialProduct = {
 
   featured: false,
   active: true,
+  soldOut: false,
 
   images: [],
   variants: [],
@@ -533,6 +534,23 @@ const ProductModal = ({
                     />
                     Active Product
                   </label>
+
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="soldOut"
+                      checked={product.soldOut}
+                      onChange={handleChange}
+                      className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                    />
+
+                    <span className="font-medium text-red-600">Sold Out</span>
+                  </label>
+
+                  <p className="ml-7 text-sm text-gray-500">
+                    Display a red SOLD OUT ribbon on the storefront and prevent
+                    customers from purchasing this product.
+                  </p>
 
                   <div className="border-t pt-4">
                     <label

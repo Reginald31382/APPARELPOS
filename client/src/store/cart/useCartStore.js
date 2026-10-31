@@ -17,6 +17,11 @@ const useCartStore = create(
       },
 
       addItem: (item) => {
+        if (item.soldOut) {
+          notifyError("This product is currently unavailable.");
+          return;
+        }
+
         const items = [...get().items];
 
         const existingIndex = items.findIndex((i) => i.sku === item.sku);
@@ -32,9 +37,7 @@ const useCartStore = create(
           }
 
           items[existingIndex].quantity = newQuantity;
-
           set({ items });
-
           return;
         }
 

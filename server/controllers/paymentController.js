@@ -4,12 +4,125 @@ import PendingCheckout from "../models/PendingCheckout.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { getStripe } from "../services/stripeService.js";
 import { getShippingRates } from "../services/shippingService.js";
+import shippo from "../services/shipping/shippoClient.js";
 
 const FREE_SHIPPING_THRESHOLD = 250;
 
+// Normalize values for reliable address comparisons.
+const normalizeValue = (value) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase();
+
+// Shippo may return an object reference or URL for a resource.
+const normalizeResourceId = (value) => {
+  if (!value) return "";
+
+  const stringValue =
+    typeof value === "object"
+      ? value.objectId || value.object_id || value.id || ""
+      : String(value);
+
+  return stringValue.split("/").filter(Boolean).pop() || "";
+};
+
+// Support camelCase and snake_case API fields.
+const getShippoField = (object, camelCase, snakeCase) =>
+  object?.[camelCase] ?? object?.[snakeCase] ?? null;
+
+// Verify that the original Shippo rate belongs to the original shipment
+// and that the shipment destination matches the checkout address.
+const verifyInHouseShippingRate = async ({ shipping, shippingAddress }) => {
+  if (!shipping?.id || !shipping?.shipmentId) {
+    return null;
+  }
+
+  const [rate, shipment] = await Promise.all([
+    shippo.rates.get(shipping.id),
+    shippo.shipments.get(shipping.shipmentId),
+  ]);
+
+  if (!rate || !shipment) {
+    return null;
+  }
+
+  const rateShipmentId = normalizeResourceId(
+    getShippoField(rate, "shipment", "shipment"),
+  );
+
+  const shipmentId = normalizeResourceId(
+    getShippoField(shipment, "objectId", "object_id"),
+  );
+
+  if (
+    rateShipmentId !== String(shipping.shipmentId) ||
+    shipmentId !== String(shipping.shipmentId)
+  ) {
+    return null;
+  }
+
+  const destination = getShippoField(shipment, "addressTo", "address_to") || {};
+
+  const addressMatches =
+    normalizeValue(getShippoField(destination, "street1", "street_1")) ===
+      normalizeValue(shippingAddress.address1) &&
+    normalizeValue(destination.city) === normalizeValue(shippingAddress.city) &&
+    normalizeValue(destination.state) ===
+      normalizeValue(shippingAddress.state) &&
+    normalizeValue(getShippoField(destination, "zip", "zip")) ===
+      normalizeValue(shippingAddress.zipCode || shippingAddress.zip) &&
+    normalizeValue(destination.country) ===
+      normalizeValue(shippingAddress.country || "US");
+
+  if (!addressMatches) {
+    return null;
+  }
+
+  const carrier = getShippoField(rate, "provider", "provider");
+
+  const serviceLevel =
+    getShippoField(rate, "servicelevel", "servicelevel") || {};
+
+  const service = serviceLevel.name;
+
+  const cost = Number(getShippoField(rate, "amount", "amount"));
+
+  const currency = getShippoField(rate, "currency", "currency");
+
+  if (
+    !carrier ||
+    !service ||
+    !Number.isFinite(cost) ||
+    cost < 0 ||
+    (currency && String(currency).toUpperCase() !== "USD")
+  ) {
+    return null;
+  }
+
+  // Make sure the carrier and service match the customer's selection.
+  if (
+    normalizeValue(carrier) !== normalizeValue(shipping.carrier) ||
+    normalizeValue(service) !== normalizeValue(shipping.service)
+  ) {
+    return null;
+  }
+
+  return {
+    id: shipping.id,
+    shipmentId: shipping.shipmentId,
+    carrier,
+    service,
+    cost,
+    estimatedDays:
+      getShippoField(rate, "estimatedDays", "estimated_days") ?? null,
+  };
+};
+
 const validateCheckoutItems = async (items) => {
   if (!Array.isArray(items) || items.length === 0) {
-    throw new Error("Your cart is empty.");
+    const error = new Error("Your cart is empty.");
+    error.statusCode = 400;
+    throw error;
   }
 
   const validatedItems = [];
@@ -18,17 +131,32 @@ const validateCheckoutItems = async (items) => {
     const quantity = Number(item.quantity);
 
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
-      throw new Error("Invalid item quantity.");
+      const error = new Error("Invalid item quantity.");
+      error.statusCode = 400;
+      throw error;
     }
 
     if (!item.productId) {
-      throw new Error("A valid product ID is required.");
+      const error = new Error("A valid product ID is required.");
+      error.statusCode = 400;
+      throw error;
     }
 
     const product = await Product.findById(item.productId);
 
     if (!product || !product.active) {
-      throw new Error("A product in your cart is unavailable.");
+      const error = new Error("A product in your cart is unavailable.");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // SERVER-SIDE SOLD OUT PROTECTION
+    if (product.soldOut) {
+      const error = new Error(
+        `${product.name} is currently unavailable and cannot be purchased.`,
+      );
+      error.statusCode = 409;
+      throw error;
     }
 
     const variant = product.variants.find(
@@ -39,9 +167,11 @@ const validateCheckoutItems = async (items) => {
     );
 
     if (!variant) {
-      throw new Error(
+      const error = new Error(
         `The selected variant for ${product.name} is unavailable.`,
       );
+      error.statusCode = 400;
+      throw error;
     }
 
     const regularPrice = Number(variant.price ?? product.price ?? 0);
@@ -53,7 +183,9 @@ const validateCheckoutItems = async (items) => {
         : regularPrice;
 
     if (!Number.isFinite(unitPrice) || unitPrice < 0) {
-      throw new Error(`Invalid price for ${product.name}.`);
+      const error = new Error(`Invalid price for ${product.name}.`);
+      error.statusCode = 400;
+      throw error;
     }
 
     validatedItems.push({
@@ -86,6 +218,7 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     });
   }
 
+  // Validate products, variants, prices, and Sold Out status.
   const validatedItems = await validateCheckoutItems(items);
 
   const subtotal = Number(
@@ -94,26 +227,39 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
       .toFixed(2),
   );
 
-  const availableRates = await getShippingRates({
-    items: validatedItems.map((item) => ({
-      productId: item.productId,
-      quantity: item.quantity,
-      sku: item.sku,
-      color: item.color,
-      size: item.size,
-    })),
-    shippingAddress,
-  });
-
-  // console.log("Selected shipping rate from frontend:", shipping);
-  // console.log("Available shipping rates from backend:", availableRates);
-
-  const selectedRate = availableRates.find(
-    (rate) =>
-      String(rate.id) === String(shipping.id) &&
-      rate.service === shipping.service &&
-      rate.carrier === shipping.carrier,
+  const isInHouseCart = validatedItems.every(
+    (item) => item.fulfillmentType === "InHouse",
   );
+
+  let selectedRate;
+
+  if (isInHouseCart) {
+    // InHouse: retrieve the ORIGINAL Shippo rate and shipment.
+    // Do not create another shipment here.
+    selectedRate = await verifyInHouseShippingRate({
+      shipping,
+      shippingAddress,
+    });
+  } else {
+    // Printful / Printify: retain the existing rate validation.
+    const availableRates = await getShippingRates({
+      items: validatedItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        sku: item.sku,
+        color: item.color,
+        size: item.size,
+      })),
+      shippingAddress,
+    });
+
+    selectedRate = availableRates.find(
+      (rate) =>
+        String(rate.id) === String(shipping.id) &&
+        rate.service === shipping.service &&
+        rate.carrier === shipping.carrier,
+    );
+  }
 
   if (!selectedRate) {
     return res.status(400).json({
@@ -233,8 +379,6 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
   }
 
   // Save the Stripe Session ID separately.
-  // Keep the pending record if this save fails because Stripe
-  // may already have created a valid Checkout Session.
   try {
     pendingCheckout.stripeCheckoutSessionId = stripeSession.id;
     await pendingCheckout.save();

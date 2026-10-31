@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import ProductModal from "../../components/product/ProductModal";
 import { fetchProducts, deleteProduct } from "../../services/productService";
+
+const ITEMS_PER_PAGE = 10;
 
 const getProductPricing = (product) => {
   const variants = product.variants || [];
@@ -23,8 +25,24 @@ const getProductPricing = (product) => {
     };
   });
 
+  // Handle products that don't have variants.
+  if (prices.length === 0) {
+    const regularPrice = Number(product.price || 0);
+    const salePrice = Number(product.salePrice || 0);
+    const effectivePrice =
+      salePrice > 0 && salePrice < regularPrice ? salePrice : regularPrice;
+
+    return {
+      minPrice: effectivePrice,
+      maxPrice: effectivePrice,
+      minProfit: effectivePrice - productCost,
+      maxProfit: effectivePrice - productCost,
+      hasVariantPriceOverride: false,
+      hasSale: salePrice > 0 && salePrice < regularPrice,
+    };
+  }
+
   const effectivePrices = prices.map((item) => item.effectivePrice);
-  const regularPrices = prices.map((item) => item.regularPrice);
   const profits = prices.map((item) => item.profit);
 
   return {
@@ -50,6 +68,9 @@ const Products = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const navigate = useNavigate();
 
   const loadProducts = async () => {
     try {
@@ -57,9 +78,10 @@ const Products = () => {
 
       const data = await fetchProducts({ status: "all" });
 
-      setProducts(data);
+      setProducts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to load products:", error);
+      toast.error("Failed to load products.");
     } finally {
       setLoading(false);
     }
@@ -68,6 +90,23 @@ const Products = () => {
   useEffect(() => {
     loadProducts();
   }, []);
+
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
+    return products.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [products, currentPage]);
+
+  // Keep the current page valid if products are deleted or removed.
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    } else if (totalPages === 0 && currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   const handleAddProduct = () => {
     setSelectedProduct(null);
@@ -88,7 +127,6 @@ const Products = () => {
 
     try {
       await deleteProduct(product._id);
-
       await loadProducts();
 
       toast.success("Product deleted.");
@@ -104,12 +142,17 @@ const Products = () => {
     setIsModalOpen(false);
   };
 
-  const navigate = useNavigate();
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <>
       <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">Products</h1>
 
@@ -145,13 +188,14 @@ const Products = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {products.map((product) => {
-              const totalStock = product.variants.reduce(
-                (sum, variant) => sum + variant.quantity,
+            {paginatedProducts.map((product) => {
+              const totalStock = (product.variants || []).reduce(
+                (sum, variant) => sum + Number(variant.quantity || 0),
                 0,
               );
 
               const pricing = getProductPricing(product);
+
               return (
                 <div
                   key={product._id}
@@ -174,6 +218,7 @@ const Products = () => {
                       <h2 className="truncate text-lg font-semibold">
                         {product.name}
                       </h2>
+
                       <p className="text-sm text-gray-500">
                         {product.brand || "No Brand"} •{" "}
                         {product.category || "Uncategorized"}
@@ -272,6 +317,56 @@ const Products = () => {
                 </div>
               );
             })}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white px-5 py-4">
+                <p className="text-sm text-gray-500">
+                  Showing{" "}
+                  <span className="font-semibold text-gray-900">
+                    {(currentPage - 1) * ITEMS_PER_PAGE + 1}
+                  </span>
+                  {" – "}
+                  <span className="font-semibold text-gray-900">
+                    {Math.min(currentPage * ITEMS_PER_PAGE, products.length)}
+                  </span>
+                  {" of "}
+                  <span className="font-semibold text-gray-900">
+                    {products.length}
+                  </span>{" "}
+                  products
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Previous
+                  </button>
+
+                  <span className="px-2 text-sm text-gray-600">
+                    Page {currentPage} of {totalPages}
+                  </span>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {totalPages <= 1 && products.length > 0 && (
+              <p className="px-2 text-right text-sm text-gray-500">
+                {products.length}{" "}
+                {products.length === 1 ? "product" : "products"}
+              </p>
+            )}
           </div>
         )}
       </div>

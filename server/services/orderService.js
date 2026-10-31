@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 import Order from "../models/Order.js";
+import Product from "../models/Products.js";
 import PendingCheckout from "../models/PendingCheckout.js";
 
 import generateOrderNumber from "../utils/generateOrderNumber.js";
@@ -12,6 +13,63 @@ import { emitOrderCreated } from "./socketService.js";
 import { sendReceiptEmail } from "./email/sendReceiptEmail.js";
 import { addTimelineEvent } from "./orders/timelineService.js";
 import { createReceipt } from "./receiptService.js";
+
+/*
+|--------------------------------------------------------------------------
+| Check Product Availability Before Completing Paid Order
+|--------------------------------------------------------------------------
+*/
+
+async function checkOrderAvailability(items, dbSession) {
+  const reviewReasons = [];
+
+  const productIds = items
+    .map((item) => String(item.productId || ""))
+    .filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+  const uniqueProductIds = [...new Set(productIds)];
+
+  const products = await Product.find({
+    _id: { $in: uniqueProductIds },
+  })
+    .select("_id name soldOut active")
+    .session(dbSession)
+    .lean();
+
+  const productMap = new Map(
+    products.map((product) => [String(product._id), product]),
+  );
+
+  for (const item of items) {
+    const productId = String(item.productId || "");
+    const product = productMap.get(productId);
+
+    if (!product) {
+      reviewReasons.push(
+        `${item.name || "A product"} is no longer available in the catalog.`,
+      );
+
+      continue;
+    }
+
+    if (product.soldOut) {
+      reviewReasons.push(
+        `${product.name} was marked Sold Out before payment completed.`,
+      );
+    }
+
+    if (!product.active) {
+      reviewReasons.push(
+        `${product.name} was deactivated before payment completed.`,
+      );
+    }
+  }
+
+  return {
+    required: reviewReasons.length > 0,
+    reason: [...new Set(reviewReasons)].join(" "),
+  };
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +109,16 @@ export async function completeOrder({
   try {
     dbSession.startTransaction();
 
+    // Check current product availability for paid online Stripe orders.
+    let fulfillmentReview = {
+      required: false,
+      reason: "",
+    };
+
+    if (orderType === "Online" && paymentMethod === "Stripe") {
+      fulfillmentReview = await checkOrderAvailability(items, dbSession);
+    }
+
     const orderNumber = await generateOrderNumber();
 
     [order] = await Order.create(
@@ -78,6 +146,14 @@ export async function completeOrder({
             },
           })),
 
+          fulfillmentReview: {
+            required: fulfillmentReview.required,
+            reason: fulfillmentReview.reason,
+            flaggedAt: fulfillmentReview.required ? new Date() : null,
+            resolvedAt: null,
+            resolvedBy: null,
+          },
+
           subtotal,
           tax,
 
@@ -98,7 +174,9 @@ export async function completeOrder({
           total,
           paymentMethod,
           paymentStatus,
-          status,
+
+          // Hold orders requiring review.
+          status: fulfillmentReview.required ? "Pending" : status,
 
           ...(stripeCheckoutSessionId && {
             stripeCheckoutSessionId,
@@ -112,17 +190,28 @@ export async function completeOrder({
       { session: dbSession },
     );
 
-    addTimelineEvent(
-      order,
-      "Order Created",
-      "Payment received and order created.",
-    );
+    if (fulfillmentReview.required) {
+      addTimelineEvent(
+        order,
+        "Order Requires Review",
+        `Payment was received, but fulfillment is on hold. ${fulfillmentReview.reason}`,
+      );
+    } else {
+      addTimelineEvent(
+        order,
+        "Order Created",
+        "Payment received and order created.",
+      );
+    }
 
     await order.save({ session: dbSession });
 
     await createReceipt(order, dbSession);
 
-    await reduceInventory(order.items, dbSession);
+    // Do not reduce inventory for an order requiring review.
+    if (!fulfillmentReview.required) {
+      await reduceInventory(order.items, dbSession);
+    }
 
     await dbSession.commitTransaction();
   } catch (error) {
@@ -139,7 +228,7 @@ export async function completeOrder({
   try {
     await createNotification({
       type: "NEW_ORDER",
-      title: "New Order",
+      title: fulfillmentReviewTitle(order),
       message: `${order.orderNumber} has been placed by ${order.customerEmail}`,
       orderId: order._id,
     });
@@ -173,6 +262,12 @@ export async function completeOrder({
   }
 
   return order;
+}
+
+function fulfillmentReviewTitle(order) {
+  return order.fulfillmentReview?.required
+    ? "Order Requires Review"
+    : "New Order";
 }
 
 /*

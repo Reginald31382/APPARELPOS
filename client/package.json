@@ -24,6 +24,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
     "dayjs": "^1.11.21",
+    "dompurify": "^3.4.17",
     "exceljs": "^4.4.0",
     "framer-motion": "^12.43.0",
     "jspdf": "^4.2.1",

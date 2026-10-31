@@ -37,7 +37,7 @@ const Checkout = () => {
       : configuredTaxRate;
 
   const tax = subtotal * (taxRate / 100);
-  const freeShippingThreshold = store?.freeShippingThreshold ?? 150;
+  const freeShippingThreshold = store?.freeShippingThreshold ?? 250;
 
   const shippingCost =
     subtotal >= freeShippingThreshold ? 0 : (selectedShipping?.cost ?? 0);

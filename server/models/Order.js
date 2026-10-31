@@ -90,6 +90,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+
     customerEmail: {
       type: String,
       trim: true,
@@ -104,6 +105,35 @@ const orderSchema = new mongoose.Schema(
     },
 
     items: [orderItemSchema],
+
+    // Holds paid orders requiring administrative review.
+    fulfillmentReview: {
+      required: {
+        type: Boolean,
+        default: false,
+      },
+
+      reason: {
+        type: String,
+        default: "",
+      },
+
+      flaggedAt: {
+        type: Date,
+        default: null,
+      },
+
+      resolvedAt: {
+        type: Date,
+        default: null,
+      },
+
+      resolvedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
+    },
 
     subtotal: {
       type: Number,

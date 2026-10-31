@@ -7,6 +7,8 @@ import {
   calculatePrintifyShipping,
 } from "../services/printifyService.js";
 
+import { validatePrintifyOrder } from "../services/printifyOrderService.js";
+
 export const testPrintifyConnection = asyncHandler(async (req, res) => {
   const shops = await getPrintifyShops();
 
@@ -235,3 +237,24 @@ export const testPrintifyShipping = asyncHandler(async (req, res) => {
     rates: shippingMethods,
   });
 });
+
+export const validatePrintifyOrderController = asyncHandler(
+  async (req, res) => {
+    const { orderId } = req.body;
+
+    if (!orderId) {
+      return res.status(400).json({
+        success: false,
+        message: "Order ID is required.",
+      });
+    }
+
+    const result = await validatePrintifyOrder(orderId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Printify order validation successful.",
+      validation: result,
+    });
+  },
+);

@@ -17,6 +17,11 @@ const useCustomerCartStore = create(
       },
 
       addItem: (item) => {
+        if (item.soldOut) {
+          notifyError("This product is currently unavailable.");
+          return false;
+        }
+
         const items = [...get().items];
 
         const existingIndex = items.findIndex((i) => i.sku === item.sku);
@@ -31,14 +36,12 @@ const useCustomerCartStore = create(
             newQuantity > item.stock
           ) {
             notifyError("Not enough inventory");
-            return;
+            return false;
           }
 
           items[existingIndex].quantity = newQuantity;
-
           set({ items });
-
-          return;
+          return true;
         }
 
         items.push({
@@ -47,6 +50,7 @@ const useCustomerCartStore = create(
         });
 
         set({ items });
+        return true;
       },
 
       removeItem: (sku) => {
