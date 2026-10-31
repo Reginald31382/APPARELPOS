@@ -3,6 +3,7 @@ import {
   testPrintifyConnection,
   getProducts,
   importProduct,
+  getProductStatus,
   testPrintifyShipping,
   validatePrintifyOrderController,
 } from "../controllers/printifyController.js";
@@ -33,6 +34,12 @@ router.post(
 );
 
 router.get("/products", protect, authorize("Admin", "Manager"), getProducts);
+router.get(
+  "/products/:id/status",
+  protect,
+  authorize("Admin", "Manager"),
+  getProductStatus,
+);
 
 router.post(
   "/products/:id/import",

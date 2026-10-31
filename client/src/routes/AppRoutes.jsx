@@ -27,6 +27,7 @@ import Employees from "../pages/admin/Employees";
 import ReviewPage from "../pages/ReviewPage";
 import ProductDetails from "../modules/product/pages/ProductDetails";
 import PrintfulProducts from "../pages/admin/PrintfulProducts";
+import PrintifyProducts from "../pages/admin/PrintifyProducts";
 import ProtectedRoute from "../modules/auth/components/ProtectedRoute";
 
 import NotFound from "../pages/NotFound";
@@ -75,6 +76,7 @@ const AppRoutes = () => {
         <Route path="products" element={<Products />} />
         <Route path="products/:id" element={<ProductDetails />} />
         <Route path="printful" element={<PrintfulProducts />} />
+        <Route path="printify" element={<PrintifyProducts />} />
         <Route path="orders" element={<Orders />} />
         <Route path="receipts" element={<Receipts />} />
         <Route path="employees" element={<Employees />} />

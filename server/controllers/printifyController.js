@@ -142,6 +142,13 @@ export const getProducts = asyncHandler(async (req, res) => {
     products: printifyProducts.map((product) => ({
       ...product,
       imported: importedIds.has(String(product.id)),
+      published: typeof product.visible === "boolean" ? product.visible : null,
+      publishStatus:
+        product.visible === true
+          ? "Published"
+          : product.visible === false
+            ? "Unpublished"
+            : "Unknown",
     })),
   });
 });
@@ -258,3 +265,31 @@ export const validatePrintifyOrderController = asyncHandler(
     });
   },
 );
+
+export const getProductStatus = asyncHandler(async (req, res) => {
+  const printifyProductId = String(req.params.id);
+
+  const product = await getPrintifyProduct(printifyProductId);
+
+  const published =
+    typeof product.visible === "boolean" ? product.visible : null;
+
+  return res.status(200).json({
+    success: true,
+    productId: printifyProductId,
+    title: product.title || "Untitled Product",
+    published,
+    status:
+      published === true
+        ? "Published"
+        : published === false
+          ? "Unpublished"
+          : "Unknown",
+    message:
+      published === true
+        ? "Printify reports this product as visible."
+        : published === false
+          ? "Printify reports this product as not visible."
+          : "Printify did not return a visibility status.",
+  });
+});

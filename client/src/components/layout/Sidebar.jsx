@@ -45,13 +45,19 @@ const Sidebar = () => {
           Printful Products
         </NavLink>
 
+        <NavLink to="/admin/printify" className={linkClasses}>
+          <FaTshirt />
+          Printify Products
+        </NavLink>
+
         <NavLink to="/admin/orders" className={linkClasses}>
           <FaClipboardList />
           Orders
         </NavLink>
 
         <NavLink to="/admin/receipts" className={linkClasses}>
-          <IoReceiptSharp /> Receipts
+          <IoReceiptSharp />
+          Receipts
         </NavLink>
 
         <NavLink to="/admin/employees" className={linkClasses}>
