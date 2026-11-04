@@ -2,29 +2,36 @@ const ResponsiveDrawer = ({ open, onClose, width = "500px", children }) => {
   return (
     <>
       {/* Backdrop */}
-      {open && (
-        <div onClick={onClose} className="fixed inset-0 z-40 bg-black/50" />
-      )}
+      <div
+        aria-hidden="true"
+        onClick={onClose}
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
+          open
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
+        }`}
+      />
 
       {/* Drawer */}
-      <div
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={!open}
         className={`
           fixed right-0 top-0 z-50
-          flex h-full flex-col
+          flex h-dvh max-h-dvh flex-col
           bg-white shadow-2xl
           transition-transform duration-300 ease-in-out
-
-          w-full
-          sm:max-w-[500px]
-
           ${open ? "translate-x-0" : "translate-x-full"}
         `}
         style={{
-          maxWidth: width,
+          width: "100%",
+          maxWidth: `min(${width}, 100vw)`,
+          visibility: open ? "visible" : "hidden",
         }}
       >
         {children}
-      </div>
+      </aside>
     </>
   );
 };

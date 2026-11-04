@@ -10,42 +10,45 @@ import {
 import EmployeeForm from "./EmployeeForm";
 import useUpdateUser from "../hooks/useUpdateUser";
 
+const initialForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  role: "Cashier",
+  isActive: true,
+};
+
 const EditEmployeeModal = ({ employee, open, onOpenChange }) => {
   const { mutate, isPending } = useUpdateUser();
 
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    role: "Cashier",
-    isActive: true,
-  });
+  const [form, setForm] = useState(initialForm);
 
   useEffect(() => {
     if (!employee) return;
 
     setForm({
-      firstName: employee.firstName,
-      lastName: employee.lastName,
-      email: employee.email,
+      firstName: employee.firstName || "",
+      lastName: employee.lastName || "",
+      email: employee.email || "",
       phone: employee.phone || "",
-      role: employee.role,
-      isActive: employee.isActive,
+      role: employee.role || "Cashier",
+      isActive: employee.isActive ?? true,
     });
   }, [employee]);
 
-  if (!employee) return null;
-
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]:
-        e.target.name === "isActive" ? e.target.value : e.target.value,
-    });
+    const { name, value, type, checked } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSave = () => {
+    if (!employee) return;
+
     mutate(
       {
         id: employee._id,
@@ -59,31 +62,40 @@ const EditEmployeeModal = ({ employee, open, onOpenChange }) => {
     );
   };
 
+  if (!employee) return null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
-          <DialogTitle>Edit Employee</DialogTitle>
+      <DialogContent className="max-h-[90dvh] w-[calc(100%-1rem)] max-w-xl overflow-y-auto rounded-xl p-4 sm:p-6">
+        <DialogHeader className="mb-2">
+          <DialogTitle className="text-xl font-bold sm:text-2xl">
+            Edit Employee
+          </DialogTitle>
         </DialogHeader>
 
+        {/* Employee Form */}
         <EmployeeForm
           form={form}
           onChange={handleChange}
           showPasswordFields={false}
         />
 
-        <div className="mt-6 flex justify-end gap-3">
+        {/* Actions */}
+        <div className="mt-5 flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end sm:gap-3">
           <button
+            type="button"
             onClick={() => onOpenChange(false)}
-            className="rounded-lg border px-4 py-2"
+            disabled={isPending}
+            className="w-full rounded-lg border px-4 py-3 text-sm font-semibold transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:py-2"
           >
             Cancel
           </button>
 
           <button
+            type="button"
             disabled={isPending}
             onClick={handleSave}
-            className="rounded-lg bg-black px-5 py-2 text-white"
+            className="w-full rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:py-2"
           >
             {isPending ? "Saving..." : "Save Changes"}
           </button>

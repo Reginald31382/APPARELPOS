@@ -29,6 +29,7 @@ const getProductPricing = (product) => {
   if (prices.length === 0) {
     const regularPrice = Number(product.price || 0);
     const salePrice = Number(product.salePrice || 0);
+
     const effectivePrice =
       salePrice > 0 && salePrice < regularPrice ? salePrice : regularPrice;
 
@@ -149,45 +150,58 @@ const Products = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const formatPriceRange = (min, max) =>
+    min === max
+      ? `$${min.toFixed(2)}`
+      : `$${min.toFixed(2)} – $${max.toFixed(2)}`;
+
   return (
     <>
       <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        {/* Header */}
+        <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Products</h1>
+            <h1 className="text-2xl font-bold sm:text-3xl">Products</h1>
 
-            <p className="mt-1 text-gray-500">Manage your product catalog.</p>
+            <p className="mt-1 text-sm text-gray-500 sm:text-base">
+              Manage your product catalog.
+            </p>
           </div>
 
           <button
+            type="button"
             onClick={handleAddProduct}
-            className="rounded-xl bg-black px-5 py-3 font-medium text-white transition hover:bg-gray-800"
+            className="w-full rounded-xl bg-black px-5 py-3 text-sm font-medium text-white transition hover:bg-gray-800 sm:w-auto sm:text-base"
           >
             + Add Product
           </button>
         </div>
 
+        {/* Loading */}
         {loading ? (
           <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
             Loading products...
           </div>
         ) : products.length === 0 ? (
-          <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
+          /* Empty State */
+          <div className="rounded-2xl border bg-white p-6 text-center shadow-sm sm:p-10">
             <h2 className="text-xl font-semibold">No products yet</h2>
 
-            <p className="mt-2 text-gray-500">
+            <p className="mt-2 text-sm text-gray-500">
               Start building your catalog by adding your first product.
             </p>
 
             <button
+              type="button"
               onClick={handleAddProduct}
-              className="mt-6 rounded-xl bg-black px-6 py-3 font-medium text-white transition hover:bg-gray-800"
+              className="mt-6 w-full rounded-xl bg-black px-6 py-3 font-medium text-white transition hover:bg-gray-800 sm:w-auto"
             >
               Add Your First Product
             </button>
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Product Cards */}
             {paginatedProducts.map((product) => {
               const totalStock = (product.variants || []).reduce(
                 (sum, variant) => sum + Number(variant.quantity || 0),
@@ -200,117 +214,140 @@ const Products = () => {
                 <div
                   key={product._id}
                   onClick={() => navigate(`/admin/products/${product._id}`)}
-                  className="cursor-pointer rounded-xl border bg-white transition hover:border-black hover:shadow-md"
+                  className="cursor-pointer rounded-xl border bg-white transition hover:border-gray-400 hover:shadow-md"
                 >
-                  <div className="flex flex-wrap items-center gap-4 p-5">
-                    {/* Image */}
-                    <img
-                      src={
-                        product.images?.[0] ||
-                        "https://placehold.co/100x100?text=No+Image"
-                      }
-                      alt={product.name}
-                      className="h-20 w-20 rounded-lg bg-[#f7f5f2] object-contain p-2"
-                    />
+                  <div className="p-4 sm:p-5">
+                    {/* Product Header */}
+                    <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+                      <img
+                        src={
+                          product.images?.[0] ||
+                          "https://placehold.co/100x100?text=No+Image"
+                        }
+                        alt={product.name}
+                        className="h-20 w-20 shrink-0 rounded-lg bg-[#f7f5f2] object-contain p-2 sm:h-24 sm:w-24"
+                      />
 
-                    {/* Product */}
-                    <div className="min-w-[180px] flex-1">
-                      <h2 className="truncate text-lg font-semibold">
-                        {product.name}
-                      </h2>
+                      <div className="min-w-0 flex-1">
+                        <h2 className="break-words text-base font-semibold text-gray-900 sm:text-lg">
+                          {product.name}
+                        </h2>
 
-                      <p className="text-sm text-gray-500">
-                        {product.brand || "No Brand"} •{" "}
-                        {product.category || "Uncategorized"}
-                      </p>
-                    </div>
-
-                    {/* Retail */}
-                    <div className="hidden w-36 shrink-0 text-center md:block">
-                      <p className="text-xs text-gray-500">Retail</p>
-
-                      <p className="font-semibold">
-                        {pricing.minPrice === pricing.maxPrice
-                          ? `$${pricing.minPrice.toFixed(2)}`
-                          : `$${pricing.minPrice.toFixed(2)} – $${pricing.maxPrice.toFixed(2)}`}
-                      </p>
-
-                      {pricing.hasSale && (
-                        <p className="text-xs text-red-600">
-                          Sale price active
+                        <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+                          {product.brand || "No Brand"} •{" "}
+                          {product.category || "Uncategorized"}
                         </p>
-                      )}
 
-                      {pricing.hasVariantPriceOverride && (
-                        <p className="text-xs text-blue-600">
-                          Variant override
+                        <div className="mt-2">
+                          {product.active ? (
+                            <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                              Active
+                            </span>
+                          ) : (
+                            <span className="inline-block rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                              Hidden
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Product Information Grid */}
+                    <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                      {/* Retail */}
+                      <div className="rounded-lg bg-gray-50 p-3">
+                        <p className="text-xs text-gray-500">Retail</p>
+
+                        <p className="mt-1 break-words text-sm font-semibold text-gray-900">
+                          {formatPriceRange(pricing.minPrice, pricing.maxPrice)}
                         </p>
-                      )}
-                    </div>
 
-                    {/* Cost */}
-                    <div className="hidden w-24 text-center lg:block">
-                      <p className="text-xs text-gray-500">Cost</p>
+                        {pricing.hasSale && (
+                          <p className="mt-1 text-xs text-red-600">
+                            Sale price active
+                          </p>
+                        )}
 
-                      <p>${Number(product.cost || 0).toFixed(2)}</p>
-                    </div>
+                        {pricing.hasVariantPriceOverride && (
+                          <p className="mt-1 text-xs text-blue-600">
+                            Variant override
+                          </p>
+                        )}
+                      </div>
 
-                    {/* Profit */}
-                    <div className="hidden w-36 shrink-0 text-center lg:block">
-                      <p className="text-xs text-gray-500">Profit</p>
+                      {/* Cost */}
+                      <div className="rounded-lg bg-gray-50 p-3">
+                        <p className="text-xs text-gray-500">Cost</p>
 
-                      <p
-                        className={`font-semibold ${
-                          pricing.minProfit < 0
-                            ? "text-red-600"
-                            : "text-green-600"
-                        }`}
-                      >
-                        {pricing.minProfit === pricing.maxProfit
-                          ? `$${pricing.minProfit.toFixed(2)}`
-                          : `$${pricing.minProfit.toFixed(2)} – $${pricing.maxProfit.toFixed(2)}`}
-                      </p>
+                        <p className="mt-1 text-sm font-semibold text-gray-900">
+                          ${Number(product.cost || 0).toFixed(2)}
+                        </p>
+                      </div>
 
-                      <p className="text-xs text-gray-500">Before fees</p>
-                    </div>
+                      {/* Profit */}
+                      <div className="rounded-lg bg-gray-50 p-3">
+                        <p className="text-xs text-gray-500">Profit</p>
 
-                    {/* Stock */}
-                    <div className="w-24 text-center">
-                      <p className="text-xs text-gray-500">Stock</p>
+                        <p
+                          className={`mt-1 break-words text-sm font-semibold ${
+                            pricing.minProfit < 0
+                              ? "text-red-600"
+                              : "text-green-600"
+                          }`}
+                        >
+                          {formatPriceRange(
+                            pricing.minProfit,
+                            pricing.maxProfit,
+                          )}
+                        </p>
 
-                      <p className="font-semibold">{totalStock}</p>
-                    </div>
+                        <p className="mt-1 text-xs text-gray-500">
+                          Before fees
+                        </p>
+                      </div>
 
-                    {/* Status */}
-                    <div className="w-24 text-center">
-                      {product.active ? (
-                        <span className="rounded-full bg-green-100 px-3 py-1 text-xs text-green-700">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-red-100 px-3 py-1 text-xs text-red-700">
-                          Hidden
-                        </span>
-                      )}
+                      {/* Stock */}
+                      <div className="rounded-lg bg-gray-50 p-3">
+                        <p className="text-xs text-gray-500">Stock</p>
+
+                        <p className="mt-1 text-sm font-semibold text-gray-900">
+                          {totalStock}
+                        </p>
+                      </div>
+
+                      {/* Status */}
+                      <div className="rounded-lg bg-gray-50 p-3">
+                        <p className="text-xs text-gray-500">Status</p>
+
+                        <p
+                          className={`mt-1 text-sm font-semibold ${
+                            product.active ? "text-green-700" : "text-red-700"
+                          }`}
+                        >
+                          {product.active ? "Active" : "Hidden"}
+                        </p>
+                      </div>
                     </div>
 
                     {/* Actions */}
                     <div
-                      className="flex gap-2"
+                      className="mt-4 flex flex-col gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:justify-end"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
+                        type="button"
                         onClick={() => handleEditProduct(product)}
-                        className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100"
+                        className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100 sm:w-auto sm:py-2"
                       >
-                        Edit
+                        Edit Product
                       </button>
 
                       <button
+                        type="button"
                         onClick={() => handleDeleteProduct(product)}
-                        className="rounded-lg bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-700"
+                        className="w-full rounded-lg bg-red-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-red-700 sm:w-auto sm:py-2"
                       >
-                        Delete
+                        Delete Product
                       </button>
                     </div>
                   </div>
@@ -320,8 +357,8 @@ const Products = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-white px-5 py-4">
-                <p className="text-sm text-gray-500">
+              <div className="flex flex-col gap-4 rounded-xl border bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <p className="text-center text-sm text-gray-500 sm:text-left">
                   Showing{" "}
                   <span className="font-semibold text-gray-900">
                     {(currentPage - 1) * ITEMS_PER_PAGE + 1}
@@ -337,23 +374,25 @@ const Products = () => {
                   products
                 </p>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between gap-2 sm:justify-end">
                   <button
+                    type="button"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none sm:px-4"
                   >
                     Previous
                   </button>
 
-                  <span className="px-2 text-sm text-gray-600">
+                  <span className="whitespace-nowrap px-2 text-xs text-gray-600 sm:text-sm">
                     Page {currentPage} of {totalPages}
                   </span>
 
                   <button
+                    type="button"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="rounded-lg border px-4 py-2 text-sm font-medium transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none sm:px-4"
                   >
                     Next
                   </button>
@@ -371,6 +410,7 @@ const Products = () => {
         )}
       </div>
 
+      {/* Product Modal */}
       <ProductModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}

@@ -8,6 +8,7 @@ import {
   ClipboardList,
   Pencil,
 } from "lucide-react";
+
 import useInventoryHistory from "@/modules/product/hooks/useInventoryHistory";
 
 const reasonStyles = {
@@ -33,32 +34,26 @@ const reasonStyles = {
   },
 };
 
-const InventoryHistoryTable = () => {
-  const { data = [], isLoading } = useInventoryHistory();
-  const today = new Date().toLocaleDateString("en-US", {
+const getFormattedDate = (date) =>
+  new Date(date).toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
     day: "numeric",
     year: "numeric",
   });
 
-  const todayChanges = data.filter((item) => {
-    const today = new Date().toDateString();
+const InventoryHistoryTable = () => {
+  const { data = [], isLoading } = useInventoryHistory();
 
-    return new Date(item.createdAt).toDateString() === today;
-  }).length;
+  const today = getFormattedDate(new Date());
 
   const [openDates, setOpenDates] = useState({
     [today]: true,
   });
+
   const groupedHistory = useMemo(() => {
     return data.reduce((groups, item) => {
-      const date = new Date(item.createdAt).toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      });
+      const date = getFormattedDate(item.createdAt);
 
       if (!groups[date]) {
         groups[date] = [];
@@ -71,58 +66,75 @@ const InventoryHistoryTable = () => {
   }, [data]);
 
   useEffect(() => {
-    const today = new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-
     if (groupedHistory[today]) {
       setOpenDates((prev) => ({
         ...prev,
         [today]: true,
       }));
     }
-  }, [groupedHistory]);
+  }, [groupedHistory, today]);
 
   if (isLoading) {
-    return <p>Loading history...</p>;
+    return (
+      <div className="py-8 text-center text-sm text-gray-500">
+        Loading history...
+      </div>
+    );
+  }
+
+  if (Object.keys(groupedHistory).length === 0) {
+    return (
+      <div className="py-10 text-center">
+        <ClipboardList className="mx-auto mb-3 text-gray-300" size={32} />
+
+        <p className="font-medium text-gray-700">No inventory history yet</p>
+
+        <p className="mt-1 text-sm text-gray-400">
+          Inventory adjustments and movements will appear here.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-5">
+    <div className="min-w-0 space-y-4 sm:space-y-5">
       {Object.entries(groupedHistory).map(([date, items]) => (
         <div
           key={date}
-          className="overflow-hidden rounded-xl border bg-white shadow-sm"
+          className="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
         >
+          {/* Date Header */}
           <button
+            type="button"
             onClick={() =>
               setOpenDates((prev) => ({
                 ...prev,
                 [date]: !prev[date],
               }))
             }
-            className="sticky top-0 z-10 flex w-full items-center justify-between border-b bg-gray-50 px-6 py-4"
+            aria-expanded={Boolean(openDates[date])}
+            className="flex w-full items-center justify-between gap-3 border-b border-gray-100 bg-gray-50 px-3 py-4 text-left transition hover:bg-gray-100 sm:px-6"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               {openDates[date] ? (
-                <ChevronDown size={18} />
+                <ChevronDown size={18} className="shrink-0 text-gray-500" />
               ) : (
-                <ChevronRight size={18} />
+                <ChevronRight size={18} className="shrink-0 text-gray-500" />
               )}
 
-              <h3 className="font-semibold">{date}</h3>
+              <h3 className="text-sm font-semibold text-gray-900 sm:text-base">
+                {date}
+              </h3>
             </div>
 
-            <span className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">
+            <span className="shrink-0 rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">
               {items.length}
             </span>
           </button>
 
+          {/* History Entries */}
           {openDates[date] && (
-            <div className="divide-y">
+            <div className="divide-y divide-gray-100">
               {items.map((item) => {
                 const reason =
                   reasonStyles[item.reason] ||
@@ -133,50 +145,62 @@ const InventoryHistoryTable = () => {
                 return (
                   <div
                     key={item._id}
-                    className="grid grid-cols-[110px_1fr_160px] items-center gap-6 border-t px-6 py-4 hover:bg-gray-50"
+                    className="p-4 transition hover:bg-gray-50 sm:px-6 sm:py-5"
                   >
-                    {/* Time */}
-                    <div className="text-sm font-medium text-gray-500">
-                      {new Date(item.createdAt).toLocaleTimeString([], {
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </div>
+                    {/* Mobile and Desktop Entry */}
+                    <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[100px_minmax(0,1fr)_150px] sm:items-center sm:gap-4 lg:grid-cols-[110px_minmax(0,1fr)_160px] lg:gap-6">
+                      {/* Time */}
+                      <div className="flex items-center gap-2 text-xs font-medium text-gray-500 sm:block sm:text-sm">
+                        <span className="rounded-md bg-gray-100 px-2 py-1 sm:bg-transparent sm:px-0 sm:py-0">
+                          {new Date(item.createdAt).toLocaleTimeString([], {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
 
-                    {/* Product */}
-                    <div>
-                      <p className="font-semibold">{item.productName}</p>
+                      {/* Product Details */}
+                      <div className="min-w-0">
+                        <p className="break-words text-sm font-semibold text-gray-900 sm:text-base">
+                          {item.productName}
+                        </p>
 
-                      <p className="text-sm text-gray-500">
-                        {item.color} • {item.size} • {item.sku}
-                      </p>
+                        <p className="mt-1 break-words text-xs text-gray-500 sm:text-sm">
+                          {[item.color, item.size, item.sku]
+                            .filter(Boolean)
+                            .join(" • ") || "No variant details"}
+                        </p>
 
-                      <p className="mt-1 text-xs text-gray-400">
-                        {item.performedBy?.firstName}
-                        {item.performedBy?.lastName}
-                      </p>
-                    </div>
+                        <p className="mt-1 break-words text-xs text-gray-400">
+                          {[
+                            item.performedBy?.firstName,
+                            item.performedBy?.lastName,
+                          ]
+                            .filter(Boolean)
+                            .join(" ") || "Unknown user"}
+                        </p>
+                      </div>
 
-                    {/* Right Side */}
-                    <div className="flex flex-col items-end gap-2">
-                      <span
-                        className={`text-xl font-bold ${
-                          item.adjustment > 0
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {item.adjustment > 0 ? "+" : ""}
-                        {item.adjustment}
-                      </span>
+                      {/* Adjustment and Reason */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-3 sm:flex-col sm:items-end sm:border-0 sm:pt-0">
+                        <span
+                          className={`text-xl font-bold tabular-nums ${
+                            item.adjustment > 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {item.adjustment > 0 ? "+" : ""}
+                          {item.adjustment}
+                        </span>
 
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs ${
-                          reason.className
-                        }`}
-                      >
-                        {item.reason}
-                      </span>
+                        <span
+                          className={`inline-flex max-w-full items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${reason.className}`}
+                        >
+                          <Icon size={13} />
+                          {item.reason}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );

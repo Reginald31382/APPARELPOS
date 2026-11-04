@@ -13,25 +13,31 @@ const ExportButtons = ({ filters, summary, sales, orders, inventory }) => {
     inventory,
   };
 
+  const buttonStyles =
+    "min-h-11 w-full rounded-lg px-4 py-3 text-sm font-semibold text-white transition sm:w-auto sm:px-5";
+
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-3">
       <button
+        type="button"
         onClick={() => exportCSV(report)}
-        className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white hover:bg-blue-700"
+        className={`${buttonStyles} bg-blue-600 hover:bg-blue-700`}
       >
         Export CSV
       </button>
 
       <button
+        type="button"
         onClick={() => exportExcel(report)}
-        className="rounded-lg bg-green-600 px-5 py-3 font-medium text-white hover:bg-green-700"
+        className={`${buttonStyles} bg-green-600 hover:bg-green-700`}
       >
         Export Excel
       </button>
 
       <button
+        type="button"
         onClick={() => exportPDF(report)}
-        className="rounded-lg bg-gray-900 px-5 py-3 font-medium text-white hover:bg-black"
+        className={`${buttonStyles} bg-gray-900 hover:bg-black`}
       >
         Export PDF
       </button>

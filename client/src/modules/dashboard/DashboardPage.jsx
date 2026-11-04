@@ -12,28 +12,36 @@ const DashboardPage = () => {
   const { data, isLoading } = useDashboard();
 
   if (isLoading) {
-    return <p className="p-8">Loading dashboard...</p>;
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <p className="text-sm text-gray-500 sm:text-base">
+          Loading dashboard...
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-8 p-8">
+    <div className="min-w-0 space-y-5 sm:space-y-7 lg:space-y-8">
       {/* Header */}
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight">Welcome Back 👋</h1>
+      <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
+            Welcome Back 👋
+          </h1>
 
-          <p className="mt-2 text-gray-500">
+          <p className="mt-2 text-sm text-gray-500 sm:text-base">
             Here's what's happening in your store today.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 shadow-sm">
-          <CalendarDays size={18} />
+        <div className="flex w-fit max-w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm shadow-sm sm:px-4 sm:py-3">
+          <CalendarDays size={18} className="shrink-0 text-gray-500" />
 
-          <span className="font-medium">
+          <span className="font-medium text-gray-700">
             {new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "long",
+              weekday: "short",
+              month: "short",
               day: "numeric",
               year: "numeric",
             })}
@@ -42,23 +50,31 @@ const DashboardPage = () => {
       </div>
 
       {/* KPI Cards */}
-      <DashboardGrid stats={data} />
+      <section className="min-w-0">
+        <DashboardGrid stats={data} />
+      </section>
 
-      {/* Charts + Quick Actions */}
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2">
+      {/* Revenue Chart + Quick Actions */}
+      <section className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-3 xl:gap-6">
+        <div className="min-w-0 xl:col-span-2">
           <RevenueSnapshot />
         </div>
 
-        <QuickActions />
-      </div>
+        <div className="min-w-0">
+          <QuickActions />
+        </div>
+      </section>
 
-      {/* Tables */}
-      <div className="grid gap-6 xl:grid-cols-2">
-        <RecentOrders orders={data.recentOrders} />
+      {/* Recent Orders + Low Inventory */}
+      <section className="grid min-w-0 grid-cols-1 gap-4 xl:grid-cols-2 xl:gap-6">
+        <div className="min-w-0">
+          <RecentOrders orders={data?.recentOrders ?? []} />
+        </div>
 
-        <LowInventory products={data.lowInventoryProducts} />
-      </div>
+        <div className="min-w-0">
+          <LowInventory products={data?.lowInventoryProducts ?? []} />
+        </div>
+      </section>
     </div>
   );
 };

@@ -7,11 +7,11 @@ const ReceiptSummaryCards = () => {
   const today = new Date().toDateString();
 
   const todaysReceipts = receipts.filter(
-    (r) => new Date(r.createdAt).toDateString() === today,
+    (receipt) => new Date(receipt.createdAt).toDateString() === today,
   );
 
   const revenue = todaysReceipts.reduce(
-    (sum, receipt) => sum + receipt.total,
+    (sum, receipt) => sum + (Number(receipt.total) || 0),
     0,
   );
 
@@ -38,15 +38,19 @@ const ReceiptSummaryCards = () => {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
       {cards.map((card) => (
         <div
           key={card.title}
-          className="rounded-xl border bg-white p-5 shadow-sm"
+          className="min-w-0 rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5 lg:p-6"
         >
-          <p className="text-sm text-gray-500">{card.title}</p>
+          <p className="text-xs font-medium text-gray-500 sm:text-sm">
+            {card.title}
+          </p>
 
-          <h2 className="mt-2 text-3xl font-bold">{card.value}</h2>
+          <h2 className="mt-2 break-words text-xl font-bold text-gray-900 sm:text-2xl lg:text-3xl">
+            {card.value}
+          </h2>
         </div>
       ))}
     </div>

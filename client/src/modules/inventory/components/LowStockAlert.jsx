@@ -22,12 +22,12 @@ const LowStockAlert = ({ onSelectItem }) => {
 
   if (lowStockItems.length === 0) {
     return (
-      <div className="rounded-xl border bg-green-50 p-6">
-        <h2 className="text-lg font-bold text-green-700">
+      <div className="rounded-xl border border-green-200 bg-green-50 p-4 sm:p-6">
+        <h2 className="text-base font-bold text-green-700 sm:text-lg">
           ✓ No Low Stock Items
         </h2>
 
-        <p className="mt-2 text-green-600">
+        <p className="mt-2 text-sm text-green-600 sm:text-base">
           Everything is sufficiently stocked.
         </p>
       </div>
@@ -35,30 +35,42 @@ const LowStockAlert = ({ onSelectItem }) => {
   }
 
   return (
-    <div className="rounded-xl border bg-white shadow-sm">
-      <div className="border-b p-4">
-        <h2 className="text-xl font-bold text-red-600">⚠ Low Stock Alerts</h2>
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="border-b border-gray-200 p-4 sm:p-5">
+        <h2 className="text-lg font-bold text-red-600 sm:text-xl">
+          ⚠ Low Stock Alerts
+        </h2>
+
+        <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+          {lowStockItems.length} inventory variant
+          {lowStockItems.length !== 1 ? "s" : ""} need attention
+        </p>
       </div>
 
-      <div className="divide-y">
+      <div className="divide-y divide-gray-100">
         {lowStockItems.map((item) => (
-          <div
+          <button
             key={item.id}
-            onClick={() => onSelectItem(item)}
-            className="flex cursor-pointer items-center justify-between p-4 transition hover:bg-gray-50"
+            type="button"
+            onClick={() => onSelectItem?.(item)}
+            className="flex w-full min-w-0 flex-col gap-3 p-4 text-left transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
           >
-            {" "}
-            <div>
-              <h3 className="font-semibold">{item.name}</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="break-words text-sm font-semibold text-gray-900 sm:text-base">
+                {item.name}
+              </h3>
 
-              <p className="text-sm text-gray-500">
-                {item.color} • {item.size}
+              <p className="mt-1 text-xs text-gray-500 sm:text-sm">
+                {item.color || "N/A"} • {item.size || "N/A"}
               </p>
 
-              <p className="text-xs text-gray-400">{item.sku}</p>
+              <p className="mt-1 break-all text-xs text-gray-400">
+                SKU: {item.sku || "N/A"}
+              </p>
             </div>
+
             <span
-              className={`rounded-full px-3 py-1 text-sm font-semibold ${
+              className={`inline-flex w-fit shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold sm:text-sm ${
                 item.quantity === 0
                   ? "bg-red-100 text-red-700"
                   : "bg-yellow-100 text-yellow-700"
@@ -66,7 +78,7 @@ const LowStockAlert = ({ onSelectItem }) => {
             >
               {item.quantity === 0 ? "Out of Stock" : `${item.quantity} Left`}
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

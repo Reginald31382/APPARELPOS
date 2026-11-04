@@ -1,31 +1,49 @@
 const LowInventory = ({ products = [] }) => {
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
-      <h2 className="mb-5 text-xl font-bold">Low Inventory</h2>
+    <div className="min-w-0 rounded-xl border bg-white p-4 shadow-sm sm:p-5 lg:p-6">
+      <div className="mb-4 flex items-center justify-between gap-2 sm:mb-5">
+        <h2 className="text-lg font-bold text-gray-900 sm:text-xl">
+          Low Inventory
+        </h2>
+
+        <span className="text-xs text-gray-500 sm:text-sm">
+          {products.length} {products.length === 1 ? "item" : "items"}
+        </span>
+      </div>
 
       {products.length === 0 ? (
-        <p className="text-gray-500">All inventory levels look good.</p>
+        <div className="rounded-lg bg-gray-50 px-4 py-8 text-center">
+          <p className="text-sm text-gray-500">
+            All inventory levels look good.
+          </p>
+        </div>
       ) : (
         <div className="space-y-3">
           {products.map((product) => {
-            const lowestVariant = product.variants.reduce((lowest, variant) =>
+            const variants = product.variants ?? [];
+
+            if (variants.length === 0) return null;
+
+            const lowestVariant = variants.reduce((lowest, variant) =>
               variant.quantity < lowest.quantity ? variant : lowest,
             );
 
             return (
               <div
                 key={product._id}
-                className="flex items-center justify-between rounded-lg border p-3"
+                className="flex min-w-0 items-center justify-between gap-3 rounded-lg border p-3 sm:p-4"
               >
-                <div>
-                  <p className="font-semibold">{product.name}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-gray-900 sm:text-base">
+                    {product.name}
+                  </p>
 
-                  <p className="text-sm text-gray-500">
+                  <p className="mt-1 truncate text-xs text-gray-500 sm:text-sm">
                     {lowestVariant.color} • {lowestVariant.size}
                   </p>
                 </div>
 
-                <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-700">
+                <span className="shrink-0 rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700 sm:px-3 sm:text-sm">
                   {lowestVariant.quantity} Left
                 </span>
               </div>

@@ -6,19 +6,25 @@ const DashboardCard = ({
   subtitle,
 }) => {
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm transition hover:shadow-md">
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+    <div className="min-w-0 rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md sm:p-5 lg:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-xs font-medium text-gray-500 sm:text-sm">
+            {title}
+          </h3>
 
-          <p className="mt-2 text-3xl font-bold text-gray-900">{value}</p>
+          <p className="mt-2 break-words text-2xl font-bold text-gray-900 sm:text-3xl">
+            {value}
+          </p>
 
-          {subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}
+          {subtitle && (
+            <p className="mt-1 text-xs text-gray-500 sm:text-sm">{subtitle}</p>
+          )}
         </div>
 
         {icon && (
           <div
-            className={`flex h-12 w-12 items-center justify-center rounded-lg ${color}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg sm:h-12 sm:w-12 ${color}`}
           >
             {icon}
           </div>

@@ -1,19 +1,19 @@
 import DashboardCard from "./DashboardCard";
 import { formatCurrency } from "../../../utils/currency";
 
-const DashboardGrid = ({ stats }) => {
+const DashboardGrid = ({ stats = {} }) => {
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
       <DashboardCard
         title="Today's Sales"
-        value={formatCurrency(stats.todaySales)}
+        value={formatCurrency(stats.todaySales ?? 0)}
       />
 
-      <DashboardCard title="Orders Today" value={stats.ordersToday} />
+      <DashboardCard title="Orders Today" value={stats.ordersToday ?? 0} />
 
-      <DashboardCard title="Items Sold" value={stats.itemsSold} />
+      <DashboardCard title="Items Sold" value={stats.itemsSold ?? 0} />
 
-      <DashboardCard title="Low Inventory" value={stats.lowInventory} />
+      <DashboardCard title="Low Inventory" value={stats.lowInventory ?? 0} />
     </div>
   );
 };
