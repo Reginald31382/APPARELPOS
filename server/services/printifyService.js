@@ -1,7 +1,7 @@
 const PRINTIFY_API_URL = "https://api.printify.com/v1";
 
 export async function printifyRequest(path, options = {}) {
-  const token = process.env.PRINTIFY_API_TOKEN;
+  const token = process.env.PRINTIFY_API_TOKEN?.trim();
 
   if (!token) {
     console.error("[PRINTIFY ERROR] Missing PRINTIFY_API_TOKEN");
