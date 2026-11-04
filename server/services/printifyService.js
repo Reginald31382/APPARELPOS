@@ -4,39 +4,56 @@ export async function printifyRequest(path, options = {}) {
   const token = process.env.PRINTIFY_API_TOKEN;
 
   if (!token) {
+    console.error("[PRINTIFY ERROR] Missing PRINTIFY_API_TOKEN");
     throw new Error("PRINTIFY_API_TOKEN is not configured.");
   }
 
-  const response = await fetch(`${PRINTIFY_API_URL}${path}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "User-Agent": "ApparelPOS",
-      Accept: "application/json",
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...options.headers,
-    },
-  });
-
-  const text = await response.text();
-
-  let data;
-
   try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = null;
-  }
+    const response = await fetch(`${PRINTIFY_API_URL}${path}`, {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Agent": "ApparelPOS",
+        Accept: "application/json",
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...options.headers,
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error(
-      data?.message ||
-        data?.error ||
-        `Printify API returned HTTP ${response.status}.`,
-    );
-  }
+    const responseText = await response.text();
 
-  return data;
+    let data;
+
+    try {
+      data = responseText ? JSON.parse(responseText) : null;
+    } catch {
+      data = responseText;
+    }
+
+    if (!response.ok) {
+      console.error("[PRINTIFY API ERROR]", {
+        status: response.status,
+        statusText: response.statusText,
+        path,
+        response: data,
+      });
+
+      throw new Error(
+        data?.message ||
+          data?.error ||
+          `Printify API returned HTTP ${response.status}.`,
+      );
+    }
+
+    return data;
+  } catch (error) {
+    console.error("[PRINTIFY REQUEST FAILED]", {
+      path,
+      message: error.message,
+    });
+
+    throw error;
+  }
 }
 
 export async function getPrintifyShops() {
@@ -47,6 +64,7 @@ export async function getPrintifyProducts() {
   const shopId = process.env.PRINTIFY_SHOP_ID;
 
   if (!shopId) {
+    console.error("[PRINTIFY ERROR] Missing PRINTIFY_SHOP_ID");
     throw new Error("PRINTIFY_SHOP_ID is not configured.");
   }
 
