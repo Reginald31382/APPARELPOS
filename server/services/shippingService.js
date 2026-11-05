@@ -105,6 +105,13 @@ export const getShippingRates = async ({ items, shippingAddress }) => {
   const hasPrintify = printifyItems.length > 0;
   const hasInHouse = inHouseItems.length > 0;
 
+  console.log("[SHIPPING] Fulfillment breakdown:", {
+    printful: hasPrintful,
+    printify: hasPrintify,
+    inHouse: hasInHouse,
+    itemCount: validatedItems.length,
+  });
+
   // Until combined shipping is implemented, do not undercharge mixed carts.
   const supplierTypesPresent = [hasPrintful, hasPrintify, hasInHouse].filter(
     Boolean,

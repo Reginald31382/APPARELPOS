@@ -19,6 +19,9 @@ const CATEGORY_MAP = {
   pants: "pants",
   shorts: "pants",
   accessories: "accessories",
+  hats: "accessories",
+  beanies: "accessories",
+  caps: "accessories",
 };
 
 export const calculatePrintfulShipping = (items) => {
