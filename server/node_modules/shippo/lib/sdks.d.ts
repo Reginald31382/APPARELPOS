@@ -54,7 +54,7 @@ export declare class ClientSDK {
     _createRequest(context: HookContext, conf: RequestConfig, options?: RequestOptions): Result<Request, InvalidRequestError | UnexpectedClientError>;
     _do(request: Request, options: {
         context: HookContext;
-        errorCodes: number | string | (number | string)[];
+        isErrorStatusCode: (statusCode: number) => boolean;
         retryConfig: RetryConfig;
         retryCodes: string[];
     }): Promise<Result<Response, RequestAbortedError | RequestTimeoutError | ConnectionError | UnexpectedClientError>>;

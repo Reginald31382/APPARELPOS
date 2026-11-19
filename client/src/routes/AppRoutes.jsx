@@ -22,6 +22,7 @@ import Inventory from "../pages/admin/Inventory";
 import ReportsPage from "../modules/reports/ReportsPage";
 import Setup from "../pages/auth/Setup";
 import Login from "../pages/auth/Login";
+import ForgotPassword from "../pages/auth/ForgotPassword";
 import Settings from "../pages/admin/Settings";
 import Employees from "../pages/admin/Employees";
 import ReviewPage from "../pages/ReviewPage";
@@ -53,6 +54,7 @@ const AppRoutes = () => {
       {/* Authentication */}
       <Route path="/setup" element={<Setup />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route
         path="/pos"

@@ -12,29 +12,27 @@ export const protect = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    let decoded;
-
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-      // console.log("JWT verification successful:", decoded.id);
-    } catch (error) {
-      // console.error("JWT verification failed:", error.name, error.message);
-      throw error;
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findById(decoded.id).select("-password");
 
-    if (!user) {
+    if (!user || !user.isActive) {
       return res.status(401).json({
-        message: "User not found.",
+        message: "Not authorized.",
+      });
+    }
+
+    // Invalidate tokens issued before the latest password change
+    const tokenVersion = decoded.tokenVersion ?? 0;
+    const currentTokenVersion = user.tokenVersion ?? 0;
+
+    if (tokenVersion !== currentTokenVersion) {
+      return res.status(401).json({
+        message: "Session expired. Please log in again.",
       });
     }
 
     req.user = user;
-
     next();
   } catch (error) {
     return res.status(401).json({

@@ -13,32 +13,33 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _APIPromise_promise, _APIPromise_unwrapped, _a;
+var _APIPromise_instances, _APIPromise_promise, _APIPromise_unwrapped, _APIPromise_getUnwrapped, _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.APIPromise = void 0;
 class APIPromise {
     constructor(p) {
+        _APIPromise_instances.add(this);
         _APIPromise_promise.set(this, void 0);
         _APIPromise_unwrapped.set(this, void 0);
         this[_a] = "APIPromise";
         __classPrivateFieldSet(this, _APIPromise_promise, p instanceof Promise ? p : Promise.resolve(p), "f");
-        __classPrivateFieldSet(this, _APIPromise_unwrapped, p instanceof Promise
-            ? __classPrivateFieldGet(this, _APIPromise_promise, "f").then(([value]) => value)
-            : Promise.resolve(p[0]), "f");
+        __classPrivateFieldSet(this, _APIPromise_unwrapped, p instanceof Promise ? null : Promise.resolve(p[0]), "f");
     }
     then(onfulfilled, onrejected) {
         return __classPrivateFieldGet(this, _APIPromise_promise, "f").then(onfulfilled ? ([value]) => onfulfilled(value) : void 0, onrejected);
     }
     catch(onrejected) {
-        return __classPrivateFieldGet(this, _APIPromise_unwrapped, "f").catch(onrejected);
+        return __classPrivateFieldGet(this, _APIPromise_instances, "m", _APIPromise_getUnwrapped).call(this).catch(onrejected);
     }
     finally(onfinally) {
-        return __classPrivateFieldGet(this, _APIPromise_unwrapped, "f").finally(onfinally);
+        return __classPrivateFieldGet(this, _APIPromise_instances, "m", _APIPromise_getUnwrapped).call(this).finally(onfinally);
     }
     $inspect() {
         return __classPrivateFieldGet(this, _APIPromise_promise, "f");
     }
 }
 exports.APIPromise = APIPromise;
-_APIPromise_promise = new WeakMap(), _APIPromise_unwrapped = new WeakMap(), _a = Symbol.toStringTag;
+_APIPromise_promise = new WeakMap(), _APIPromise_unwrapped = new WeakMap(), _APIPromise_instances = new WeakSet(), _a = Symbol.toStringTag, _APIPromise_getUnwrapped = function _APIPromise_getUnwrapped() {
+    return (__classPrivateFieldSet(this, _APIPromise_unwrapped, __classPrivateFieldGet(this, _APIPromise_unwrapped, "f") ?? __classPrivateFieldGet(this, _APIPromise_promise, "f").then(([value]) => value), "f"));
+};
 //# sourceMappingURL=async.js.map

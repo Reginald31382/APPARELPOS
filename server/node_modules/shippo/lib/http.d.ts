@@ -17,11 +17,11 @@ export type BeforeRequestHook = (req: Request) => Awaitable<Request | void>;
 export type RequestErrorHook = (err: unknown, req: Request) => Awaitable<void>;
 export type ResponseHook = (res: Response, req: Request) => Awaitable<void>;
 export declare class HTTPClient {
-    private options;
     private fetcher;
     private requestHooks;
     private requestErrorHooks;
     private responseHooks;
+    private options;
     constructor(options?: HTTPClientOptions);
     request(request: Request): Promise<Response>;
     /**

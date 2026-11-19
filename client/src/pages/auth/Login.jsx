@@ -6,11 +6,9 @@ import useLogin from "../../modules/auth/hooks/useLogin";
 
 const Login = () => {
   const { data, isLoading } = useSetup();
-
   const { mutate, isPending, error } = useLogin();
 
   const [email, setEmail] = useState("");
-
   const [password, setPassword] = useState("");
 
   if (isLoading) {
@@ -23,22 +21,19 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    mutate({
-      email,
-      password,
-    });
+    mutate({ email, password });
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg"
+        className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg"
       >
-        <Link to="/" className="absolute top-4 left-4 text-2xl">
+        <Link to="/" className="absolute left-4 top-4 text-2xl">
           <MdOutlineCancel />
         </Link>
+
         <h1 className="mb-6 text-center text-3xl font-bold">
           J.Rome POS Login
         </h1>
@@ -46,6 +41,7 @@ const Login = () => {
         <input
           type="email"
           placeholder="Email"
+          required
           className="mb-4 w-full rounded-lg border p-3"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -54,10 +50,20 @@ const Login = () => {
         <input
           type="password"
           placeholder="Password"
-          className="mb-6 w-full rounded-lg border p-3"
+          required
+          className="mb-2 w-full rounded-lg border p-3"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        <div className="mb-6 flex justify-end">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-gray-600 transition hover:text-black hover:underline"
+          >
+            Forgot Password?
+          </Link>
+        </div>
 
         {error && (
           <p className="mb-4 text-sm text-red-600">

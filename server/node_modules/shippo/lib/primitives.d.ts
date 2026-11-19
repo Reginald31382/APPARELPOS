@@ -23,4 +23,5 @@ export declare function compactMap<T>(values: Record<string, T | undefined>): Re
 export declare function allRequired<V extends Record<string, unknown>>(v: V): {
     [K in keyof V]: NonNullable<V[K]>;
 } | undefined;
+export declare function isPlainObject(value: unknown): value is Record<string, unknown>;
 //# sourceMappingURL=primitives.d.ts.map

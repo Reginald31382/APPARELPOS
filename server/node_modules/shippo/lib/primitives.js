@@ -9,6 +9,7 @@ exports.combineSignals = combineSignals;
 exports.abortSignalAny = abortSignalAny;
 exports.compactMap = compactMap;
 exports.allRequired = allRequired;
+exports.isPlainObject = isPlainObject;
 class InvariantError extends Error {
     constructor(message) {
         super(message);
@@ -107,5 +108,22 @@ function allRequired(v) {
         return void 0;
     }
     return v;
+}
+function isPlainObject(value) {
+    if (value === null || typeof value !== "object")
+        return false;
+    if (Object.prototype.toString.call(value) !== "[object Object]")
+        return false;
+    const proto = Object.getPrototypeOf(value);
+    if (proto === null || proto === Object.prototype)
+        return true;
+    // cross-realm plain objects (vm contexts, iframes) inherit from a
+    // different realm's Object.prototype, which itself has a null prototype
+    try {
+        return Object.getPrototypeOf(proto) === null;
+    }
+    catch {
+        return false;
+    }
 }
 //# sourceMappingURL=primitives.js.map

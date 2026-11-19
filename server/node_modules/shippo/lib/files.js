@@ -5,6 +5,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readableStreamToArrayBuffer = readableStreamToArrayBuffer;
 exports.getContentTypeFromFileName = getContentTypeFromFileName;
+exports.bytesToBlob = bytesToBlob;
 /**
  * Consumes a stream and returns a concatenated array buffer. Useful in
  * situations where we need to read the whole file because it forms part of a
@@ -73,5 +74,23 @@ function getContentTypeFromFileName(fileName) {
         otf: "font/otf",
     };
     return mimeTypes[ext] || null;
+}
+/**
+ * Creates a Blob from file content with the given MIME type.
+ *
+ * Node.js Buffers are Uint8Array subclasses that may share a pooled
+ * ArrayBuffer (byteOffset > 0, byteLength < buffer.byteLength). Passing
+ * such a Buffer directly to `new Blob([buf])` can include the entire
+ * underlying pool on some runtimes, producing a Blob with extra bytes
+ * that corrupts multipart uploads.
+ *
+ * Copying into a standalone Uint8Array ensures the Blob receives only the
+ * intended bytes regardless of runtime behaviour.
+ */
+function bytesToBlob(content, contentType) {
+    if (content instanceof Uint8Array) {
+        return new Blob([new Uint8Array(content)], { type: contentType });
+    }
+    return new Blob([content], { type: contentType });
 }
 //# sourceMappingURL=files.js.map
