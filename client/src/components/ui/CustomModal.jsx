@@ -75,7 +75,7 @@ const CustomModal = () => {
                 Phone
               </p>
 
-              <p className="text-sm font-medium text-gray-900">313-474-1286</p>
+              <p className="text-sm font-medium text-gray-900">734-879-8512</p>
             </div>
           </a>
         </div>
